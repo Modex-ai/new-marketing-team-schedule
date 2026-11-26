@@ -518,6 +518,10 @@ table.lbt tr.tot td{font-weight:700;background:var(--pale-3);border-bottom:none}
 .cbar{height:8px;background:var(--line-2);border-radius:9px;overflow:hidden;display:flex}
 .cbar i{display:block;height:100%;background:var(--ok)}
 .cbar i.miss{background:#E7A3AA}
+.cbar i.late{background:#E3B06A}.cbar i.unk{background:#A9C9B4}
+.spd{display:flex;height:10px;width:120px;border-radius:9px;overflow:hidden;margin-left:auto;background:var(--line-2,#ECE7DE)}
+.spd i{display:block;height:100%}.spd .b0{background:var(--ok)}.spd .b1{background:#E3B06A}.spd .b2{background:#D9825B}.spd .b3{background:#B4233A}
+.subm{font-size:11.5px;white-space:nowrap}.subm.ok{color:var(--ok)}.subm.late{color:var(--warn)}.subm.na{color:var(--muted)}
 .crow .ms{font-size:11.5px;color:var(--bad);margin-top:5px;white-space:normal}
 .crow .cpc{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--deep);text-align:right;min-width:62px}
 .crow .cpc small{display:block;font-family:var(--sans);font-size:10.5px;color:var(--muted);font-weight:500}
@@ -936,7 +940,7 @@ const DEFAULT_SOURCES = [
 const DEFAULT_DATA = {
   version: 1,
   updatedAt: null,
-  settings: { weekStart: 0, startDate: "2026-11-22", dayStart: "03:00" },
+  settings: { weekStart: 0, startDate: "2026-11-22", dayStart: "03:00", reportGrace: 60 },
   members: SEED_MEMBERS.map(([id, name, code], k) => ({ id, name, code, color: PALETTE[k % PALETTE.length] })),
   shiftTypes: [
     { id: "morning", name: "Morning", color: "#F0B84A", kind: "work", icon: "sun", time: "11:00-19:00", track: true },
@@ -1043,6 +1047,25 @@ function cellAt(D, mid, i) {
   const off = ty.kind === "off", r = off ? null : tRange(c.t);
   return { ty, resp: off ? null : respById(D, c.r), t: off ? "" : c.t || "", n: c.n || "", off, work: !off, s: r ? i * 1440 + r.s : null, e: r ? i * 1440 + r.e : null, dur: r ? r.dur : 0, i };
 }
+// an ISO timestamp as Cairo wall-clock minutes (same scale as cellAt's s / e)
+function isoAbs(iso) {
+  const p = Object.fromEntries(cairoFmt.formatToParts(new Date(iso)).map((x) => [x.type, x.value]));
+  return dIdx(`${p.year}-${p.month}-${p.day}`) * 1440 + (+p.hour % 24) * 60 + +p.minute + +p.second / 60;
+}
+const graceOf = (D) => Math.max(0, +(D.settings.reportGrace ?? 60) || 0);
+// when the shift ends; a work day with no time set ends when the day switches over
+const shiftEnd = (D, c) => (c.e != null ? c.e : (c.i + 1) * 1440 + dayStartMin(D));
+// "42 min", "2h 10m", "3d 4h" after the shift ended
+function fmtDelay(m) {
+  if (m == null) return "—";
+  if (m <= 0) return "before shift end";
+  m = Math.round(m);
+  if (m < 60) return `${m} min`;
+  if (m < 1440) return `${Math.floor(m / 60)}h${m % 60 ? " " + (m % 60) + "m" : ""}`;
+  const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60);
+  return `${d}d${h ? " " + h + "h" : ""}`;
+}
+const median = (L) => { if (!L.length) return null; const x = L.slice().sort((a, b) => a - b), k = Math.floor(x.length / 2); return x.length % 2 ? x[k] : (x[k - 1] + x[k]) / 2; };
 const dayNote = (D, i) => { const ws = wkStart(D, i), w = weekAt(D, ws); return w ? (w.notes || {})[i - ws] || "" : ""; };
 const trackedTypes = (D) => D.shiftTypes.filter((t) => t.kind === "work" && t.track !== false);
 const trackedResps = (D) => D.responsibilities.filter((r) => r.track);
@@ -1703,6 +1726,11 @@ function repModel() {
       p.first = rep.length ? rep[0].i : null;
       const aovs = p.rows.filter((r) => r.orders > 0 && r.sales > 0).map((r) => r.sales / r.orders).sort((a, b) => a - b);
       p.medAov = aovs.length ? aovs[Math.floor(aovs.length / 2)] : null;
+      // submission times recorded by the Apps Script edit trigger
+      p.stamps = {};
+      for (const [d, o] of Object.entries(sh.stamps || {})) if (o && o.f) p.stamps[dIdx(d)] = { f: isoAbs(o.f), l: o.l ? isoAbs(o.l) : null, n: o.n || 0, x: !!o.x };
+      p.stampSince = sh.stampSince ? isoAbs(sh.stampSince) : null;
+      for (const r of p.rows) r.st = p.stamps[r.i] || null;
     }
     return p;
   });
@@ -1853,26 +1881,49 @@ function agg(rows, a, b, shift = RS.shift) {
   t.exchRate = t.orders ? t.exch / t.orders : null;
   return t;
 }
-// Scheduled working days (from the Weekly Schedule, up to yesterday) vs days with a report.
+// Scheduled working days (from the Weekly Schedule) vs days with a report.
 // Days with an approved excuse / day-off change don't count; neither do days before her sheet started.
+// Each scheduled work day is due `reportGrace` minutes (default 60) after her shift ends.
+//   on time = written before the deadline · late = written after it · missing = deadline passed, nothing written
+// Times come from the Apps Script edit trigger. Reports written before it was installed count as "time not recorded",
+// and the on-time rate only covers days due after recording started (so months of history don't read as 0%).
 function compliance(D, p, a, b, t, shift = RS.shift) {
-  const out = { expected: 0, done: 0, missing: [], offLogged: [], excused: [], schedDays: 0 };
+  const out = { expected: 0, done: 0, missing: [], offLogged: [], excused: [], schedDays: 0, onTime: 0, late: [], unknown: 0, pending: 0, delays: [], buckets: [0, 0, 0, 0], edited: 0, median: null, known: 0, missTimed: 0, timed: 0, rate: null };
   if (!p.m) return out;
   const byI = Object.fromEntries(p.rows.map((r) => [r.i, r]));
   const exc = new Set((D.requests || []).filter((r) => r.member === p.m.id && EXCUSED.has(r.type) && r.status !== "rejected").map((r) => dIdx(r.date)));
-  for (let i = a; i <= Math.min(b, t - 1); i++) {
-    if (weekAt(D, wkStart(D, i))) out.schedDays++;
+  const now = cairoNow().abs, g = graceOf(D), since = p.stampSince;
+  for (let i = a; i <= Math.min(b, t + 1); i++) {
+    if (i <= t && weekAt(D, wkStart(D, i))) out.schedDays++;
     if (p.first != null && i < p.first) continue;
     const c = cellAt(D, p.m.id, i);
     if (!c || !c.work) continue;
     if (shift && c.ty.name !== shift) continue;
     if (exc.has(i)) { out.excused.push(i); continue; }
+    const end = shiftEnd(D, c), due = end + g, r = byI[i], rep = !!(r && (r.hasNums || r.fb)), st = rep && r.st ? r.st : null;
+    if (!rep && now < due) { out.pending++; continue; } // shift not over yet, or still inside the grace period
     out.expected++;
-    const r = byI[i];
-    if (r && (r.hasNums || r.fb)) out.done++;
-    else { out.missing.push(i); if (r && r.off) out.offLogged.push(i); }
+    if (!rep) { out.missing.push(i); if (r && r.off) out.offLogged.push(i); if (since != null && due >= since) out.missTimed++; continue; }
+    out.done++;
+    if (!st) { out.unknown++; continue; }
+    const delay = st.f - end;
+    out.known++; out.delays.push(delay);
+    if (st.f <= due) out.onTime++; else out.late.push({ i, d: delay });
+    out.buckets[delay <= g ? 0 : delay <= 120 ? 1 : delay <= 1440 ? 2 : 3]++;
+    if (st.l != null && st.l - st.f > 360) out.edited++;
   }
+  out.median = median(out.delays);
+  out.timed = out.known + out.missTimed;
+  out.rate = out.timed ? out.onTime / out.timed : null;
   return out;
+}
+// "3:42 PM · 42 min after" for the profile's day table
+function subCell(D, p, r) {
+  if (!(r.hasNums || r.fb)) return `<span class="subm na">—</span>`;
+  if (!r.st) return `<span class="subm na" title="Written before time tracking started">not recorded</span>`;
+  const c = p.m ? cellAt(D, p.m.id, r.i) : null, d = c && c.work ? r.st.f - shiftEnd(D, c) : null, late = d != null && d > graceOf(D);
+  const day = Math.floor(r.st.f / 1440);
+  return `<span class="subm ${d == null ? "" : late ? "late" : "ok"}">${day !== r.i ? DY[wdOf(day)] + " " : ""}${fmtT(r.st.f)}${d == null ? "" : ` · ${fmtDelay(d)}${d > 0 ? " after" : ""}`}${r.st.l != null && r.st.l - r.st.f > 360 ? ` · edited ${dmy(Math.floor(r.st.l / 1440))}` : ""}</span>`;
 }
 const byMonth = (list) => { const g = {}; for (const i of list) { const d = new Date(i * 864e5), k = MON[d.getUTCMonth()] + " " + d.getUTCFullYear(); (g[k] = g[k] || []).push(i); } return g; };
 const daysTxt = (list, max) => { const L = max ? list.slice(-max) : list; return L.map((i) => `${DY[wdOf(i)]} ${new Date(i * 864e5).getUTCDate()}`).join(", "); };
@@ -1918,7 +1969,8 @@ function renderReports() {
     <div class="kpi"><div class="l">Items per order</div><div class="v">${T.ipo == null ? "—" : nf2.format(T.ipo)}</div>${X(T.ipo, P.ipo)}</div>
     <div class="kpi"><div class="l">Refund rate</div><div class="v">${fPct(T.refundRate)}<small>· ${fN(T.refunds)}</small></div>${X(T.refundRate, P.refundRate, true, true)}</div>
     <div class="kpi"><div class="l">Exchange rate</div><div class="v">${fPct(T.exchRate)}<small>· ${fN(T.exch)}</small></div>${X(T.exchRate, P.exchRate, true, true)}</div>
-    <div class="kpi"><div class="l">Reports on scheduled days</div><div class="v ${exp && done < exp ? "bad" : exp ? "ok" : ""}">${exp ? fPct(done / exp, 0) : "—"}<small>${exp ? `· ${done}/${exp}` : ""}</small></div><div class="dl ${exp - done ? "bad" : "flat"}">${exp ? `${exp - done} missing report${exp - done === 1 ? "" : "s"}` : "No scheduled days in this period"}</div></div></div>`;
+    ${(() => { const ot = people.reduce((x, p) => x + p.comp.onTime, 0), kn = people.reduce((x, p) => x + p.comp.timed, 0), ms = people.reduce((x, p) => x + p.comp.missing.length, 0), lt = people.reduce((x, p) => x + p.comp.late.length, 0);
+      return `<div class="kpi"><div class="l">Reports on time</div><div class="v ${kn && ot < kn ? "bad" : kn ? "ok" : ""}">${kn ? fPct(ot / kn, 0) : "—"}<small>${kn ? `· ${ot}/${kn}` : ""}</small></div><div class="dl ${ms || lt ? "bad" : "flat"}">${exp ? `${done}/${exp} submitted · ${ms} missing · ${lt} late` : "No due reports in this period"}</div></div>`; })()}</div>`;
   h += `<section class="card"><div class="sh"><div><div class="eyebrow">Team Reports · Sales Performance</div><h2>${rngTxt(a, b)}</h2><div class="sub">Daily sales from ${sales.length} team sheet${sales.length === 1 ? "" : "s"}${RS.shift ? ` · ${esc(RS.shift)} shifts` : ""}</div></div></div>
     ${b - a > 400 ? monthBarsSVG(sales, a, b) : trendSVG(sales, a, b)}</section>`;
   // leaderboard
@@ -1943,19 +1995,26 @@ function renderReports() {
   // report discipline
   const withSched = people.filter((p) => p.m);
   const firstWeek = Object.keys(D.weeks).sort()[0];
-  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Discipline · checked against the Weekly Schedule</div><h2>Report Submission</h2><div class="sub">Every day she was scheduled to work in this period (up to yesterday) vs the days she wrote a report. Days off, approved excuses and days before her sheet started aren't counted.${firstWeek ? ` Schedule available from ${dmy(dIdx(firstWeek), 1)}.` : ""}</div></div></div>
-    <div class="lbw"><table class="lbt ctb"><thead><tr><th>Team member</th><th>Rate</th><th>Scheduled</th><th>Reported</th><th>Missing</th><th>Logged “Off” on a work day</th><th>Excused</th><th>Last report</th><th></th></tr></thead><tbody>`;
+  const G = graceOf(D), since = Math.min(...people.map((p) => p.stampSince ?? Infinity));
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Discipline · checked against the Weekly Schedule</div><h2>Report Submission &amp; Speed</h2><div class="sub">Each scheduled work day is due <b>${fmtDelay(G)} after her shift ends</b>. Written before that = on time · after = late · nothing by then = missing. Days off, approved excuses and days before her sheet started aren't counted.${firstWeek ? ` Schedule available from ${dmy(dIdx(firstWeek), 1)}.` : ""} ${isFinite(since) ? `Submission times recorded since ${dmy(Math.floor(since / 1440), 1)} — the on-time rate covers days from then on.` : `<b>Submission times start recording once the updated Apps Script is installed.</b>`}</div></div></div>
+    <div class="lbw"><table class="lbt ctb"><thead><tr><th>Team member</th><th>Submitted</th><th>On-time rate</th><th>Due</th><th>On time</th><th>Late</th><th>Missing</th><th>Typical time after shift</th><th>Speed</th><th>Excused</th><th>Last report</th><th></th></tr></thead><tbody>`;
   h += withSched.map((p) => {
-    const c = p.comp, pc = c.expected ? c.done / c.expected : null, open = RS.compOpen[p.key];
-    const miss = byMonth(c.missing);
-    return `<tr><td><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${p.first != null ? "Sheet since " + dmy(p.first, 1) : "No reports yet"}</small></div></div></td>
-      <td style="min-width:170px"><div class="row" style="gap:10px;flex-wrap:nowrap;justify-content:flex-end"><div class="cbar" style="width:110px">${c.expected ? `<i style="width:${(pc * 100).toFixed(1)}%"></i><i class="miss" style="width:${(100 - pc * 100).toFixed(1)}%"></i>` : ""}</div><b class="cpc2 ${pc == null ? "" : pc >= 0.95 ? "ok" : pc >= 0.8 ? "warn" : "bad"}">${pc == null ? "—" : Math.round(pc * 100) + "%"}</b></div></td>
-      <td>${c.expected}</td><td>${c.done}</td><td>${c.missing.length ? `<b style="color:var(--bad)">${c.missing.length}</b>` : "0"}</td><td>${c.offLogged.length || "0"}</td><td>${c.excused.length || "0"}</td>
+    const c = p.comp, open = RS.compOpen[p.key], tot = c.expected;
+    const w = (n) => (tot ? ((n / tot) * 100).toFixed(1) : 0), pc = tot ? c.done / tot : null;
+    const bk = c.buckets, bt = bk.reduce((x, y) => x + y, 0);
+    return `<tr><td><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${p.first != null ? "Sheet since " + dmy(p.first, 1) : "No reports yet"}${c.pending ? ` · ${c.pending} due soon` : ""}</small></div></div></td>
+      <td style="min-width:170px"><div class="row" style="gap:10px;flex-wrap:nowrap;justify-content:flex-end"><div class="cbar" style="width:110px" title="On time ${c.onTime} · late ${c.late.length} · time not recorded ${c.unknown} · missing ${c.missing.length}">${tot ? `<i style="width:${w(c.onTime)}%"></i><i class="unk" style="width:${w(c.unknown)}%"></i><i class="late" style="width:${w(c.late.length)}%"></i><i class="miss" style="width:${w(c.missing.length)}%"></i>` : ""}</div><b class="cpc2 ${pc == null ? "" : pc >= 0.95 ? "ok" : pc >= 0.8 ? "warn" : "bad"}">${pc == null ? "—" : Math.round(pc * 100) + "%"}</b></div></td>
+      <td><b class="cpc2 ${c.rate == null ? "" : c.rate >= 0.95 ? "ok" : c.rate >= 0.8 ? "warn" : "bad"}" style="font-size:16px">${c.rate == null ? "—" : Math.round(c.rate * 100) + "%"}</b></td>
+      <td>${c.expected}</td><td>${c.onTime}${c.unknown ? `<small class="muted" title="Written before time tracking started"> +${c.unknown} n/r</small>` : ""}</td><td>${c.late.length ? `<b style="color:var(--warn)">${c.late.length}</b>` : "0"}</td><td>${c.missing.length ? `<b style="color:var(--bad)">${c.missing.length}</b>` : "0"}</td>
+      <td>${c.median == null ? (c.unknown ? `<span class="muted" title="Written before time tracking started">not recorded</span>` : "—") : `<b>${fmtDelay(c.median)}</b>`}</td>
+      <td>${bt ? `<div class="spd" title="≤ ${fmtDelay(G)}: ${bk[0]} · up to 2h: ${bk[1]} · same day: ${bk[2]} · 1 day+: ${bk[3]}">${bk.map((n, k) => (n ? `<i class="b${k}" style="flex:${n}"></i>` : "")).join("")}</div>` : `<span class="muted">—</span>`}</td>
+      <td>${c.excused.length || "0"}</td>
       <td>${p.last == null ? "—" : dmy(p.last, true)}</td>
-      <td>${c.missing.length ? `<button class="btn sm ghost" data-act="repCompOpen" data-k="${esc(p.key)}">${open ? "Hide days" : "Show days"}</button>` : ""}</td></tr>
-      ${open && c.missing.length ? `<tr class="cdays"><td colspan="9">${Object.entries(miss).map(([mn, L]) => `<div><b>${mn}</b> · ${L.length} day${L.length === 1 ? "" : "s"}: ${L.map((i) => `<span class="${c.offLogged.includes(i) ? "offl" : ""}">${DY[wdOf(i)]} ${new Date(i * 864e5).getUTCDate()}</span>`).join(", ")}</div>`).join("")}${c.offLogged.length ? `<div class="muted" style="font-size:11.5px;margin-top:4px">Underlined days: she wrote “off” in her sheet but the schedule has her working.</div>` : ""}</td></tr>` : ""}`;
-  }).join("") || `<tr><td colspan="9" class="muted" style="text-align:left">Link each sheet to a team member (Manage → Reports) to track submissions.</td></tr>`;
-  h += `</tbody></table></div></section>`;
+      <td>${c.missing.length || c.late.length ? `<button class="btn sm ghost" data-act="repCompOpen" data-k="${esc(p.key)}">${open ? "Hide days" : "Show days"}</button>` : ""}</td></tr>
+      ${open && (c.missing.length || c.late.length) ? `<tr class="cdays"><td colspan="12">${Object.entries(byMonth(c.missing)).map(([mn, L]) => `<div><b style="color:var(--bad)">Missing · ${mn}</b> · ${L.length} day${L.length === 1 ? "" : "s"}: ${L.map((i) => `<span class="${c.offLogged.includes(i) ? "offl" : ""}">${DY[wdOf(i)]} ${new Date(i * 864e5).getUTCDate()}</span>`).join(", ")}</div>`).join("")}${c.late.length ? `<div><b style="color:var(--warn)">Late</b> · ${c.late.slice().sort((x, y) => y.d - x.d).map((x) => `${DY[wdOf(x.i)]} ${dmy(x.i)} (${fmtDelay(x.d)} after shift)`).join(", ")}</div>` : ""}${c.offLogged.length ? `<div class="muted" style="font-size:11.5px;margin-top:4px">Underlined days: she wrote “off” in her sheet but the schedule has her working.</div>` : ""}</td></tr>` : ""}`;
+  }).join("") || `<tr><td colspan="12" class="muted" style="text-align:left">Link each sheet to a team member (Manage → Reports) to track submissions.</td></tr>`;
+  h += `</tbody></table></div>
+    <div class="legend2" style="margin-top:12px"><span><i style="--c:var(--ok)"></i>Within ${fmtDelay(G)}</span><span><i style="--c:#E3B06A"></i>Up to 2h</span><span><i style="--c:#D9825B"></i>Same day</span><span><i style="--c:#B4233A"></i>1 day or more</span><span><i style="--c:#A9C9B4"></i>Submitted, time not recorded</span></div></section>`;
   // shifts + quality
   const shifts = Object.entries(T.byShift).sort((x, y) => y[1].sales - x[1].sales);
   const flags = qualityFlags(D, people, a, b, t);
@@ -2066,13 +2125,13 @@ function repDetail(key, tab) {
     const X = (x, y, l, pt) => (cmp ? dlt(x, y, l, pt) : "");
     const rows = p.rows.filter((r) => r.i >= a && r.i <= b && (!RS.shift || r.sk === RS.shift)).sort((x, y) => y.i - x.i);
     const recs = (D.requests || []).filter((r) => r.member === p.src.memberId && p.src.memberId && dIdx(r.date) >= a && dIdx(r.date) <= b);
-    const mk = [["Sales", `EGP ${fN(c.sales)}`, X(c.sales, pv.sales)], ["Orders", fN(c.orders), X(c.orders, pv.orders)], ["AOV", `EGP ${fN(c.aov)}`, X(c.aov, pv.aov)], ["Items / order", c.ipo == null ? "—" : nf2.format(c.ipo), X(c.ipo, pv.ipo)], ["Refund rate", fPct(c.refundRate), X(c.refundRate, pv.refundRate, true, true)], ["Reports", cp.expected ? `${cp.done}/${cp.expected}` : "—", cp.missing.length ? `<div class="dl bad">${cp.missing.length} missing</div>` : ""]];
+    const mk = [["Sales", `EGP ${fN(c.sales)}`, X(c.sales, pv.sales)], ["Orders", fN(c.orders), X(c.orders, pv.orders)], ["AOV", `EGP ${fN(c.aov)}`, X(c.aov, pv.aov)], ["Items / order", c.ipo == null ? "—" : nf2.format(c.ipo), X(c.ipo, pv.ipo)], ["Refund rate", fPct(c.refundRate), X(c.refundRate, pv.refundRate, true, true)], ["Reports on time", cp.timed ? `${cp.onTime}/${cp.timed}` : cp.expected ? `${cp.done}/${cp.expected}` : "—", cp.missing.length || cp.late.length ? `<div class="dl bad">${cp.late.length} late · ${cp.missing.length} missing</div>` : cp.median != null ? `<div class="dl good">typical ${fmtDelay(cp.median)} after shift</div>` : cp.expected ? `<div class="dl flat">${cp.done}/${cp.expected} submitted</div>` : ""]];
     const missSet = new Set(cp.missing);
     body = `${p.kind === "metrics" ? `<div class="mk">${mk.map(([l, v, d]) => `<div><span>${l}</span><b>${v}</b>${d}</div>`).join("")}</div>` : ""}
     ${recs.length ? `<div class="panel"><h4>Records in this period</h4>${recs.map((r) => `<div style="font-size:13px;padding:4px 0"><span class="tp ${r.type}">${esc(REQ_TYPES[r.type] || r.type)}</span> ${DY[wdOf(dIdx(r.date))]} ${dmy(dIdx(r.date))}${isAdj(r) ? ` · <b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "")}` : ""}${r.details ? ` — ${esc(r.details)}` : ""} <span class="ss ${stClass(r)}">${stLabel(r)}</span></div>`).join("")}</div>` : ""}
     ${cp.missing.length ? `<div class="banner warn" style="margin-bottom:12px"><b>Missing reports (${cp.missing.length}):</b> ${daysTxt(cp.missing)}</div>` : ""}
-    <div class="tw"><table><thead><tr><th>Day</th><th>Shift</th>${p.kind === "metrics" ? `<th>Sales</th><th>Orders</th><th>Items</th><th>AOV</th><th>OOS</th><th>Refunds</th><th>Exch.</th>` : ""}<th style="text-align:left">Feedback</th></tr></thead><tbody>
-    ${rows.map((r) => `<tr class="${r.off ? "off" : ""}"><td>${DY[wdOf(r.i)]} ${dmy(r.i)}</td><td>${esc(r.shift || "—")}</td>${p.kind === "metrics" ? `<td><b>${fN(r.sales)}</b></td><td>${fN(r.orders)}</td><td>${fN(r.items)}</td><td>${r.orders ? fN(r.sales / r.orders) : "—"}</td><td>${fN(r.oos)}</td><td>${fN(r.refunds)}</td><td>${fN(r.exch)}</td>` : ""}<td class="f" dir="auto">${esc(r.fb)}</td></tr>`).join("") || `<tr><td colspan="10" class="muted">Nothing logged in this period.</td></tr>`}</tbody></table></div>`;
+    <div class="tw"><table><thead><tr><th>Day</th><th>Shift</th><th>Submitted</th>${p.kind === "metrics" ? `<th>Sales</th><th>Orders</th><th>Items</th><th>AOV</th><th>OOS</th><th>Refunds</th><th>Exch.</th>` : ""}<th style="text-align:left">Feedback</th></tr></thead><tbody>
+    ${rows.map((r) => `<tr class="${r.off ? "off" : ""}"><td>${DY[wdOf(r.i)]} ${dmy(r.i)}</td><td>${esc(r.shift || "—")}</td><td>${subCell(D, p, r)}</td>${p.kind === "metrics" ? `<td><b>${fN(r.sales)}</b></td><td>${fN(r.orders)}</td><td>${fN(r.items)}</td><td>${r.orders ? fN(r.sales / r.orders) : "—"}</td><td>${fN(r.oos)}</td><td>${fN(r.refunds)}</td><td>${fN(r.exch)}</td>` : ""}<td class="f" dir="auto">${esc(r.fb)}</td></tr>`).join("") || `<tr><td colspan="10" class="muted">Nothing logged in this period.</td></tr>`}</tbody></table></div>`;
     void missSet;
   } else {
     const H = profileData(D, p, t);
@@ -2095,7 +2154,7 @@ function repDetail(key, tab) {
       const shiftRows = Object.entries(L.byShift).sort((x, y) => y[1].sales - x[1].sales);
       body = `<div class="pf-h"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><div class="pf-n">${esc(p.name)}${former ? ` <span class="stale warn">Former</span>` : ""}</div><div class="muted">${p.code ? "ID " + esc(p.code) + " · " : ""}Since ${dmy(H.start, 1)} · ${tenure(H.start, t)} · ${H.schedDays} scheduled work days · ${H.offDays} days off</div></div>
         <div class="pf-r"><span>Last report</span><b>${p.last == null ? "Never" : dmy(p.last, 1)}</b></div></div>
-      ${p.kind === "metrics" ? `<div class="mk">${[["Lifetime sales", `EGP ${fN(L.sales)}`, `${fN(L.orders)} orders · ${fN(L.items)} items`], ["Average order value", `EGP ${fN(L.aov)}`, `${L.ipo == null ? "—" : nf2.format(L.ipo)} items per order`], ["Avg daily sales", `EGP ${fN(L.avgDaily)}`, `${L.selling} selling days`], ["Refund rate", fPct(L.refundRate), `${fN(L.refunds)} refunds`], ["Exchange rate", fPct(L.exchRate), `${fN(L.exch)} exchanges · ${fN(L.oos)} OOS`], ["Report discipline", rate == null ? "—" : fPct(rate, 0), cp.expected ? `${cp.done}/${cp.expected} days · ${cp.missing.length} missing` : "No scheduled days"]].map(([l, v, s]) => `<div><span>${l}</span><b>${v}</b><small>${s}</small></div>`).join("")}</div>` : `<div class="mk"><div><span>Report discipline</span><b>${rate == null ? "—" : fPct(rate, 0)}</b><small>${cp.done}/${cp.expected} days</small></div><div><span>Feedback notes</span><b>${H.fbRows.length}</b><small>since ${dmy(H.start, 1)}</small></div></div>`}
+      ${p.kind === "metrics" ? `<div class="mk">${[["Lifetime sales", `EGP ${fN(L.sales)}`, `${fN(L.orders)} orders · ${fN(L.items)} items`], ["Average order value", `EGP ${fN(L.aov)}`, `${L.ipo == null ? "—" : nf2.format(L.ipo)} items per order`], ["Avg daily sales", `EGP ${fN(L.avgDaily)}`, `${L.selling} selling days`], ["Refund rate", fPct(L.refundRate), `${fN(L.refunds)} refunds`], ["Exchange rate", fPct(L.exchRate), `${fN(L.exch)} exchanges · ${fN(L.oos)} OOS`], ["Report discipline", rate == null ? "—" : fPct(rate, 0), cp.expected ? `${cp.done}/${cp.expected} days · ${cp.missing.length} missing${cp.timed ? ` · ${fPct(cp.rate, 0)} on time` : ""}${cp.median != null ? ` · typical ${fmtDelay(cp.median)}` : ""}` : "No scheduled days"]].map(([l, v, s]) => `<div><span>${l}</span><b>${v}</b><small>${s}</small></div>`).join("")}</div>` : `<div class="mk"><div><span>Report discipline</span><b>${rate == null ? "—" : fPct(rate, 0)}</b><small>${cp.done}/${cp.expected} days</small></div><div><span>Feedback notes</span><b>${H.fbRows.length}</b><small>since ${dmy(H.start, 1)}</small></div></div>`}
       ${p.kind === "metrics" ? `<div class="hls">${hl.map(([l, v, s]) => `<div><span>${l}</span><b>${v}</b><small>${esc(s)}</small></div>`).join("")}</div>` : ""}
       ${p.kind === "metrics" ? `<div class="panel"><h4>Sales by month</h4>${monthChart(H.months)}</div>` : ""}
       <div class="panel"><h4>Month by month</h4><div class="tw"><table><thead><tr><th>Month</th><th>Sales</th><th>vs prev. month</th><th>Orders</th><th>Items</th><th>AOV</th><th>Items / order</th><th>Avg / day</th><th>Refund %</th><th>Exch. %</th><th>OOS</th><th>Reports</th><th>Missing</th></tr></thead><tbody>
@@ -2138,7 +2197,8 @@ function showView(v) {
 }
 function sourcesEditor(D) {
   const admin = S.me && S.me.role === "admin", people = repModel();
-  let h = `<p class="muted" style="margin-top:0">Each team member's Google Sheet with a <b>Daily Log</b> tab (Date · Moderator · Shift · Total Sales · Orders · Items · … · Feedback). A sheet with just <b>Date · Feedback</b> also works — it shows in Team Feedback. ${admin ? "" : "<b>Only admins can change this list.</b>"}</p>`;
+  let h = `<div class="panel"><div class="row" style="align-items:end"><label class="field">Report due after shift ends (minutes)<input type="number" min="0" step="15" data-num="1" data-path="settings.reportGrace" value="${esc(D.settings.reportGrace ?? 60)}" ${admin ? "" : "disabled"}></label><span class="muted" style="font-size:12px;padding-bottom:9px">Written within this time = on time. After it = late. Nothing by then = missing.</span></div></div>
+  <p class="muted" style="margin-top:0">Each team member's Google Sheet with a <b>Daily Log</b> tab (Date · Moderator · Shift · Total Sales · Orders · Items · … · Feedback). A sheet with just <b>Date · Feedback</b> also works — it shows in Team Feedback. ${admin ? "" : "<b>Only admins can change this list.</b>"}</p>`;
   (D.reportSources || []).forEach((s, k) => {
     const p = people.find((x) => x.key === s.id);
     h += `<div class="srcrow"><label class="field">Team member<select data-path="reportSources.${k}.memberId" ${admin ? "" : "disabled"}><option value="">— Not on the schedule —</option>${D.members.map((m) => `<option value="${esc(m.id)}" ${m.id === s.memberId ? "selected" : ""}>${esc(m.name)}</option>`).join("")}</select></label>

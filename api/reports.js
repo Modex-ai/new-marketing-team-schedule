@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     if (!j.ok) throw new Error(j.error === 'unauthorized' ? 'The Apps Script key does not match REPORTS_KEY.' : j.error || 'Apps Script error');
     const snap = { ids, fetchedAt: new Date().toISOString(), generatedAt: j.generatedAt, sheets: j.sheets || [] };
     await writeJSON(CACHE, snap, 2);
-    if (check) return res.status(200).json({ ok: true, fetchedAt: snap.fetchedAt, sheets: snap.sheets.map((x) => ({ title: x.title, tab: x.tab, error: x.error, rows: (x.rows || []).length, header: x.header, firstDate: x.rows && x.rows[0] && x.rows[0][0], lastDate: x.rows && x.rows.length ? x.rows[x.rows.length - 1][0] : null, updated: x.updated })) });
+    if (check) return res.status(200).json({ ok: true, fetchedAt: snap.fetchedAt, stamping: j.stamping || null, sheets: snap.sheets.map((x) => ({ title: x.title, tab: x.tab, error: x.error, rows: (x.rows || []).length, header: x.header, firstDate: x.rows && x.rows[0] && x.rows[0][0], lastDate: x.rows && x.rows.length ? x.rows[x.rows.length - 1][0] : null, updated: x.updated, stampSince: x.stampSince || null, stampedDays: Object.keys(x.stamps || {}).length })) });
     return res.status(200).json({ configured: true, ...snap });
   } catch (e) {
     const error = String((e && e.message) || e);
