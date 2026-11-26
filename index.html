@@ -78,7 +78,7 @@ main.wrap{margin-top:-64px;position:relative;z-index:2;padding-bottom:120px}
 .banner.info{background:#E6EFEF;color:var(--teal);border:1px solid #CFE0E0}
 section.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px;margin-bottom:18px}
 .sh{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
-.sh h2{font-family:var(--head);font-size:25px;font-weight:600;margin:0;line-height:1.1;color:var(--teal)}
+.sh h2{font-family:var(--head);font-size:26px;font-weight:500;margin:0;line-height:1.1;color:var(--teal)}
 .sh .eyebrow{color:#C17F35;margin-bottom:4px}
 .sh .sub{font-size:13px;color:var(--muted);margin-top:4px}
 .chip-s{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:3px 10px;vertical-align:middle}
@@ -157,6 +157,53 @@ table.wk tr.notes th,table.wk tr.notes td{font-size:12px}
 table.wk tr.notes td{color:var(--warn);background:#FFF8EC!important}
 .fn{font-size:12px;color:var(--muted);margin-top:12px}
 
+
+/* weekly report (soft table — members × days) */
+.tblw{overflow-x:auto}
+table.wk2{width:100%;border-collapse:separate;border-spacing:0;min-width:1000px;table-layout:fixed;font-size:12.5px}
+table.wk2 th,table.wk2 td{padding:10px 7px;border-bottom:1px solid var(--line-2);vertical-align:top;text-align:center}
+table.wk2 thead th{background:var(--teal);color:#fff;font-weight:700;font-size:12.5px;letter-spacing:.03em;padding:13px 6px;vertical-align:middle}
+table.wk2 thead th:first-child{border-top-left-radius:12px;text-align:left;padding-left:18px;width:180px}
+table.wk2 thead th:last-child{border-top-right-radius:12px;width:92px}
+table.wk2 thead th .dd{display:block;font-weight:500;opacity:.62;font-size:11px;margin-top:1px}
+table.wk2 thead th.today{background:var(--teal-3);box-shadow:inset 0 -3px 0 var(--orange)}
+table.wk2 td.today{background:#FFF8EE}
+table.wk2 td.mem{text-align:left;padding-left:18px;position:sticky;left:0;background:#fff;z-index:1;vertical-align:middle}
+table.wk2 .mem .nm{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
+table.wk2 .mem .rl{font-size:11px;color:var(--muted);margin-left:17px}
+.slot{display:block;border-radius:11px;padding:7px 6px 6px;background:color-mix(in srgb,var(--c) 11%,white);border:1px solid color-mix(in srgb,var(--c) 26%,white);transition:.15s}
+.slot .sn{display:block;font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:color-mix(in srgb,var(--c) 72%,#10292A)}
+.slot b{display:block;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);margin-top:1px}
+.slot small{display:block;color:var(--muted);font-size:10.5px;line-height:1.35;margin-top:1px}
+.slot small.nn{color:var(--warn)}
+.offc{display:block;font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--soft);background:var(--line-2);border-radius:11px;padding:9px 0;transition:.15s}
+.offc small{display:block;letter-spacing:0;text-transform:none;font-weight:500;color:var(--warn);font-size:10.5px}
+.emc{display:block;color:var(--soft);padding:8px 0}
+table.wk2 td.tot{font-family:var(--head);font-size:21px;font-weight:500;color:var(--teal);vertical-align:middle}
+table.wk2 td.tot small{display:block;font-family:var(--sans);font-size:10.5px;color:var(--muted);font-weight:500}
+table.wk2 tr.notes td{font-size:11.5px;color:var(--warn);vertical-align:middle}
+table.wk2 td.editable{cursor:pointer}
+table.wk2 td.editable:hover .slot,table.wk2 td.editable:hover .offc,table.wk2 td.editable:hover .emc{box-shadow:0 0 0 2px var(--orange);border-radius:11px}
+
+/* week editor — whole-week grid */
+.wgw{overflow-x:auto;margin:0 -4px}
+table.wgrid{width:100%;border-collapse:separate;border-spacing:5px;table-layout:fixed;min-width:1120px}
+table.wgrid th{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;padding:4px 2px}
+table.wgrid th small{display:block;font-weight:600;letter-spacing:0;text-transform:none;font-size:11px}
+table.wgrid th.today{color:#C17F35}
+table.wgrid th.gp{color:var(--bad)}
+table.wgrid .mc{width:132px;text-align:left}
+table.wgrid td{background:color-mix(in srgb,var(--c,#E2DED5) 10%,var(--cream));border:1px solid color-mix(in srgb,var(--c,#E2DED5) 22%,white);border-radius:12px;padding:6px;vertical-align:top}
+table.wgrid td.mc{background:none;border:none;vertical-align:middle;padding-left:0}
+table.wgrid td.mc .who{font-weight:800;font-size:13px;display:flex;align-items:center;gap:8px}
+table.wgrid td.mc small{display:block;font-weight:600;color:var(--muted);font-size:11px}
+.gc{display:flex;flex-direction:column;gap:5px}
+.gc select,.gc input{font-size:11.5px;padding:5px 4px;border-radius:8px;width:100%;font-weight:700}
+.gc select.ps,.gc select.rs{background:var(--c,#fff);color:var(--tc,var(--ink));border-color:transparent;border-radius:999px;text-align:center}
+.gc .tcell{gap:4px}
+.gc .tcell input{padding:4px 5px;font-size:11px}
+.gc input.gn{font-weight:500;background:rgba(255,255,255,.7)}
+
 /* insights */
 .ctbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .ctbl th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800;padding:8px 6px;border-bottom:1px solid var(--line);text-align:center}
@@ -182,17 +229,21 @@ table.wk tr.notes td{color:var(--warn);background:#FFF8EC!important}
 .pc{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
 .pc-h{background:linear-gradient(135deg,#0A3133,var(--teal-2));color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px}
 .pc-h .av{box-shadow:none;border:3px solid rgba(255,255,255,.2);background-clip:padding-box}
-.pc-h .n{font-family:var(--head);font-size:20px;font-weight:600;line-height:1.1}
+.pc-h .n{font-family:var(--head);font-size:21px;font-weight:500;line-height:1.1}
 .pc-h .r{font-size:11.5px;opacity:.65;margin-top:2px}
 .pc-h .h{margin-left:auto;text-align:right}
-.pc-h .h b{font-family:var(--head);font-size:22px;font-weight:600;line-height:1;display:block;color:var(--gold)}
+.pc-h .h b{font-family:var(--head);font-size:23px;font-weight:500;line-height:1;display:block;color:var(--gold)}
 .pc-h .h small{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.65}
 .pc ul{list-style:none;margin:0;padding:6px 14px}
-.pc li{display:grid;grid-template-columns:22px 82px 1fr;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line-2);font-size:12.5px}
+.pc li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line-2);font-size:12.5px}
 .pc li:last-child{border-bottom:none}
 .pc li.today{background:linear-gradient(90deg,transparent,#FFF4E4 15%,#FFF4E4 85%,transparent)}
-.pc li .dn{font-weight:800;color:var(--ink-2);line-height:1.2}
-.pc li .dn small{display:block;font-weight:600;color:var(--muted);font-size:11px}
+.pc li .dn{font-weight:700;color:var(--ink-2);width:70px;flex:none}
+.pc li .tm{text-align:right;font-variant-numeric:tabular-nums}
+.pc li .tm b{font-weight:600}
+.pc li .tm small{display:block;color:var(--muted);font-size:11px;line-height:1.3}
+.pc li .tm small i{font-style:normal;font-weight:800;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb,var(--c) 72%,#10292A)}
+.pc li.off .tm{color:var(--soft);font-weight:700;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
 .pc li .dt{display:flex;flex-direction:column;gap:3px;align-items:flex-end;text-align:right}
 .pc li .dt .x{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .pc li .dt .tm{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -202,7 +253,7 @@ table.wk tr.notes td{color:var(--warn);background:#FFF8EC!important}
 
 /* ---------- modal / admin ---------- */
 .overlay{position:fixed;inset:0;background:rgba(8,35,36,.5);backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:28px 12px;z-index:50;overflow-y:auto}
-.modal{background:#fff;border-radius:18px;width:100%;max-width:1080px;box-shadow:0 24px 70px rgba(5,30,31,.35);overflow:hidden}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:1280px;box-shadow:0 24px 70px rgba(5,30,31,.35);overflow:hidden}
 .modal.small{max-width:380px}
 .m-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;background:var(--teal);color:#fff;gap:12px}
 .m-head h3{margin:0;font-family:var(--head);font-size:22px;font-weight:600}
@@ -355,6 +406,9 @@ input[type=color]{height:38px;padding:2px;border:1px solid var(--line);border-ra
   .lc .det{font-size:12px}
   .people{grid-template-columns:1fr}
   .wkf{border-radius:14px;padding:6px}
+  table.wk2{min-width:860px}
+  table.wk2 thead th:first-child{width:120px;padding-left:12px}
+  table.wk2 td.mem{padding-left:12px}
   table.wk{min-width:calc(96px + var(--n) * 128px)}
   table.wk thead th.dcol{width:96px;font-size:14px;padding-left:10px}
   table.wk tbody th{font-size:13.5px;padding:10px 6px 10px 10px}
@@ -635,7 +689,7 @@ const S = {
   token: localStorage.getItem("vmo_token") || "", me: null, users: null, logUser: "", logAll: false,
   serverOK: false, fresh: false,
   dayView: null, weekOffset: 0,
-  admin: { open: false, tab: "week", mode: "person", member: null, day: 0, hl: null, custom: {}, newSrc: "prev", newDate: "" },
+  admin: { open: false, tab: "week", mode: "week", member: null, day: 0, hl: null, custom: {}, newSrc: "prev", newDate: "" },
 };
 const V = () => S.draft || S.data;
 const dirty = () => S.draft && JSON.stringify(S.draft) !== JSON.stringify(S.data);
@@ -802,12 +856,34 @@ function weekTableHTML(D, ws, forExport) {
   if (notes.some(Boolean)) h += notes.map((x, k) => (x ? `<tr class="notes"><th>Note<span>${DY[wdOf(ws + k)]} ${ddmmyyyy(ws + k).slice(0, 5)}</span></th><td colspan="${mem.length}">${esc(x)}</td></tr>` : "")).join("");
   return h + `</tbody></table>`;
 }
+function weekSoftHTML(D, ws) {
+  const st = weekStats(D, ws), ci = curIdx(), edit = !!S.me;
+  let h = `<thead><tr><th>Team member</th>`;
+  for (let k = 0; k < 7; k++) { const i = ws + k; h += `<th class="${i === ci ? "today" : ""}">${DY[wdOf(i)]}<span class="dd">${dmy(i)}</span></th>`; }
+  h += `<th>Hours</th></tr></thead><tbody>`;
+  for (const m of st.mem) {
+    const p = st.per[m.id];
+    h += `<tr><td class="mem"><div class="nm"><span class="dot" style="--c:${esc(m.color)}"></span>${esc(m.name)}</div><div class="rl">${m.code ? "ID " + esc(m.code) : ""}</div></td>`;
+    p.days.forEach((c, k) => {
+      const i = ws + k;
+      let inner;
+      if (!c) inner = `<span class="emc">–</span>`;
+      else if (c.off) inner = `<span class="offc">${esc(c.ty.name)}${c.n ? `<small>${esc(c.n)}</small>` : ""}</span>`;
+      else inner = `<span class="slot" style="--c:${esc(c.ty.color)}"><i class="sn">${esc(c.ty.name)}</i><b>${c.t ? esc(tLabel(c.t, 1)) : "—"}</b>${c.resp ? `<small>${esc(c.resp.name)}</small>` : ""}${c.n ? `<small class="nn">${esc(c.n)}</small>` : ""}</span>`;
+      h += `<td class="${i === ci ? "today" : ""} ${edit ? "editable" : ""}" ${edit ? `data-act="cellEdit" data-m="${esc(m.id)}" data-k="${k}" title="Edit ${esc(m.name)} · ${DAYS[wdOf(i)]}"` : ""}>${inner}</td>`;
+    });
+    h += `<td class="tot">${hrs(p.work)}<small>${p.shifts} shift${p.shifts === 1 ? "" : "s"} · ${p.off} off</small></td></tr>`;
+  }
+  const notes = Array.from({ length: 7 }, (_, k) => dayNote(D, ws + k));
+  if (notes.some(Boolean)) h += `<tr class="notes"><td class="mem"><div class="nm">Notes</div></td>${notes.map((x) => `<td>${esc(x)}</td>`).join("")}<td></td></tr>`;
+  return h + `</tbody>`;
+}
 function renderWeek() {
   const D = V(), ws = viewWS(), created = !!weekAt(D, ws);
   $("#wkTitle").textContent = `${dmy(ws)} – ${dmy(ws + 6, 1)}`;
   $("#wkSub").innerHTML = (S.weekOffset === 0 ? "This week · " : S.weekOffset === 1 ? "Next week · " : S.weekOffset === -1 ? "Last week · " : "") +
     (created ? `<span class="chip-s pub">● Published</span>${S.me ? " · Click any cell to edit it" : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
-  $("#wkBody").innerHTML = created ? `<div class="wkf">${weekTableHTML(D, ws)}</div>` : `<div class="empty">This week hasn't been created yet.<br><button class="btn sm primary" style="margin-top:10px" data-act="openCreate">Create this week</button></div>`;
+  $("#wkBody").innerHTML = created ? `<div class="tblw"><table class="wk2">${weekSoftHTML(D, ws)}</table></div>` : `<div class="empty">This week hasn't been created yet.<br><button class="btn sm primary" style="margin-top:10px" data-act="openCreate">Create this week</button></div>`;
   $("#wkPrev").disabled = S.weekOffset <= minOffset();
   $("#wkExport").disabled = !created;
   $("#wkFoot").textContent = "Shifts belong to the day they start — a 7:00 PM – 3:00 AM night shift is that day's night. All times Cairo.";
@@ -843,9 +919,10 @@ function renderPeople() {
   $("#people").innerHTML = st.mem.map((m) => {
     const p = st.per[m.id];
     const rows = p.days.map((c, k) => {
-      const i = ws + k;
-      const right = !c ? `<span class="muted">–</span>` : `<div class="x"><span class="pill sm" style="${pc(c.ty)}">${esc(c.ty.name)}</span>${c.resp ? `<span class="rp" style="${pc(c.resp)};font-size:11px">${esc(c.resp.name)}</span>` : ""}</div>${c.t ? `<span class="tm">${esc(tLabel(c.t))}</span>` : ""}`;
-      return `<li class="${i === ci ? "today" : ""}"><span class="dic">${c ? iconFor(c.ty) : ""}</span><span class="dn">${DAYS[wdOf(i)]}<small>${ddmmyyyy(i)}</small></span><div class="dt">${right}</div></li>`;
+      const i = ws + k, dn = `<span class="dn">${DY[wdOf(i)]} ${new Date(i * 864e5).getUTCDate()}</span>`, td = i === ci ? "today" : "";
+      if (!c) return `<li class="off ${td}">${dn}<span class="tm">Not set</span></li>`;
+      if (c.off) return `<li class="off ${td}">${dn}<span class="tm">${esc(c.ty.name)}</span></li>`;
+      return `<li class="${td}" style="--c:${esc(c.ty.color)}">${dn}<span class="tm"><b>${c.t ? esc(tLabel(c.t, 1)) : "—"}</b><small><i>${esc(c.ty.name)}</i>${c.resp ? " · " + esc(c.resp.name) : ""}</small></span></li>`;
     }).join("");
     return `<div class="pc"><div class="pc-h"><div class="av" style="--c:${esc(m.color)}">${esc(initials(m.name))}</div><div><div class="n">${esc(m.name)}</div><div class="r">${m.code ? "ID " + esc(m.code) + " · " : ""}${p.shifts} shifts · ${p.off} off</div></div><div class="h"><b>${hrs(p.work)}</b><small>this week</small></div></div>
       <ul>${rows}</ul>
@@ -1042,16 +1119,23 @@ async function userAction(method, body, okMsg) {
 }
 const opts = (list, sel, blank) => (blank != null ? `<option value="">${blank}</option>` : "") + list.map((o) => `<option value="${esc(o.id)}" ${o.id === sel ? "selected" : ""}>${esc(o.name)}</option>`).join("");
 // one editable row: shift · responsible of · time (+ note)
-function cellCells(D, key, mid, k) {
+function cellCtl(D, key, mid, k) {
   const c = ((D.weeks[key].cells[mid] || {})[k]) || {}, p = `weeks.${key}.cells.${mid}.${k}`;
   const ty = typeById(D, c.s), off = ty && ty.kind === "off", rs = respById(D, c.r), ck = `${key}.${mid}.${k}`;
   const custom = !off && (S.admin.custom[ck] || (c.t && !D.timeSlots.includes(c.t)));
   const tOpts = `<option value="">—</option>` + D.timeSlots.map((t) => `<option value="${t}" ${t === c.t && !custom ? "selected" : ""}>${esc(tLabel(t))}</option>`).join("") + `<option value="custom" ${custom ? "selected" : ""}>Custom time…</option>`;
   const tr = tRange(c.t);
-  return `<td><select class="ps" data-path="${p}.s" style="${ty ? pc(ty) : ""}">${opts(D.shiftTypes, c.s, "—")}</select></td>
-    <td><select class="rs" data-path="${p}.r" style="${rs && !off ? pc(rs) : ""}" ${off ? "disabled" : ""}>${opts(D.responsibilities, off ? "" : c.r, off ? (ty ? ty.name : "—") : "—")}</select></td>
-    <td><div class="tcell"><select data-tsel="${p}.t" data-ck="${ck}" ${off ? "disabled" : ""}>${off ? `<option>${esc(ty.name)}</option>` : tOpts}</select>${custom ? `<input type="time" step="900" data-tpart="s" data-tp="${p}.t" value="${tr ? toHM(tr.s) : "11:00"}"><input type="time" step="900" data-tpart="e" data-tp="${p}.t" value="${tr ? toHM(tr.e) : "19:00"}">` : ""}</div></td>
-    <td><input type="text" data-path="${p}.n" value="${esc(c.n || "")}" placeholder="Note" style="width:100%;font-weight:500"></td>`;
+  return {
+    ty, off,
+    s: `<select class="ps" data-path="${p}.s" style="${ty ? pc(ty) : ""}">${opts(D.shiftTypes, c.s, "—")}</select>`,
+    r: `<select class="rs" data-path="${p}.r" style="${rs && !off ? pc(rs) : ""}" ${off ? "disabled" : ""}>${opts(D.responsibilities, off ? "" : c.r, off ? (ty ? ty.name : "—") : "—")}</select>`,
+    t: `<div class="tcell"><select data-tsel="${p}.t" data-ck="${ck}" ${off ? "disabled" : ""}>${off ? `<option>${esc(ty.name)}</option>` : tOpts}</select>${custom ? `<input type="time" step="900" data-tpart="s" data-tp="${p}.t" value="${tr ? toHM(tr.s) : "11:00"}"><input type="time" step="900" data-tpart="e" data-tp="${p}.t" value="${tr ? toHM(tr.e) : "19:00"}">` : ""}</div>`,
+    n: (cls) => `<input type="text" class="${cls || ""}" data-path="${p}.n" value="${esc(c.n || "")}" placeholder="Note" style="width:100%;font-weight:500">`,
+  };
+}
+function cellCells(D, key, mid, k) {
+  const x = cellCtl(D, key, mid, k);
+  return `<td>${x.s}</td><td>${x.r}</td><td>${x.t}</td><td>${x.n()}</td>`;
 }
 const toHM = (m) => { m = ((Math.round(m) % 1440) + 1440) % 1440; return pad(Math.floor(m / 60)) + ":" + pad(m % 60); };
 function weekEditor(D) {
@@ -1069,10 +1153,23 @@ function weekEditor(D) {
     <div class="row" style="margin-top:12px">${others.length ? `<select id="addExisting">${opts(others)}</select><button class="btn sm" data-act="weekAddExisting">+ Add to week</button><span class="muted">or</span>` : ""}
     <input type="text" id="newPerson" placeholder="New person's name" style="width:190px"><input type="text" id="newPersonCode" placeholder="ID (optional)" style="width:130px"><button class="btn sm" data-act="weekAddNew">+ Add new person</button></div></div>`;
   if (!wm.length) return body;
-  body += `<div class="row" style="justify-content:space-between;margin-bottom:12px"><div class="seg"><button class="${A.mode === "person" ? "active" : ""}" data-act="mode" data-v="person">By person</button><button class="${A.mode === "day" ? "active" : ""}" data-act="mode" data-v="day">By day</button></div>
+  body += `<div class="row" style="justify-content:space-between;margin-bottom:12px"><div class="seg"><button class="${A.mode === "week" ? "active" : ""}" data-act="mode" data-v="week">By week</button><button class="${A.mode === "person" ? "active" : ""}" data-act="mode" data-v="person">By person</button><button class="${A.mode === "day" ? "active" : ""}" data-act="mode" data-v="day">By day</button></div>
     <span class="muted" style="font-size:12px">Picking a shift fills in its usual time — change anything after.</span></div>`;
   const head = (first) => `<thead><tr><th style="width:${A.mode === "person" ? 150 : 190}px">${first}</th><th style="width:150px">Shift</th><th>Responsible of</th><th style="width:270px">Time</th><th style="width:170px">Note</th></tr></thead>`;
-  if (A.mode === "person") {
+  if (A.mode === "week") {
+    const ci = curIdx();
+    body += `<div class="wgw"><table class="wgrid"><thead><tr><th class="mc" style="text-align:left">Team member</th>${Array.from({ length: 7 }, (_, k) => { const i = ws + k, g = dayCoverage(D, i).gaps; return `<th class="${g.length ? "gp" : i === ci ? "today" : ""}" ${g.length ? `title="Uncovered: ${esc(g.map((x) => x.r.name + " · " + x.t.name).join(", "))}"` : ""}>${DY[wdOf(i)]}${g.length ? " ⚠" : ""}<small>${dmy(i)}</small></th>`; }).join("")}</tr></thead><tbody>`;
+    for (const m of wm) {
+      body += `<tr><td class="mc"><div class="who"><span class="dot" style="--c:${esc(m.color)}"></span><div>${esc(m.name)}<small>${esc(m.code || "")}</small></div></div></td>`;
+      for (let k = 0; k < 7; k++) {
+        const x = cellCtl(D, key, m.id, k);
+        body += `<td style="${x.ty && !x.off ? `--c:${esc(x.ty.color)}` : ""}"><div class="gc">${x.s}${x.off ? "" : x.r + x.t}${x.n("gn")}</div></td>`;
+      }
+      body += `</tr>`;
+    }
+    body += `</tbody></table></div>
+      <div class="row" style="margin:6px 0 14px"><span class="muted" style="font-size:12px">Day notes:</span>${Array.from({ length: 7 }, (_, k) => `<input type="text" data-path="weeks.${key}.notes.${k}" value="${esc((w.notes || {})[k] || "")}" placeholder="${DY[wdOf(ws + k)]} note" style="flex:1;min-width:110px;font-size:12px;padding:6px 8px;font-weight:500">`).join("")}</div>`;
+  } else if (A.mode === "person") {
     if (!wm.some((m) => m.id === A.member)) A.member = wm[0].id;
     const m = memById(D, A.member);
     body += `<div class="chips">${wm.map((x) => `<button class="chip ${x.id === A.member ? "active" : ""}" data-act="pickMember" data-id="${esc(x.id)}">${esc(x.name)}${x.code ? `<small>${esc(x.code)}</small>` : ""}</button>`).join("")}</div>
@@ -1266,7 +1363,7 @@ document.addEventListener("click", async (e) => {
     case "cardSave": case "cardShare":
       try { await saveCard(el.dataset.id, act === "cardShare"); } catch (err) { toast("Couldn't create the image: " + err.message, true); }
       return;
-    case "createWeek": D.weeks[wkKey()] = buildWeek(D, viewWS(), el.dataset.src); toast(el.dataset.src === "prev" ? "Copied last week — change what's different, then save" : "Week created — fill it in, then save"); return R();
+    case "createWeek": D.weeks[wkKey()] = buildWeek(D, viewWS(), el.dataset.src); S.admin.mode = "week"; toast(el.dataset.src === "prev" ? "Copied last week — change what's different, then save" : "Week created — fill it in, then save"); return R();
     case "newWeekGo": {
       const d = $("#newDate").value; if (!d) return toast("Pick a date", true);
       const ws = wkStart(D, dIdx(d)), key = iDate(ws);
@@ -1274,7 +1371,7 @@ document.addEventListener("click", async (e) => {
         if (S.admin.newSrc === "prev" && !D.weeks[iDate(ws - 7)]) return toast("The week before it doesn't exist — copy a specific week or start empty", true);
         D.weeks[key] = buildWeek(D, ws, S.admin.newSrc, $("#pickWeek")?.value);
       }
-      S.weekOffset = (ws - wkStart(D, curIdx())) / 7; S.admin.tab = "week"; S.admin.newDate = "";
+      S.weekOffset = (ws - wkStart(D, curIdx())) / 7; S.admin.tab = "week"; S.admin.mode = "week"; S.admin.newDate = "";
       toast("Week ready — edit it, then save"); return R();
     }
     case "weekRemove": {
