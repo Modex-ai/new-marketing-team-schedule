@@ -28,9 +28,12 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'method not allowed' });
   }
-  if (!(await userFromToken(bearer(req)))) return res.status(401).json({ error: 'Please sign in again' });
-
   const url = process.env.REPORTS_URL, key = process.env.REPORTS_KEY;
+  const q0 = req.query || Object.fromEntries(new URL(req.url, 'http://x').searchParams);
+  // ?check=1&k=<REPORTS_KEY> → connection health only (titles, row counts, dates, errors — no sales or feedback)
+  const check = q0.check === '1' && key && q0.k === key;
+  if (!check && !(await userFromToken(bearer(req)))) return res.status(401).json({ error: 'Please sign in again' });
+
   if (!url || !key) return res.status(200).json({ configured: false });
 
   const sched = await readJSON(SCHEDULE).catch(() => null);
@@ -41,7 +44,7 @@ export default async function handler(req, res) {
   const q = req.query || Object.fromEntries(new URL(req.url, 'http://x').searchParams);
   const cached = await readJSON(CACHE).catch(() => null);
   const sameIds = cached && Array.isArray(cached.ids) && cached.ids.join() === ids.join();
-  if (q.force !== '1' && sameIds && Date.now() - new Date(cached.fetchedAt).getTime() < MAX_AGE_MS) {
+  if (q.force !== '1' && !check && sameIds && Date.now() - new Date(cached.fetchedAt).getTime() < MAX_AGE_MS) {
     return res.status(200).json({ configured: true, cached: true, ...cached });
   }
 
@@ -56,6 +59,7 @@ export default async function handler(req, res) {
     if (!j.ok) throw new Error(j.error === 'unauthorized' ? 'The Apps Script key does not match REPORTS_KEY.' : j.error || 'Apps Script error');
     const snap = { ids, fetchedAt: new Date().toISOString(), generatedAt: j.generatedAt, sheets: j.sheets || [] };
     await writeJSON(CACHE, snap, 2);
+    if (check) return res.status(200).json({ ok: true, fetchedAt: snap.fetchedAt, sheets: snap.sheets.map((x) => ({ title: x.title, tab: x.tab, error: x.error, rows: (x.rows || []).length, header: x.header, firstDate: x.rows && x.rows[0] && x.rows[0][0], lastDate: x.rows && x.rows.length ? x.rows[x.rows.length - 1][0] : null, updated: x.updated })) });
     return res.status(200).json({ configured: true, ...snap });
   } catch (e) {
     const error = String((e && e.message) || e);
