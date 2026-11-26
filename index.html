@@ -61,6 +61,8 @@ button{cursor:pointer}
 .btn.ghost{background:transparent;border-color:transparent}
 .btn.ghost:hover{background:var(--pale-2)}
 .btn.sm{padding:5px 10px;font-size:12px;border-radius:8px}
+a.btn{text-decoration:none;color:inherit}
+.btn.light{color:#fff}
 .btn[disabled]{opacity:.45;cursor:default}
 .ico{width:15px;height:15px;flex:none}
 .userchip{display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.85)}
@@ -459,6 +461,112 @@ table.xs tr.notes td{background:#FFF8EC!important;color:var(--warn);font-size:18
   .etbl tr.erow{background:var(--pale-3);border-radius:12px;padding:8px;margin-bottom:8px}
   .etbl tr.erow td{background:none!important;padding:3px 0!important}
 }
+
+/* ---------- view switch (Operations / Reports) ---------- */
+.viewrow{margin-top:22px}
+.views{display:inline-flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:3px;gap:2px}
+.views button{border:none;background:none;color:rgba(255,255,255,.7);font-weight:600;font-size:13px;padding:7px 15px;border-radius:9px;display:inline-flex;gap:7px;align-items:center;transition:.15s}
+.views button:hover{color:#fff}
+.views button.active{background:#fff;color:var(--deep);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.views .lock{width:13px;height:13px;opacity:.7}
+
+/* ---------- team reports ---------- */
+.rbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.rbar .chips{margin:0}
+.rbar input[type=date]{padding:5px 8px;font-size:12px}
+.rmeta{font-size:12px;color:var(--muted)}
+.rmeta b{color:var(--ink-2);font-weight:600}
+.dl{font-size:11.5px;font-weight:700;margin-top:3px;white-space:nowrap}
+.dl.good{color:var(--ok)} .dl.bad{color:var(--bad)} .dl.flat{color:var(--muted)}
+.kpi .v .cur{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--muted);margin-right:4px;letter-spacing:.06em}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .ax{font-family:var(--sans);font-size:10.5px;fill:var(--muted)}
+.chart .gl{stroke:var(--line-2);stroke-width:1}
+.chart .avg{stroke:var(--orange);stroke-width:1.5;stroke-dasharray:5 4}
+.chart rect.seg{transition:opacity .15s}
+.chart rect.seg:hover{opacity:.82}
+.legend2{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:10px}
+.legend2 span{display:inline-flex;align-items:center;gap:6px}
+.legend2 i{width:10px;height:10px;border-radius:3px;background:var(--c)}
+.lbw{overflow-x:auto}
+table.lbt{width:100%;border-collapse:collapse;font-size:13px;min-width:1040px}
+table.lbt th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+table.lbt th:nth-child(-n+2),table.lbt td:nth-child(-n+2){text-align:left}
+table.lbt td{padding:11px 8px;border-bottom:1px solid var(--line-2);text-align:right;font-variant-numeric:tabular-nums;vertical-align:middle;white-space:nowrap}
+table.lbt tr.click{cursor:pointer;transition:background .12s}
+table.lbt tr.click:hover td{background:var(--pale-3)}
+table.lbt td.rk{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--gold);width:40px;text-align:center!important}
+table.lbt .who{display:flex;align-items:center;gap:10px}
+table.lbt .who .av{width:32px;height:32px;font-size:11.5px;box-shadow:none}
+table.lbt .who b{display:block;font-weight:700;font-size:13.5px}
+table.lbt .who small{display:block;color:var(--muted);font-size:11px}
+table.lbt td.sl b{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--deep)}
+.share{height:3px;background:var(--line-2);border-radius:9px;margin-top:5px;width:120px;margin-left:auto}
+.share i{display:block;height:100%;background:var(--c);border-radius:9px}
+table.lbt tr.tot td{font-weight:700;background:var(--pale-3);border-bottom:none}
+.stale{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px}
+.stale.ok{background:var(--ok-bg);color:var(--ok)} .stale.warn{background:var(--warn-bg);color:var(--warn)} .stale.bad{background:var(--bad-bg);color:var(--bad)}
+.comp{display:flex;flex-direction:column;gap:2px}
+.crow{display:grid;grid-template-columns:minmax(120px,1fr) 1.3fr auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line-2)}
+.crow:last-child{border-bottom:none}
+.crow .nm{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+.crow .nm small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.cbar{height:8px;background:var(--line-2);border-radius:9px;overflow:hidden;display:flex}
+.cbar i{display:block;height:100%;background:var(--ok)}
+.cbar i.miss{background:#E7A3AA}
+.crow .ms{font-size:11.5px;color:var(--bad);margin-top:5px;white-space:normal}
+.crow .cpc{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--deep);text-align:right;min-width:62px}
+.crow .cpc small{display:block;font-family:var(--sans);font-size:10.5px;color:var(--muted);font-weight:500}
+.flags{display:flex;flex-direction:column;gap:8px}
+.flag{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:start;border:1px solid #F1D9C0;background:#FFFAF3;border-radius:12px;padding:10px 12px;font-size:12.8px}
+.flag.err{border-color:#EFC6CB;background:#FFF6F7}
+.flag .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--warn-bg);color:var(--warn);font-weight:800}
+.flag.err .ic{background:var(--bad-bg);color:var(--bad)}
+.flag b{font-weight:700}
+.flag small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.shtbl td b{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--deep)}
+.fbbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.fbbar input{min-width:220px;flex:1;max-width:340px;padding:7px 10px}
+.fbi{display:grid;grid-template-columns:170px 1fr;gap:18px;padding:16px 0;border-bottom:1px solid var(--line-2)}
+.fbi:last-child{border-bottom:none}
+.fbi .who{display:flex;gap:10px;align-items:flex-start}
+.fbi .who .av{width:32px;height:32px;font-size:11.5px;box-shadow:none}
+.fbi .who b{display:block;font-size:13px}
+.fbi .who small{display:block;color:var(--muted);font-size:11.5px;line-height:1.4}
+.fbt{white-space:pre-line;font-size:13.5px;line-height:1.75;color:var(--ink-2);text-align:start;unicode-bidi:plaintext;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer;margin:0}
+.fbt.open{display:block;-webkit-line-clamp:unset;cursor:default}
+.fbi .more{font-size:11.5px;font-weight:700;color:var(--brand-2);margin-top:4px;background:none;border:none;padding:0}
+.fbi mark{background:#FCE8C6;color:inherit;border-radius:3px;padding:0 1px}
+.rsetup{border:1px solid var(--line);border-radius:16px;padding:26px;background:linear-gradient(180deg,#fff,var(--pale-3))}
+.rsetup h3{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--deep);margin:0 0 6px}
+.rsetup ol{margin:14px 0 0;padding-left:20px;line-height:1.9;font-size:13.5px;color:var(--ink-2)}
+.rsetup code{background:var(--pale-2);border:1px solid var(--pale);border-radius:6px;padding:1px 6px;font-size:12px}
+.dtl .mk{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+.dtl .mk>div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--pale-3)}
+.dtl .mk span{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.dtl .mk b{display:block;font-family:var(--serif);font-size:22px;font-weight:600;color:var(--deep);line-height:1.15;margin-top:2px}
+.dtl table{width:100%;border-collapse:collapse;font-size:12.5px}
+.dtl th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.dtl th:nth-child(-n+2),.dtl td:nth-child(-n+2){text-align:left}
+.dtl td{padding:9px 6px;border-bottom:1px solid var(--line-2);text-align:right;vertical-align:top;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dtl td.f{white-space:pre-line;text-align:start;unicode-bidi:plaintext;min-width:260px;max-width:440px;font-size:12.5px;line-height:1.6;color:var(--ink-2)}
+.dtl tr.off td{color:var(--soft)}
+.srcrow{display:grid;grid-template-columns:200px 150px 1fr auto auto;gap:10px;align-items:end;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--pale-3)}
+.srcrow .st3{font-size:11.5px;color:var(--muted);padding-bottom:9px;white-space:nowrap}
+.srcrow .st3.bad{color:var(--bad)}
+@media (max-width:1000px){
+  .dtl .mk{grid-template-columns:repeat(3,1fr)}
+  .srcrow{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .views button{padding:6px 11px;font-size:12px}
+  .fbi{grid-template-columns:1fr;gap:8px}
+  .crow{grid-template-columns:1fr auto}
+  .crow .cb{grid-column:1/-1;order:3}
+  .dtl .mk{grid-template-columns:repeat(2,1fr)}
+  .dtl .tw{overflow-x:auto}
+}
 </style>
 </head>
 <body>
@@ -478,9 +586,10 @@ table.xs tr.notes td{background:#FFF8EC!important;color:var(--warn);font-size:18
       <button class="btn light" id="adminBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Manage</span></button>
     </div>
   </div>
+  <div class="wrap viewrow"><nav class="views"><button class="active" data-v="ops" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Operations</button><button data-v="reports" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg>Team Reports</button></nav></div>
 </header>
 
-<main class="wrap">
+<main class="wrap" id="opsView">
   <div class="kpis" id="kpis"></div>
   <div id="banners"></div>
 
@@ -552,6 +661,8 @@ table.xs tr.notes td{background:#FFF8EC!important;color:var(--warn);font-size:18
   </section>
 </main>
 
+<main class="wrap hidden" id="repView"></main>
+
 <div id="exportStage"></div>
 <div id="modalRoot"></div>
 <div id="lbRoot"></div>
@@ -585,6 +696,15 @@ function seedWeek() {
   }));
   return { memberIds: SEED_MEMBERS.map((m) => m[0]), cells, notes: {}, createdAt: "2026-11-22T00:00:00.000Z" };
 }
+const DEFAULT_SOURCES = [
+  { id: "src-heba", sheetId: "1dcGo7iY0jCJ6bzJF9CHXMcmgcCrEgdwMp3hueYNJxZE", memberId: "heba" },
+  { id: "src-mai", sheetId: "1JzFWJe6rO-nsPGArSe22bgmCJTfyS64hLDIGhdJVa2c", memberId: "mai" },
+  { id: "src-roaa", sheetId: "1x2YBcCXVPrdwglstbJEoecH0FyKXuH9PydRR8mqm9YI", memberId: "roaa" },
+  { id: "src-basant", sheetId: "1pz6qqCg6LNWu-Q6WvnAhuT39VYOGvrFlV_kz1u90lJw", memberId: "basant" },
+  { id: "src-suhaila", sheetId: "1l-cQr2Hp-rdk5jJr23p1ZctTca4epiwk8apIssEZCcw", memberId: "suhaila" },
+  { id: "src-snapel", sheetId: "1fMFZ6e2VznvImyYaD63emUtplY39BGhx4gCSfZTfO0Y", memberId: "snapel" },
+  { id: "src-shams", sheetId: "18zI8u9XpnZUOhOQkP3o8DMjoegMDDX1a3hU7Cc6D84w", memberId: "", name: "Shams" },
+];
 const DEFAULT_DATA = {
   version: 1,
   updatedAt: null,
@@ -603,6 +723,7 @@ const DEFAULT_DATA = {
   timeSlots: ["11:00-19:00", "19:00-03:00", "11:00-17:00"],
   weeks: { "2026-11-22": seedWeek() },
   requests: [],
+  reportSources: DEFAULT_SOURCES,
   log: [],
 };
 
@@ -777,7 +898,9 @@ async function save() {
     const j = await call("/api/schedule", "PUT", { data: S.draft, baseUpdatedAt: S.data.updatedAt, changes: changes.length ? changes : ["Saved the schedule"] });
     S.draft.updatedAt = j.updatedAt;
     if (j.entry) S.draft.log = [j.entry, ...(S.draft.log || [])].slice(0, 500);
+    const srcChanged = JSON.stringify(S.data.reportSources) !== JSON.stringify(S.draft.reportSources);
     S.data = clone(S.draft); S.fresh = false; S.restored = false;
+    if (srcChanged && S.me) { RS.raw = null; if (RS.view === "reports") loadReports(true); }
     toast("Saved — the team sees it now");
   } catch (e) {
     if (e.status === 401) signedOut("Your session ended — sign in again, then save. Your changes are kept.");
@@ -788,7 +911,7 @@ async function save() {
 
 /* ============================ render ============================ */
 function renderAll() {
-  renderHeader(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderRequests(); renderLog(); renderSaveBar();
+  renderHeader(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderRequests(); renderLog(); renderSaveBar(); renderReports();
   if (S.admin.open) renderAdmin();
 }
 function renderHeader() {
@@ -1142,6 +1265,13 @@ function diffList(out, ctx, A, B, fields, noun) {
 }
 function diffData(A, B) {
   const out = [];
+  const sn = (D, s) => (memById(D, s.memberId) || {}).name || s.name || "sheet";
+  for (const s of B.reportSources || []) {
+    const o = (A.reportSources || []).find((x) => x.id === s.id);
+    if (!o) out.push(`Reports: added ${sn(B, s)}'s sheet`);
+    else if (o.sheetId !== s.sheetId || o.memberId !== s.memberId || (o.name || "") !== (s.name || "")) out.push(`Reports: changed ${sn(B, s)}'s sheet`);
+  }
+  for (const o of A.reportSources || []) if (!(B.reportSources || []).some((x) => x.id === o.id)) out.push(`Reports: removed ${sn(A, o)}'s sheet`);
   diffList(out, "Team", A.members, B.members, [["code", "ID"], ["color", "color"]], "member");
   diffList(out, "Shift types", A.shiftTypes, B.shiftTypes, [["color", "color"], ["kind", "type"], ["icon", "icon"], ["time", "usual time"], ["track", "coverage tracking"]], "shift");
   diffList(out, "Responsible of", A.responsibilities, B.responsibilities, [["color", "color"], ["track", "coverage tracking"]], "desk");
@@ -1262,6 +1392,337 @@ async function saveCard(id, share) {
   await exportImage(cardImageHTML(D, m, ws), `Vendoor_Schedule_${slug(m.name)}_${rangeName(ws)}.png`, share);
 }
 
+/* ============================ team reports (Google Sheets → executive view) ============================ */
+// Each team member keeps her own Google Sheet with a "Daily Log" tab (Date · Moderator · Shift · Total Sales ·
+// Orders · Items · … · Out of Stock · Refund Requests · Exchanged Orders · Feedback). /api/reports returns
+// those rows; everything below turns them into the Reports view.
+const RS = { view: "ops", loading: false, raw: null, error: "", preset: "thisMonth", from: "", to: "", fq: "", fmem: "", feedAll: false, open: {} };
+const sheetUrl = (id) => `https://docs.google.com/spreadsheets/d/${id}/edit`;
+const sheetIdOf = (s) => { const m = /\/d\/([\w-]{20,})/.exec(String(s || "")) || /^([\w-]{20,})$/.exec(String(s || "").trim()); return m ? m[1] : ""; };
+const nf0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+const nf2 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+const fN = (n) => (n == null || !isFinite(n) ? "—" : nf0.format(n));
+const fK = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(Math.round(n)));
+const fPct = (x, d = 1) => (x == null || !isFinite(x) ? "—" : (x * 100).toFixed(d) + "%");
+const RCOL = { date: /^date$/i, name: /^(moderator|t\.?l|name)$/i, shift: /^shift$/i, sales: /^(total sales|sales)$/i, orders: /^(total )?orders$/i, items: /^(total )?(items|quantity)$/i, oos: /out of stock/i, refunds: /refund/i, exch: /exchang/i, feedback: /^(feedback|notes?)$/i };
+function rNum(v) {
+  if (v === "" || v == null) return null;
+  if (typeof v === "number") return isFinite(v) ? v : null;
+  const s = String(v).replace(/[,\s٬]/g, "").replace(/EGP|ج\.?م?/gi, "");
+  if (!s || /^[-—–]$/.test(s)) return null;
+  const n = Number(s);
+  return isFinite(n) ? n : null;
+}
+function rDate(v) {
+  const s = String(v ?? "").trim();
+  let m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+  if (m) return dIdx(`${m[1]}-${m[2]}-${m[3]}`);
+  m = /(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?,?\s+(\d{4})/.exec(s);
+  if (m) { const mi = MON.findIndex((x) => x.toLowerCase() === m[2].toLowerCase()); if (mi >= 0) return Math.round(Date.UTC(+m[3], mi, +m[1]) / 864e5); }
+  m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);
+  if (m) return Math.round(Date.UTC(+m[3], +m[2] - 1, +m[1]) / 864e5);
+  return null;
+}
+const shiftKey = (s) => (/^off$/i.test(s) ? "Off" : /morning/i.test(s) && /night/i.test(s) ? "Double" : /morning/i.test(s) ? "Morning" : /night/i.test(s) ? "Night" : /mid/i.test(s) ? "Mid" : s ? "Other" : "Not set");
+let _rm = { key: "", val: null };
+function repModel() {
+  const D = V(), raw = RS.raw;
+  const key = (raw && raw.fetchedAt) + "|" + JSON.stringify(D.reportSources) + "|" + D.members.map((m) => m.id + m.name + m.color + m.code).join();
+  if (_rm.key === key) return _rm.val;
+  const byId = Object.fromEntries(((raw && raw.sheets) || []).map((s) => [s.id, s]));
+  const people = (D.reportSources || []).map((src) => {
+    const sh = byId[src.sheetId], m = memById(D, src.memberId);
+    const name = m ? m.name : src.name || (sh && sh.title ? sh.title.split(/\s+/)[0] : "Report");
+    const p = { src, m, key: src.id, name, color: m ? m.color : "#8C7A5B", code: m ? m.code || "" : "", title: (sh && sh.title) || "", url: (sh && sh.url) || sheetUrl(src.sheetId), updated: sh && sh.updated, error: sh ? sh.error || "" : raw ? "Not loaded yet — press Refresh" : "", rows: [], kind: "metrics", loaded: !!(sh && sh.rows) };
+    if (sh && sh.header && sh.rows) {
+      const H = sh.header.map((h) => String(h).trim()), col = {};
+      for (const [k, re] of Object.entries(RCOL)) col[k] = H.findIndex((h) => re.test(h));
+      p.kind = col.sales >= 0 || col.orders >= 0 ? "metrics" : "feedback";
+      const seen = {};
+      for (const r of sh.rows) {
+        const i = rDate(r[col.date >= 0 ? col.date : 0]); if (i == null) continue;
+        const g = (k) => (col[k] >= 0 ? r[col[k]] : "");
+        const shift = String(g("shift") ?? "").trim();
+        const row = { i, shift, sk: shiftKey(shift), off: /^off$/i.test(shift), sales: rNum(g("sales")), orders: rNum(g("orders")), items: rNum(g("items")), oos: rNum(g("oos")), refunds: rNum(g("refunds")), exch: rNum(g("exch")), fb: String(g("feedback") ?? "").trim() };
+        row.hasNums = row.sales != null || row.orders != null || row.items != null;
+        if (row.off && !(row.sales > 0) && !(row.orders > 0)) row.hasNums = false; // "off" rows with zeros are just a day off
+        row.reported = row.hasNums || !!row.fb || row.off;
+        if (seen[i] != null) p.rows[seen[i]] = row; else { seen[i] = p.rows.length; p.rows.push(row); }
+      }
+      p.rows.sort((a, b) => a.i - b.i);
+      const today = cairoNow().idx, rep = p.rows.filter((r) => (r.hasNums || r.fb) && r.i <= today);
+      p.last = rep.length ? rep[rep.length - 1].i : null;
+      const aovs = p.rows.filter((r) => r.orders > 0 && r.sales > 0).map((r) => r.sales / r.orders).sort((a, b) => a - b);
+      p.medAov = aovs.length ? aovs[Math.floor(aovs.length / 2)] : null;
+    }
+    return p;
+  });
+  _rm = { key, val: people };
+  return people;
+}
+function repRange() {
+  const t = cairoNow().idx, d = new Date(t * 864e5), y = d.getUTCFullYear(), mo = d.getUTCMonth(), dd = d.getUTCDate();
+  const U = (yy, mm, day) => Math.round(Date.UTC(yy, mm, day) / 864e5);
+  let a, b, pa, pb;
+  switch (RS.preset) {
+    case "thisWeek": a = wkStart(V(), t); b = t; pa = a - 7; pb = b - 7; break;
+    case "lastWeek": a = wkStart(V(), t) - 7; b = a + 6; pa = a - 7; pb = b - 7; break;
+    case "last30": a = t - 29; b = t; pa = a - 30; pb = a - 1; break;
+    case "lastMonth": a = U(y, mo - 1, 1); b = U(y, mo, 0); pa = U(y, mo - 2, 1); pb = U(y, mo - 1, 0); break;
+    case "custom": {
+      a = RS.from ? dIdx(RS.from) : t - 29; b = RS.to ? dIdx(RS.to) : t; if (b < a) [a, b] = [b, a];
+      const n = b - a + 1; pa = a - n; pb = a - 1; break;
+    }
+    default: a = U(y, mo, 1); b = t; pa = U(y, mo - 1, 1); pb = Math.min(U(y, mo - 1, dd), U(y, mo, 0));
+  }
+  return { a, b, pa, pb, t };
+}
+const rngTxt = (a, b) => { const A = new Date(a * 864e5), B = new Date(b * 864e5); return a === b ? dmy(a, 1) : A.getUTCFullYear() === B.getUTCFullYear() && A.getUTCMonth() === B.getUTCMonth() ? `${A.getUTCDate()} – ${dmy(b, 1)}` : `${dmy(a)} – ${dmy(b, 1)}`; };
+function agg(rows, a, b) {
+  const t = { sales: 0, orders: 0, items: 0, oos: 0, refunds: 0, exch: 0, days: 0, selling: 0, off: 0, fb: 0, byDay: {}, byShift: {} };
+  for (const r of rows) {
+    if (r.i < a || r.i > b) continue;
+    if (r.fb) t.fb++;
+    if (r.off && !r.hasNums) { t.off++; continue; }
+    if (!r.hasNums) continue;
+    t.days++;
+    t.sales += r.sales || 0; t.orders += r.orders || 0; t.items += r.items || 0; t.oos += r.oos || 0; t.refunds += r.refunds || 0; t.exch += r.exch || 0;
+    if ((r.sales || 0) > 0) t.selling++;
+    t.byDay[r.i] = (t.byDay[r.i] || 0) + (r.sales || 0);
+    const s = (t.byShift[r.sk] = t.byShift[r.sk] || { days: 0, sales: 0, orders: 0, items: 0 });
+    s.days++; s.sales += r.sales || 0; s.orders += r.orders || 0; s.items += r.items || 0;
+  }
+  t.aov = t.orders ? t.sales / t.orders : null;
+  t.ipo = t.orders ? t.items / t.orders : null;
+  t.avgDaily = t.selling ? t.sales / t.selling : null;
+  t.refundRate = t.orders ? t.refunds / t.orders : null;
+  t.exchRate = t.orders ? t.exch / t.orders : null;
+  return t;
+}
+function sumAgg(list) {
+  const t = { sales: 0, orders: 0, items: 0, oos: 0, refunds: 0, exch: 0, days: 0, selling: 0, off: 0, fb: 0, byDay: {}, byShift: {} };
+  for (const x of list) {
+    for (const k of ["sales", "orders", "items", "oos", "refunds", "exch", "days", "selling", "off", "fb"]) t[k] += x[k];
+    for (const [d, v] of Object.entries(x.byDay)) t.byDay[d] = (t.byDay[d] || 0) + v;
+    for (const [k, s] of Object.entries(x.byShift)) { const o = (t.byShift[k] = t.byShift[k] || { days: 0, sales: 0, orders: 0, items: 0 }); for (const f in s) o[f] += s[f]; }
+  }
+  const dayCount = Object.values(t.byDay).filter((v) => v > 0).length;
+  t.aov = t.orders ? t.sales / t.orders : null; t.ipo = t.orders ? t.items / t.orders : null;
+  t.avgDaily = dayCount ? t.sales / dayCount : null;
+  t.refundRate = t.orders ? t.refunds / t.orders : null; t.exchRate = t.orders ? t.exch / t.orders : null;
+  return t;
+}
+// ▲/▼ vs previous period. "lower" = lower is better; "pts" = show the change in percentage points
+function dlt(cur, prev, lower, pts) {
+  if (cur == null || prev == null || !isFinite(cur) || !isFinite(prev)) return `<div class="dl flat">No comparison</div>`;
+  if (pts) { const v = (cur - prev) * 100; if (Math.abs(v) < 0.05) return `<div class="dl flat">= vs previous</div>`; return `<div class="dl ${(v < 0) === !!lower ? "good" : "bad"}">${v > 0 ? "▲" : "▼"} ${Math.abs(v).toFixed(1)} pts vs previous</div>`; }
+  if (!prev) return cur ? `<div class="dl good">New vs previous</div>` : `<div class="dl flat">= vs previous</div>`;
+  const v = (cur - prev) / Math.abs(prev);
+  if (Math.abs(v) < 0.0005) return `<div class="dl flat">= vs previous</div>`;
+  return `<div class="dl ${(v < 0) === !!lower ? "good" : "bad"}">${v > 0 ? "▲" : "▼"} ${Math.abs(v * 100).toFixed(1)}% vs previous</div>`;
+}
+const pctChg = (cur, prev) => (prev ? (cur - prev) / Math.abs(prev) : null);
+// scheduled working days vs days with a report (only days that exist in the Weekly Schedule, up to yesterday)
+function compliance(D, p, a, b, t) {
+  const out = { expected: 0, done: 0, missing: [], offMismatch: [] };
+  if (!p.m) return out;
+  const byI = Object.fromEntries(p.rows.map((r) => [r.i, r]));
+  for (let i = a; i <= Math.min(b, t - 1); i++) {
+    const c = cellAt(D, p.m.id, i);
+    if (!c || !c.work) continue;
+    out.expected++;
+    const r = byI[i];
+    if (r && (r.hasNums || r.fb)) out.done++;
+    else if (r && r.off) { out.offMismatch.push(i); out.missing.push(i); }
+    else out.missing.push(i);
+  }
+  return out;
+}
+function qualityFlags(D, people, a, b, t) {
+  const F = [];
+  for (const p of people) {
+    if (p.error) F.push({ err: true, p, i: null, t: `Couldn't read the sheet`, s: p.error });
+    for (const r of p.rows) if (r.i > t + 1 && (r.hasNums || r.fb)) F.push({ err: true, p, i: r.i, t: "Written on a future date", s: `A report is logged on ${dmy(r.i, 1)} — probably typed in the wrong row.` });
+    if (!p.loaded || p.kind !== "metrics") continue;
+    const code = String(p.code || "").replace(/\D/g, "");
+    for (const r of p.rows) {
+      if (r.i < a || r.i > b || !r.hasNums) continue;
+      if (code && r.sales != null && String(Math.round(r.sales)) === code) F.push({ err: true, p, i: r.i, t: `Sales equal her ID number (${code})`, s: "Probably typed the ID into Total Sales." });
+      else if (r.orders > 0 && p.medAov && r.sales / r.orders > Math.max(4 * p.medAov, 6000)) F.push({ p, i: r.i, t: `Unusual order value — EGP ${fN(r.sales / r.orders)} per order`, s: `Her usual AOV is about EGP ${fN(p.medAov)}. Check the sales figure.` });
+      if ((r.sales || 0) > 0 && !r.orders) F.push({ p, i: r.i, t: "Sales without orders", s: `EGP ${fN(r.sales)} with 0 orders.` });
+      if (r.orders > 0 && !(r.sales > 0)) F.push({ p, i: r.i, t: "Orders without sales", s: `${r.orders} orders, no sales value.` });
+      if (r.orders > 0 && r.items != null && r.items < r.orders) F.push({ p, i: r.i, t: "Fewer items than orders", s: `${r.items} items for ${r.orders} orders.` });
+      if (r.off && (r.sales || 0) > 0) F.push({ p, i: r.i, t: "Sales on a day logged as Off", s: `EGP ${fN(r.sales)}.` });
+    }
+  }
+  return F.sort((x, y) => (y.err ? 1 : 0) - (x.err ? 1 : 0) || (y.i ?? 1e9) - (x.i ?? 1e9));
+}
+function trendSVG(people, a, b) {
+  const days = b - a + 1, W = 1000, H = 230, L = 46, T = 10, Bm = 26, cw = (W - L) / days;
+  const stacks = [];
+  let max = 0;
+  for (let k = 0; k < days; k++) {
+    let y = 0; const segs = [];
+    for (const p of people) { const v = p.cur.byDay[a + k] || 0; if (v > 0) { segs.push({ p, v, y0: y }); y += v; } }
+    stacks.push({ i: a + k, segs, tot: y }); max = Math.max(max, y);
+  }
+  if (!max) return `<div class="empty">No sales logged in this period yet.</div>`;
+  const step = Math.pow(10, Math.floor(Math.log10(max))), nice = Math.ceil(max / step) * step, sc = (H - T - Bm) / nice;
+  let g = "";
+  for (let q = 0; q <= 4; q++) { const v = (nice / 4) * q, y = H - Bm - v * sc; g += `<line class="gl" x1="${L}" x2="${W}" y1="${y}" y2="${y}"/><text class="ax" x="${L - 8}" y="${y + 3.5}" text-anchor="end">${fK(v)}</text>`; }
+  const bw = Math.max(3, Math.min(34, cw * 0.62)), labEvery = Math.ceil(days / 16);
+  stacks.forEach((s, k) => {
+    const x = L + k * cw + (cw - bw) / 2;
+    for (const sg of s.segs) { const h = sg.v * sc, y = H - Bm - (sg.y0 + sg.v) * sc; g += `<rect class="seg" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.5, h).toFixed(1)}" rx="${Math.min(3, bw / 4)}" fill="${esc(sg.p.color)}"><title>${esc(sg.p.name)} · ${DY[wdOf(s.i)]} ${dmy(s.i)} · EGP ${fN(sg.v)}</title></rect>`; }
+    if (s.tot) g += `<rect x="${(L + k * cw).toFixed(1)}" y="${T}" width="${cw.toFixed(1)}" height="${H - T - Bm}" fill="transparent"><title>${DY[wdOf(s.i)]} ${dmy(s.i)} · Team EGP ${fN(s.tot)}${s.segs.map((x) => `\n${x.p.name}: ${fN(x.v)}`).join("")}</title></rect>`;
+    if (k % labEvery === 0) g += `<text class="ax" x="${(L + k * cw + cw / 2).toFixed(1)}" y="${H - 8}" text-anchor="middle">${new Date(s.i * 864e5).getUTCDate()} ${MON[new Date(s.i * 864e5).getUTCMonth()]}</text>`;
+  });
+  const sold = stacks.filter((s) => s.tot > 0), avg = sold.reduce((x, s) => x + s.tot, 0) / sold.length, ay = H - Bm - avg * sc;
+  g += `<line class="avg" x1="${L}" x2="${W}" y1="${ay}" y2="${ay}"/><text class="ax" x="${W}" y="${ay - 5}" text-anchor="end" style="fill:#B9762F;font-weight:700">Daily avg ${fK(avg)}</text>`;
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily team sales">${g}</svg></div>
+    <div class="legend2">${people.filter((p) => p.cur.sales > 0).map((p) => `<span><i style="--c:${esc(p.color)}"></i>${esc(p.name)}</span>`).join("")}<span><i style="--c:var(--orange);height:2px"></i>Daily average</span></div>`;
+}
+function hilite(text, q) {
+  const t = esc(text);
+  if (!q) return t;
+  const qq = esc(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return t.replace(new RegExp(qq, "gi"), (m) => `<mark>${m}</mark>`);
+}
+function renderReports() {
+  if (RS.view !== "reports") return;
+  const D = V(), root = $("#repView");
+  if (!S.me) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>Sign in to view team reports</h3><p class="muted">Reports show sales and feedback from the team's Google Sheets, so they're for signed-in managers only.</p><button class="btn primary" data-act="repLogin">Sign in</button></div></section>`; return; }
+  const raw = RS.raw;
+  if (!raw && RS.loading) { root.innerHTML = `<section class="card"><div class="empty">Loading the team's sheets…</div></section>`; return; }
+  if (raw && raw.configured === false) {
+    root.innerHTML = `<section class="card"><div class="rsetup"><div class="eyebrow">Team Reports</div><h3>Connect the team's Google Sheets</h3>
+      <p class="muted" style="margin:0">One-time setup. The sheets stay private — a small Apps Script that runs as you reads them for the dashboard.</p>
+      <ol><li>Open <b>script.google.com</b> → New project → paste the code from <code>apps-script/Code.gs</code> in the repo.</li>
+      <li>Deploy → New deployment → <b>Web app</b> · Execute as <b>Me</b> · Who has access <b>Anyone</b> → copy the URL.</li>
+      <li>Add <code>REPORTS_URL</code> (that URL) and <code>REPORTS_KEY</code> (the key in the script) to the Vercel project, then redeploy.</li></ol></div></section>`;
+    return;
+  }
+  const people = repModel(), { a, b, pa, pb, t } = repRange();
+  for (const p of people) { p.cur = agg(p.rows, a, b); p.prev = agg(p.rows, pa, pb); p.comp = compliance(D, p, a, b, t); }
+  const sales = people.filter((p) => p.kind === "metrics" && p.loaded);
+  const T = sumAgg(sales.map((p) => p.cur)), P = sumAgg(sales.map((p) => p.prev));
+  const exp = people.reduce((x, p) => x + p.comp.expected, 0), done = people.reduce((x, p) => x + p.comp.done, 0);
+  const fresh = raw && raw.fetchedAt ? Math.round((Date.now() - new Date(raw.fetchedAt)) / 60000) : null;
+  const presets = [["thisWeek", "This week"], ["lastWeek", "Last week"], ["thisMonth", "This month"], ["lastMonth", "Last month"], ["last30", "Last 30 days"], ["custom", "Custom"]];
+  let h = `<div class="kpis">
+    <div class="kpi"><div class="l">Team sales</div><div class="v"><span class="cur">EGP</span>${fN(T.sales)}</div>${dlt(T.sales, P.sales)}</div>
+    <div class="kpi"><div class="l">Orders · items</div><div class="v">${fN(T.orders)}<small>· ${fN(T.items)} items</small></div>${dlt(T.orders, P.orders)}</div>
+    <div class="kpi"><div class="l">Average order value</div><div class="v"><span class="cur">EGP</span>${fN(T.aov)}</div>${dlt(T.aov, P.aov)}</div>
+    <div class="kpi"><div class="l">Avg daily sales</div><div class="v"><span class="cur">EGP</span>${fN(T.avgDaily)}</div>${dlt(T.avgDaily, P.avgDaily)}</div>
+    <div class="kpi"><div class="l">Items per order</div><div class="v">${T.ipo == null ? "—" : nf2.format(T.ipo)}</div>${dlt(T.ipo, P.ipo)}</div>
+    <div class="kpi"><div class="l">Refund rate</div><div class="v">${fPct(T.refundRate)}<small>· ${fN(T.refunds)}</small></div>${dlt(T.refundRate, P.refundRate, true, true)}</div>
+    <div class="kpi"><div class="l">Exchange rate</div><div class="v">${fPct(T.exchRate)}<small>· ${fN(T.exch)}</small></div>${dlt(T.exchRate, P.exchRate, true, true)}</div>
+    <div class="kpi"><div class="l">Reports submitted</div><div class="v ${exp && done < exp ? "bad" : exp ? "ok" : ""}">${exp ? `${done} / ${exp}` : "—"}</div><div class="dl flat">${exp ? `${exp - done} missing on scheduled days` : "No scheduled days in this period yet"}</div></div></div>`;
+  if (RS.error) h += `<div class="banner warn">${raw && raw.stale ? "Showing the last saved copy — " : ""}${esc(RS.error)}</div>`;
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Team Reports · Sales Performance</div><h2>${rngTxt(a, b)}</h2><div class="sub">Compared with ${rngTxt(pa, pb)} · from ${sales.length} team sheet${sales.length === 1 ? "" : "s"}</div></div>
+    <div class="rbar"><div class="chips">${presets.map(([k, l]) => `<button class="chip ${RS.preset === k ? "active" : ""}" data-act="repPreset" data-v="${k}">${l}</button>`).join("")}</div>
+    ${RS.preset === "custom" ? `<input type="date" id="repFrom" value="${esc(RS.from || iDate(a))}"><span class="muted">→</span><input type="date" id="repTo" value="${esc(RS.to || iDate(b))}">` : ""}
+    <button class="btn sm" data-act="repRefresh" ${RS.loading ? "disabled" : ""}>${RS.loading ? "Refreshing…" : "↻ Refresh"}</button></div></div>
+    <div class="rmeta" style="margin:-8px 0 14px">${fresh == null ? "" : `Sheets read <b>${fresh < 1 ? "just now" : fresh + " min ago"}</b> · updates every 10 minutes`}</div>
+    ${trendSVG(sales, a, b)}</section>`;
+  // leaderboard
+  const ranked = sales.slice().sort((x, y) => y.cur.sales - x.cur.sales);
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Leaderboard</div><h2>Performance by Team Member</h2><div class="sub">Click a name for her daily log, feedback and records.</div></div></div><div class="lbw"><table class="lbt"><thead><tr><th>#</th><th>Team member</th><th>Sales</th><th>vs prev.</th><th>Orders</th><th>Items</th><th>AOV</th><th>Items / order</th><th>Avg / day</th><th>Refunds</th><th>Exch.</th><th>OOS</th><th>Days logged</th><th>Last report</th></tr></thead><tbody>`;
+  ranked.forEach((p, k) => {
+    const c = p.cur, ch = pctChg(c.sales, p.prev.sales), age = p.last == null ? null : t - p.last;
+    h += `<tr class="click" data-act="repDetail" data-k="${esc(p.key)}"><td class="rk">${c.sales ? k + 1 : "–"}</td><td><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${p.code ? "ID " + esc(p.code) : esc(p.title)}</small></div></div></td>
+      <td class="sl"><b>${fN(c.sales)}</b><div class="share" style="--c:${esc(p.color)}"><i style="width:${T.sales ? ((c.sales / T.sales) * 100).toFixed(1) : 0}%"></i></div></td>
+      <td>${ch == null ? `<span class="muted">—</span>` : `<span class="dl ${ch >= 0 ? "good" : "bad"}" style="margin:0">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch * 100).toFixed(0)}%</span>`}</td>
+      <td>${fN(c.orders)}</td><td>${fN(c.items)}</td><td>${fN(c.aov)}</td><td>${c.ipo == null ? "—" : nf2.format(c.ipo)}</td><td>${fN(c.avgDaily)}</td>
+      <td>${fN(c.refunds)}</td><td>${fN(c.exch)}</td><td>${fN(c.oos)}</td><td>${c.days}${c.off ? ` <span class="muted">· ${c.off} off</span>` : ""}</td>
+      <td>${p.error ? `<span class="stale bad">Sheet error</span>` : age == null ? `<span class="stale bad">Never</span>` : `<span class="stale ${age <= 2 ? "ok" : age <= 6 ? "warn" : "bad"}">${age <= 0 ? "Today" : age === 1 ? "Yesterday" : dmy(p.last)}</span>`}</td></tr>`;
+  });
+  h += `<tr class="tot"><td></td><td>Team total</td><td>${fN(T.sales)}</td><td>${(() => { const ch = pctChg(T.sales, P.sales); return ch == null ? "—" : `<span class="dl ${ch >= 0 ? "good" : "bad"}" style="margin:0">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch * 100).toFixed(0)}%</span>`; })()}</td><td>${fN(T.orders)}</td><td>${fN(T.items)}</td><td>${fN(T.aov)}</td><td>${T.ipo == null ? "—" : nf2.format(T.ipo)}</td><td>${fN(T.avgDaily)}</td><td>${fN(T.refunds)}</td><td>${fN(T.exch)}</td><td>${fN(T.oos)}</td><td>${T.days}</td><td></td></tr></tbody></table></div>`;
+  const fbOnly = people.filter((p) => p.kind === "feedback" && p.loaded);
+  if (fbOnly.length) h += `<div class="fn">Feedback-only logs: ${fbOnly.map((p) => `<b>${esc(p.name)}</b> (${p.cur.fb} entr${p.cur.fb === 1 ? "y" : "ies"} in this period)`).join(", ")} — see Team Feedback below.</div>`;
+  h += `</section>`;
+  // compliance + shifts/quality
+  const withSched = people.filter((p) => p.m);
+  h += `<div class="grid2"><section class="card"><div class="sh"><div><div class="eyebrow">Discipline</div><h2>Report Submission</h2><div class="sub">Days she was on the Weekly Schedule vs days with a report, up to yesterday.</div></div></div><div class="comp">`;
+  h += withSched.map((p) => {
+    const c = p.comp, pc = c.expected ? c.done / c.expected : null;
+    return `<div class="crow"><div class="nm"><span class="dot" style="--c:${esc(p.color)}"></span><div>${esc(p.name)}<small>Last report: ${p.last == null ? "never" : dmy(p.last, 1)}</small></div></div>
+      <div class="cb"><div class="cbar">${c.expected ? `<i style="width:${(pc * 100).toFixed(1)}%"></i><i class="miss" style="width:${(100 - pc * 100).toFixed(1)}%"></i>` : ""}</div>${c.missing.length ? `<div class="ms">Missing: ${c.missing.slice(-6).map((i) => `${DY[wdOf(i)]} ${dmy(i)}${c.offMismatch.includes(i) ? " (logged Off)" : ""}`).join(", ")}${c.missing.length > 6 ? ` +${c.missing.length - 6} more` : ""}</div>` : c.expected ? "" : `<div class="ms" style="color:var(--muted)">No scheduled days in this period</div>`}</div>
+      <div class="cpc">${pc == null ? "—" : Math.round(pc * 100) + "%"}<small>${c.done}/${c.expected} days</small></div></div>`;
+  }).join("") || `<div class="empty">Link each sheet to a team member (Manage → Reports) to track submissions.</div>`;
+  const shifts = Object.entries(T.byShift).sort((x, y) => y[1].sales - x[1].sales);
+  const flags = qualityFlags(D, people, a, b, t);
+  h += `</div></section><section class="card"><div class="sh"><div><div class="eyebrow">Shifts &amp; data quality</div><h2>By Shift</h2><div class="sub">Sales split by the shift written in the reports.</div></div></div>
+    <table class="stbl shtbl"><thead><tr><th>Shift</th><th>Days</th><th>Sales</th><th>Share</th><th>Orders</th><th>AOV</th></tr></thead><tbody>${shifts.map(([k, s]) => `<tr><td>${esc(k)}</td><td>${s.days}</td><td><b>${fN(s.sales)}</b></td><td>${T.sales ? fPct(s.sales / T.sales) : "—"}</td><td>${fN(s.orders)}</td><td>${s.orders ? fN(s.sales / s.orders) : "—"}</td></tr>`).join("") || `<tr><td colspan="6" class="muted">No sales in this period.</td></tr>`}</tbody></table>
+    <h4 style="margin:20px 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#B98A4B">Needs checking (${flags.length})</h4>
+    <div class="flags">${flags.slice(0, 8).map((f) => `<div class="flag ${f.err ? "err" : ""}"><span class="ic">${f.err ? "!" : "?"}</span><div><b>${esc(f.p.name)}</b> — ${esc(f.t)}<small>${esc(f.s)}</small></div><span class="muted" style="font-size:11.5px;white-space:nowrap">${f.i == null ? "" : `${DY[wdOf(f.i)]} ${dmy(f.i)}`}</span></div>`).join("") || `<div class="muted" style="font-size:13px">Nothing unusual in this period.</div>`}${flags.length > 8 ? `<div class="muted" style="font-size:12px">+${flags.length - 8} more</div>` : ""}</div></section></div>`;
+  // feedback feed
+  let fb = [];
+  for (const p of people) for (const r of p.rows) if (r.fb && r.i >= a && r.i <= b) fb.push({ p, r });
+  const allFb = fb.length;
+  if (RS.fmem) fb = fb.filter((x) => x.p.key === RS.fmem);
+  if (RS.fq) { const q = RS.fq.toLowerCase(); fb = fb.filter((x) => x.r.fb.toLowerCase().includes(q)); }
+  fb.sort((x, y) => y.r.i - x.r.i || x.p.name.localeCompare(y.p.name));
+  const shown = RS.feedAll ? fb : fb.slice(0, 12);
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Voice of the team</div><h2>Team Feedback</h2><div class="sub">${allFb} note${allFb === 1 ? "" : "s"} written in this period — newest first.</div></div></div>
+    <div class="fbbar"><div class="chips" style="margin:0"><button class="chip ${RS.fmem ? "" : "active"}" data-act="repFbMem" data-k="">Everyone</button>${people.filter((p) => p.rows.some((r) => r.fb && r.i >= a && r.i <= b)).map((p) => `<button class="chip ${RS.fmem === p.key ? "active" : ""}" data-act="repFbMem" data-k="${esc(p.key)}">${esc(p.name)}</button>`).join("")}</div>
+    <input type="text" id="repFq" placeholder="Search feedback… (e.g. مقاسات, Porto)" value="${esc(RS.fq)}"></div>
+    ${shown.map(({ p, r }) => { const id = p.key + ":" + r.i, open = RS.open[id] || !!RS.fq; return `<div class="fbi"><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${DY[wdOf(r.i)]}, ${dmy(r.i, 1)}${r.shift ? ` · ${esc(r.shift)}` : ""}${r.hasNums ? `<br>EGP ${fN(r.sales)} · ${fN(r.orders)} orders` : ""}</small></div></div>
+      <div><p class="fbt ${open ? "open" : ""}" dir="auto" data-act="repFbOpen" data-id="${esc(id)}">${hilite(r.fb, RS.fq)}</p>${!open && (r.fb.length > 260 || r.fb.split("\n").length > 5) ? `<button class="more" data-act="repFbOpen" data-id="${esc(id)}">Read more</button>` : ""}</div></div>`; }).join("") || `<div class="empty">No feedback ${RS.fq || RS.fmem ? "matches this filter" : "in this period"}.</div>`}
+    ${fb.length > 12 ? `<button class="btn sm" style="margin-top:12px" data-act="repFbAll">${RS.feedAll ? "Show less" : `Show all ${fb.length}`}</button>` : ""}</section>`;
+  // sources
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Sources</div><h2>Team Sheets</h2><div class="sub">Each girl's own Google Sheet. Add or change sheets from Manage → Reports.</div></div>${S.me.role === "admin" ? `<button class="btn sm" data-act="repSources">Manage sheets</button>` : ""}</div>
+    <table class="stbl"><thead><tr><th>Sheet</th><th>Linked to</th><th>Rows</th><th>Last edited</th><th>Status</th><th></th></tr></thead><tbody>${people.map((p) => `<tr><td style="white-space:normal">${esc(p.title || "—")}</td><td><span class="row" style="gap:7px;flex-wrap:nowrap"><span class="dot" style="--c:${esc(p.color)}"></span>${esc(p.name)}${p.m ? "" : ` <span class="muted">(not on the schedule)</span>`}</span></td><td>${p.loaded ? p.rows.length : "—"}</td><td>${p.updated ? logFmt.format(new Date(p.updated)) : "—"}</td><td>${p.error ? `<span class="stale bad" title="${esc(p.error)}">Error</span>` : p.loaded ? `<span class="stale ok">Connected</span>` : `<span class="stale warn">Waiting</span>`}</td><td><a class="btn sm ghost" href="${esc(p.url)}" target="_blank" rel="noopener">Open ↗</a></td></tr>`).join("")}</tbody></table></section>`;
+  const fq = document.activeElement && document.activeElement.id === "repFq" ? [document.activeElement.selectionStart] : null;
+  root.innerHTML = h;
+  if (fq) { const el = $("#repFq"); el.focus(); el.setSelectionRange(fq[0], fq[0]); }
+}
+function repDetail(key) {
+  const D = V(), p = repModel().find((x) => x.key === key); if (!p) return;
+  const { a, b, pa, pb } = repRange(), c = agg(p.rows, a, b), pv = agg(p.rows, pa, pb);
+  const rows = p.rows.filter((r) => r.i >= a && r.i <= b).sort((x, y) => y.i - x.i);
+  const recs = (D.requests || []).filter((r) => r.member === p.src.memberId && p.src.memberId && dIdx(r.date) >= a && dIdx(r.date) <= b);
+  const mk = [["Sales", `EGP ${fN(c.sales)}`, dlt(c.sales, pv.sales)], ["Orders", fN(c.orders), dlt(c.orders, pv.orders)], ["AOV", `EGP ${fN(c.aov)}`, dlt(c.aov, pv.aov)], ["Items / order", c.ipo == null ? "—" : nf2.format(c.ipo), dlt(c.ipo, pv.ipo)], ["Refund rate", fPct(c.refundRate), dlt(c.refundRate, pv.refundRate, true, true)], ["Exchange rate", fPct(c.exchRate), dlt(c.exchRate, pv.exchRate, true, true)]];
+  $("#modalRoot").innerHTML = `<div class="overlay" data-act="repClose"><div class="modal"><div class="m-head"><h3>${esc(p.name)} · ${rngTxt(a, b)}</h3><div class="row"><a class="btn sm light" href="${esc(p.url)}" target="_blank" rel="noopener">Open sheet ↗</a><button class="btn ghost" data-act="repClose">✕</button></div></div>
+    <div class="m-body dtl">${p.kind === "metrics" ? `<div class="mk">${mk.map(([l, v, d]) => `<div><span>${l}</span><b>${v}</b>${d}</div>`).join("")}</div>` : ""}
+    ${recs.length ? `<div class="panel"><h4>Records in this period</h4>${recs.map((r) => `<div style="font-size:13px;padding:4px 0"><span class="tp ${r.type}">${esc(REQ_TYPES[r.type] || r.type)}</span> ${DY[wdOf(dIdx(r.date))]} ${dmy(dIdx(r.date))}${isAdj(r) ? ` · <b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "")}` : ""}${r.details ? ` — ${esc(r.details)}` : ""} <span class="ss ${stClass(r)}">${stLabel(r)}</span></div>`).join("")}</div>` : ""}
+    <div class="tw"><table><thead><tr><th>Day</th><th>Shift</th>${p.kind === "metrics" ? `<th>Sales</th><th>Orders</th><th>Items</th><th>AOV</th><th>OOS</th><th>Refunds</th><th>Exch.</th>` : ""}<th style="text-align:left">Feedback</th></tr></thead><tbody>
+    ${rows.map((r) => `<tr class="${r.off ? "off" : ""}"><td>${DY[wdOf(r.i)]} ${dmy(r.i)}</td><td>${esc(r.shift || "—")}</td>${p.kind === "metrics" ? `<td><b>${fN(r.sales)}</b></td><td>${fN(r.orders)}</td><td>${fN(r.items)}</td><td>${r.orders ? fN(r.sales / r.orders) : "—"}</td><td>${fN(r.oos)}</td><td>${fN(r.refunds)}</td><td>${fN(r.exch)}</td>` : ""}<td class="f" dir="auto">${esc(r.fb)}</td></tr>`).join("") || `<tr><td colspan="10" class="muted">Nothing logged in this period.</td></tr>`}</tbody></table></div></div></div></div>`;
+}
+async function loadReports(force) {
+  if (!S.me) return renderReports();
+  RS.loading = true; renderReports();
+  try { const j = await call("/api/reports" + (force ? "?force=1" : ""), "GET"); RS.raw = j; RS.error = j.error || ""; }
+  catch (e) { if (e.status === 401) { RS.loading = false; return signedOut("Please sign in again."); } RS.error = e.message; }
+  RS.loading = false; renderReports();
+}
+function showView(v) {
+  RS.view = v;
+  $("#opsView").classList.toggle("hidden", v !== "ops");
+  $("#repView").classList.toggle("hidden", v !== "reports");
+  document.querySelectorAll(".views button").forEach((b) => b.classList.toggle("active", b.dataset.v === v));
+  history.replaceState(null, "", v === "reports" ? "#reports" : location.pathname + location.search);
+  if (v === "reports") { renderReports(); if (!RS.raw && !RS.loading) loadReports(); }
+  window.scrollTo({ top: 0 });
+}
+function sourcesEditor(D) {
+  const admin = S.me && S.me.role === "admin", people = repModel();
+  let h = `<p class="muted" style="margin-top:0">Each team member's Google Sheet with a <b>Daily Log</b> tab (Date · Moderator · Shift · Total Sales · Orders · Items · … · Feedback). A sheet with just <b>Date · Feedback</b> also works — it shows in Team Feedback. ${admin ? "" : "<b>Only admins can change this list.</b>"}</p>`;
+  (D.reportSources || []).forEach((s, k) => {
+    const p = people.find((x) => x.key === s.id);
+    h += `<div class="srcrow"><label class="field">Team member<select data-path="reportSources.${k}.memberId" ${admin ? "" : "disabled"}><option value="">— Not on the schedule —</option>${D.members.map((m) => `<option value="${esc(m.id)}" ${m.id === s.memberId ? "selected" : ""}>${esc(m.name)}</option>`).join("")}</select></label>
+      <label class="field">Other name<input type="text" data-path="reportSources.${k}.name" value="${esc(s.name || "")}" ${s.memberId || !admin ? "disabled" : ""} placeholder="e.g. Shams"></label>
+      <label class="field">Sheet link<input type="text" data-srcurl="${k}" value="${esc(sheetUrl(s.sheetId))}" ${admin ? "" : "disabled"}></label>
+      <span class="st3 ${p && p.error ? "bad" : ""}">${p ? (p.error ? esc(p.error).slice(0, 60) : p.loaded ? `${p.rows.length} rows · ${esc(p.title)}`.slice(0, 60) : "Saved — loads after refresh") : ""}</span>
+      ${admin ? `<button class="btn sm danger" data-act="srcDel" data-i="${k}" style="margin-bottom:4px">Remove</button>` : "<span></span>"}</div>`;
+  });
+  if (admin) h += `<div class="panel" style="margin-top:14px"><h4>Add a sheet</h4><div class="row" style="align-items:end"><label class="field" style="flex:2;min-width:260px">Google Sheet link<input type="text" id="srcNewUrl" placeholder="https://docs.google.com/spreadsheets/d/…"></label>
+    <label class="field" style="flex:1;min-width:170px">Team member<select id="srcNewMem"><option value="">— Not on the schedule —</option>${D.members.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join("")}</select></label>
+    <label class="field" style="flex:1;min-width:140px">Other name<input type="text" id="srcNewName" placeholder="e.g. Shams"></label><button class="btn primary" data-act="srcAdd">Add sheet</button></div>
+    <div class="muted" style="font-size:12px;margin-top:8px">The sheet must be yours or shared with you (the account that owns the Apps Script). Save changes, then press Refresh on the Reports page.</div></div>`;
+  return h;
+}
+
 /* ============================ admin ============================ */
 function openAdmin(tab) {
   if (!S.token || !S.me) return openLogin(tab);
@@ -1283,12 +1744,14 @@ function openLogin(tab, msg) {
     try {
       const j = await call("/api/auth", "POST", { username: $("#liUser").value.trim(), password: $("#liPass").value });
       S.token = j.token; S.me = j.user; localStorage.setItem("vmo_token", S.token);
-      toast(`Welcome, ${S.me.name}`); renderHeader(); openAdmin(tab);
+      toast(`Welcome, ${S.me.name}`); renderHeader();
+      if (tab === "__reports") { $("#modalRoot").innerHTML = ""; RS.raw = null; showView("reports"); } else openAdmin(tab);
     } catch (err) { toast(err.status === 401 ? "Wrong username or password" : err.message, true); }
   };
 }
 function signedOut(msg) {
   S.token = ""; S.me = null; S.users = null; localStorage.removeItem("vmo_token");
+  RS.raw = null; RS.error = ""; renderReports();
   const keep = S.admin.open; S.admin.open = false;
   renderHeader();
   if (keep || msg) openLogin(S.admin.tab, msg);
@@ -1297,6 +1760,7 @@ async function checkSession() {
   if (!S.token) return;
   try { const j = await call("/api/auth", "GET"); S.me = j.user; } catch (e) { if (e.status === 401) { S.token = ""; localStorage.removeItem("vmo_token"); } }
   renderAll();
+  if (location.hash === "#reports") showView("reports");
 }
 async function loadUsers() {
   try { S.users = (await call("/api/users", "GET")).users; } catch (e) { S.users = []; if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
@@ -1430,10 +1894,11 @@ function requestsEditor(D) {
 }
 function renderAdmin() {
   const D = S.draft, A = S.admin;
-  const tabs = [["week", "Week editor"], ["new", "New week"], ["requests", "Excuses & records"], ["team", "Team"], ["shifts", "Shift types"], ["desks", "Responsible of"], ["times", "Time slots"], ["settings", "Settings"]].concat(S.me && S.me.role === "admin" ? [["users", "Users"]] : []);
+  const tabs = [["week", "Week editor"], ["new", "New week"], ["requests", "Excuses & records"], ["reports", "Reports"], ["team", "Team"], ["shifts", "Shift types"], ["desks", "Responsible of"], ["times", "Time slots"], ["settings", "Settings"]].concat(S.me && S.me.role === "admin" ? [["users", "Users"]] : []);
   let body = "";
   if (A.tab === "week") body = weekEditor(D);
   else if (A.tab === "requests") body = requestsEditor(D);
+  else if (A.tab === "reports") body = sourcesEditor(D);
   else if (A.tab === "new") {
     const def = A.newDate || iDate(wkStart(D, curIdx()) + 7), created = Object.keys(D.weeks).sort();
     body += `<div class="panel"><h4>Week</h4><label class="field" style="max-width:240px">Any day in the week<input type="date" id="newDate" value="${esc(def)}"></label><div class="muted" style="margin-top:8px;font-size:12.5px" id="newDateInfo"></div></div>
@@ -1549,6 +2014,14 @@ document.addEventListener("change", (e) => {
     return afterEdit(true);
   }
 });
+document.addEventListener("input", (e) => {
+  if (e.target.id === "repFq") { RS.fq = e.target.value; RS.feedAll = false; renderReports(); }
+});
+document.addEventListener("change", (e) => {
+  if (e.target.id === "repFrom" || e.target.id === "repTo") { RS.from = $("#repFrom").value; RS.to = $("#repTo").value; return renderReports(); }
+  const su = e.target.closest("[data-srcurl]");
+  if (su && S.draft) { const id = sheetIdOf(su.value); if (!id) return toast("That isn't a Google Sheets link", true); S.draft.reportSources[+su.dataset.srcurl].sheetId = id; afterEdit(true); }
+});
 document.addEventListener("input", onEdit);
 document.addEventListener("change", onEdit);
 function onEdit(e) {
@@ -1578,6 +2051,25 @@ document.addEventListener("click", async (e) => {
   const wkKey = () => iDate(viewWS());
   switch (act) {
     case "overlay": if (e.target === el) closeAdmin(); return;
+    case "view": if (el.dataset.v === "reports" && !S.me) return openLogin("__reports"); return showView(el.dataset.v);
+    case "repLogin": return openLogin("__reports");
+    case "repPreset": RS.preset = el.dataset.v; return renderReports();
+    case "repRefresh": return loadReports(true);
+    case "repDetail": return repDetail(el.dataset.k);
+    case "repClose": if (e.target === el || el.tagName === "BUTTON") $("#modalRoot").innerHTML = ""; return;
+    case "repFbMem": RS.fmem = el.dataset.k; RS.feedAll = false; return renderReports();
+    case "repFbOpen": RS.open[el.dataset.id] = true; return renderReports();
+    case "repFbAll": RS.feedAll = !RS.feedAll; return renderReports();
+    case "repSources": return openAdmin("reports");
+    case "srcDel": if (confirm("Remove this sheet from Reports? The sheet itself isn't touched.")) D.reportSources.splice(i, 1); return R();
+    case "srcAdd": {
+      const id = sheetIdOf($("#srcNewUrl").value); if (!id) return toast("Paste a Google Sheets link", true);
+      if (D.reportSources.some((x) => x.sheetId === id)) return toast("This sheet is already added", true);
+      const mid = $("#srcNewMem").value, nm = $("#srcNewName").value.trim();
+      if (!mid && !nm) return toast("Pick the team member, or type a name", true);
+      D.reportSources.push({ id: uid("src"), sheetId: id, memberId: mid, ...(mid ? {} : { name: nm }) });
+      toast("Added — save changes, then refresh Reports"); return R();
+    }
     case "viewAtt": case "lbNav": { const r = (V().requests || []).find((x) => x.id === el.dataset.r); if (r) openLightbox(r, +el.dataset.j); return; }
     case "closeLb": if (e.target === el || el.tagName === "BUTTON") $("#lbRoot").innerHTML = ""; return;
     case "closeModal": if (S.admin.open) closeAdmin(); else $("#modalRoot").innerHTML = ""; return;
@@ -1712,6 +2204,8 @@ window.addEventListener("beforeunload", (e) => { if (dirty()) { e.preventDefault
 
 setInterval(() => { renderHeader(); renderKpis(); renderLive(); renderDay(); }, 20000);
 setInterval(() => { if (!S.admin.open) load(true); }, 120000);
+setInterval(() => { if (RS.view === "reports" && S.me && !RS.loading && (!RS.raw || !RS.raw.fetchedAt || Date.now() - new Date(RS.raw.fetchedAt) > 10 * 60e3)) loadReports(); }, 60000);
+if (location.hash === "#reports" && !S.token) showView("reports");
 renderAll();
 load();
 checkSession();

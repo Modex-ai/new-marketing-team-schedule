@@ -40,6 +40,11 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: 'Someone else saved changes first. Refresh the page, then edit again.', updatedAt: current.updatedAt });
     }
 
+    // Only admins choose which Google Sheets the Reports page reads (an editor's save keeps the stored list).
+    if (me.role !== 'admin') {
+      if (current && Array.isArray(current.reportSources)) data.reportSources = current.reportSources;
+      else delete data.reportSources;
+    }
     data.updatedAt = new Date().toISOString();
     data.updatedBy = me.name;
     // activity log — the server stamps time and author; history comes from the stored copy, not the client
