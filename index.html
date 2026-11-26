@@ -920,14 +920,28 @@ const minOffset = () => { const D = V(); return D.settings.startDate ? Math.min(
 const setOffset = (o) => { S.weekOffset = Math.max(minOffset(), o); };
 
 /* ============================ API ============================ */
+// Full schedule history (Feb → Nov 2026, from the "Marketing Team Schedule" Google Sheets) is always
+// layered under the saved schedule, so report checks and profiles cover every past week. Weeks saved
+// in the dashboard always win; history only fills weeks that don't exist yet.
+let HIST = null;
+const histReady = fetch("assets/schedule-history.json").then((r) => r.json()).then((h) => { HIST = h; }).catch(() => {});
+function withHistory(x) {
+  if (!HIST || !x) return x;
+  for (const k of ["members", "shiftTypes", "responsibilities"]) for (const o of HIST[k] || []) if (!x[k].some((y) => y.id === o.id)) x[k].push(clone(o));
+  for (const [key, w] of Object.entries(HIST.weeks)) if (!x.weeks[key]) x.weeks[key] = clone(w);
+  if (!x.settings.startDate || x.settings.startDate > HIST.range[0]) x.settings.startDate = HIST.range[0];
+  return x;
+}
 async function load(silent) {
+  await histReady;
   try {
     const r = await fetch("/api/schedule", { cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
     S.serverOK = true; S.fresh = !j.data;
-    if (j.data && !dirty()) { S.data = normalize(j.data); if (S.draft) S.draft = clone(S.data); }
+    if (j.data && !dirty()) { S.data = withHistory(normalize(j.data)); if (S.draft) S.draft = clone(S.data); }
   } catch (e) { if (!silent) S.serverOK = false; }
+  if (!S.histApplied && !dirty()) { withHistory(S.data); if (S.draft) S.draft = clone(S.data); S.histApplied = true; }
   renderAll();
 }
 async function call(url, method, body) {
@@ -1716,8 +1730,7 @@ function renderReports() {
     <div class="rbtns">${RS.mem || RS.shift || RS.preset !== "thisMonth" || RS.cmp !== "prev" ? `<button class="btn sm ghost" data-act="repReset">Reset</button>` : ""}<button class="btn sm" data-act="repRefresh" ${RS.loading ? "disabled" : ""}>${RS.loading ? "Refreshing…" : "↻ Refresh"}</button></div></div>
     <div class="rmeta">${rngTxt(a, b)} · ${b - a + 1} day${b === a ? "" : "s"}${cmp ? ` · compared with ${rngTxt(pa, pb)}` : ""}${RS.mem ? ` · <b>${esc((all.find((p) => p.key === RS.mem) || {}).name || "")}</b> only` : ""}${RS.shift ? ` · <b>${esc(RS.shift)}</b> shifts only` : ""}${fresh == null ? "" : ` · sheets read <b>${fresh < 1 ? "just now" : fresh + " min ago"}</b>`}</div></section>`;
   if (RS.error) h += `<div class="banner warn">${raw && raw.stale ? "Showing the last saved copy — " : ""}${esc(RS.error)}</div>`;
-  const histMissing = !Object.keys(D.weeks).some((k) => dIdx(k) < wkStart(D, t) - 7);
-  if (histMissing) h += `<div class="banner info">Report checks only use weeks that exist in the Weekly Schedule. <b>Import the schedule history</b> (15 Feb – 28 Nov 2026) to check every month. <button class="btn sm primary" style="margin-left:8px" data-act="importHistory">Import now</button></div>`;
+  if (!HIST) h += `<div class="banner warn">Couldn't load the schedule history — report checks only cover weeks saved in the dashboard. Refresh the page to try again.</div>`;
   h += `<div class="kpis">
     <div class="kpi"><div class="l">Team sales</div><div class="v"><span class="cur">EGP</span>${fN(T.sales)}</div>${X(T.sales, P.sales)}</div>
     <div class="kpi"><div class="l">Orders · items</div><div class="v">${fN(T.orders)}<small>· ${fN(T.items)} items</small></div>${X(T.orders, P.orders)}</div>
@@ -2215,7 +2228,7 @@ function renderAdmin() {
 function buildWeek(D, ws, src, pickKey) {
   const from = src === "prev" ? D.weeks[iDate(ws - 7)] : src === "pick" ? D.weeks[pickKey] : null;
   if (from) return { memberIds: D.members.filter((m) => from.memberIds.includes(m.id)).map((m) => m.id), cells: clone(from.cells), notes: {}, createdAt: new Date().toISOString(), src: src === "prev" ? "copy of the previous week" : `copy of week ${dmy(dIdx(pickKey))}` };
-  return { memberIds: D.members.map((m) => m.id), cells: {}, notes: {}, createdAt: new Date().toISOString(), src: "empty" };
+  return { memberIds: D.members.filter((m) => !m.former).map((m) => m.id), cells: {}, notes: {}, createdAt: new Date().toISOString(), src: "empty" };
 }
 
 /* path helpers */
