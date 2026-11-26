@@ -17,7 +17,7 @@ const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || ''));
 const isTime = (s) => /^\d{2}:\d{2}$/.test(String(s || ''));
 const str = (v, n) => String(v ?? '').slice(0, n);
 const okUrl = (u) => /^https:\/\/[\w.-]+\.blob\.vercel-storage\.com\//.test(String(u || ''));
-const cleanAtt = (a) => (a && okUrl(a.url) ? { url: a.url, name: str(a.name, 160) || 'file', kind: a.kind === 'video' ? 'video' : 'image', size: +a.size || 0, at: new Date().toISOString() } : null);
+const cleanAtt = (a) => (a && okUrl(a.url) ? { url: a.url, name: str(a.name, 160) || 'file', kind: a.kind === 'video' ? 'video' : 'image', size: +a.size || 0, at: a.at && !isNaN(Date.parse(a.at)) ? a.at : new Date().toISOString() } : null);
 
 function cleanFields(src, out) {
   if ('title' in src) out.title = str(src.title, 200).trim();
@@ -28,6 +28,7 @@ function cleanFields(src, out) {
   if ('due' in src) out.due = isDate(src.due) ? src.due : '';
   if ('dueTime' in src) out.dueTime = isTime(src.dueTime) ? src.dueTime : '';
   if ('desk' in src) out.desk = str(src.desk, 80);
+  if ('files' in src) out.files = (Array.isArray(src.files) ? src.files : []).map(cleanAtt).filter(Boolean).slice(0, 30);
   if ('checklist' in src) out.checklist = (Array.isArray(src.checklist) ? src.checklist : []).slice(0, 40).map((c) => ({ t: str(c && c.t, 300), d: !!(c && c.d) })).filter((c) => c.t.trim());
   return out;
 }
@@ -53,7 +54,7 @@ export default async function handler(req, res) {
       if (!f.title) return res.status(400).json({ error: 'Write a title for the task' });
       if (!f.member) return res.status(400).json({ error: 'Choose who the task is for' });
       doc.seq = (+doc.seq || 0) + 1;
-      task = { id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), code: 'TSK-' + String(doc.seq).padStart(4, '0'), priority: 'normal', due: '', dueTime: '', desk: '', details: '', checklist: [], ...f, status: 'assigned', createdAt: now, createdBy: by, proof: [], rating: null, returns: 0, events: [] };
+      task = { id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), code: 'TSK-' + String(doc.seq).padStart(4, '0'), priority: 'normal', due: '', dueTime: '', desk: '', details: '', checklist: [], files: [], ...f, status: 'assigned', createdAt: now, createdBy: by, proof: [], rating: null, returns: 0, events: [] };
       ev(task, 'created');
       doc.tasks.unshift(task);
       log.push(`Task ${task.code} assigned to ${who(task)}: “${task.title}”${task.due ? ` — due ${task.due}${task.dueTime ? ' ' + task.dueTime : ''}` : ''} (${task.priority})`);
@@ -63,6 +64,7 @@ export default async function handler(req, res) {
       cleanFields(p, task);
       const edited = ['title', 'details', 'member', 'priority', 'due', 'dueTime', 'desk'].filter((k) => k in p && before[k] !== task[k]);
       if (edited.length) { ev(task, 'edited', '', { fields: edited }); log.push(`Task ${task.code}: edited ${edited.join(', ')}`); }
+      if ('files' in p && JSON.stringify((before.files || []).map((x) => x.url)) !== JSON.stringify(task.files.map((x) => x.url))) { ev(task, 'files', `${task.files.length} attachment${task.files.length === 1 ? '' : 's'}`); log.push(`Task ${task.code}: attachments updated (${task.files.length})`); }
       if ('checklist' in p && JSON.stringify(before.checklist) !== JSON.stringify(task.checklist) && !edited.length) ev(task, 'checklist');
       if (p.status && p.status !== before.status) {
         if (!STATUS.includes(p.status)) return res.status(400).json({ error: 'Unknown status' });
@@ -88,12 +90,14 @@ export default async function handler(req, res) {
     } else if (b.op === 'addProof') {
       task = find(); if (!task) return res.status(404).json({ error: 'Task not found' });
       const a = cleanAtt(b.att); if (!a) return res.status(400).json({ error: 'Invalid attachment' });
-      task.proof = [...(task.proof || []), a].slice(0, 40); ev(task, 'proof', a.name);
-      log.push(`Task ${task.code} (${who(task)}): attached ${a.name}`);
+      const L = b.list === 'files' ? 'files' : 'proof';
+      task[L] = [...(task[L] || []), a].slice(0, 40); ev(task, L === 'files' ? 'fileAdded' : 'proof', a.name);
+      log.push(`Task ${task.code} (${who(task)}): ${L === 'files' ? 'brief attachment' : 'proof'} added — ${a.name}`);
     } else if (b.op === 'delProof') {
       task = find(); if (!task) return res.status(404).json({ error: 'Task not found' });
-      const [x] = (task.proof || []).splice(+b.j, 1);
-      if (x) { ev(task, 'proofRemoved', x.name); log.push(`Task ${task.code}: removed attachment ${x.name}`); }
+      const L = b.list === 'files' ? 'files' : 'proof';
+      const [x] = (task[L] || []).splice(+b.j, 1);
+      if (x) { ev(task, L === 'files' ? 'fileRemoved' : 'proofRemoved', x.name); log.push(`Task ${task.code}: removed attachment ${x.name}`); }
     } else if (b.op === 'delete') {
       if (me.role !== 'admin') return res.status(403).json({ error: 'Only admins can delete tasks — cancel it instead' });
       const k = doc.tasks.findIndex((t) => t.id === b.id); if (k < 0) return res.status(404).json({ error: 'Task not found' });

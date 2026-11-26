@@ -690,7 +690,7 @@ table.tkp{min-width:1000px}
 .tkmem label:has(input:checked){border-color:var(--brand);background:var(--pale-2);color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
 .tkmem input{display:none}
 .tkmem .av{width:28px;height:28px;font-size:10.5px;box-shadow:none}
-.tkgrid{display:grid;grid-template-columns:auto 1fr 130px 1fr;gap:12px;margin-top:12px;align-items:end}
+.tkgrid{display:grid;grid-template-columns:auto minmax(0,1fr) 120px minmax(0,1fr);gap:12px;margin-top:12px;align-items:end}
 .tkgrid .seg{margin-top:0}
 .modal.tkm{max-width:1220px}
 .m-head .code{color:var(--amber);font-size:15px;margin-right:6px}
@@ -748,6 +748,9 @@ table.tkp{min-width:1000px}
 .tkc-s li{display:flex;align-items:flex-start;gap:14px;font-size:19.5px;line-height:1.5;padding:10px 0;border-bottom:1px dashed #E2DED5;unicode-bidi:plaintext}
 .tkc-s li:last-child{border-bottom:none}
 .tkc-s li i{flex:none;width:22px;height:22px;border:2px solid var(--brand-2);border-radius:6px;margin-top:3px}
+.tkc-a{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tkc-a img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;border:1px solid #E2DED5;display:block;background:#fff}
+.tkc-am{font-size:15px!important;color:var(--muted)!important;margin-top:10px!important}
 .tkc-n{background:#0F3A3C0D;border:1px solid #DCE7E4;border-radius:14px;padding:14px 18px;font-size:15.5px;color:var(--brand);line-height:1.6}
 .tkc-n span{display:block;font-size:16px;margin-top:4px;text-align:right}
 .tkc-f{display:flex;justify-content:space-between;margin-top:20px;font-size:13px;color:rgba(255,255,255,.5)}
@@ -1619,22 +1622,11 @@ function cardImageHTML(D, m, ws) {
     <div class="xf"><span>Vendoor · Marketing Team Operations Management</span><span>All times Cairo · Issued ${dmy(cairoNow().idx, 1)}</span></div></div>`;
 }
 async function exportImage(html, filename, share) {
-  const stage = $("#exportStage");
-  stage.innerHTML = html;
-  const node = stage.firstElementChild;
-  try {
-    await document.fonts.ready;
-    await Promise.all([...node.querySelectorAll("img")].map((im) => (im.complete ? 0 : new Promise((r) => (im.onload = im.onerror = r)))));
-    const o = { pixelRatio: 2, cacheBust: false };
-    let url;
-    try { await htmlToImage.toPng(node, o); url = await htmlToImage.toPng(node, o); } // first pass warms images (Safari)
-    catch { url = await htmlToImage.toPng(node, { ...o, skipFonts: true }); }
-    const blob = await (await fetch(url)).blob();
-    const file = new File([blob], filename, { type: "image/png" });
-    if (share && canShareFiles()) { try { await navigator.share({ files: [file], title: filename.replace(".png", "") }); return; } catch (e) { if (e.name === "AbortError") return; } }
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  } finally { stage.innerHTML = ""; }
+  const blob = await renderPng(html);
+  const file = new File([blob], filename, { type: "image/png" });
+  if (share && canShareFiles()) { try { await navigator.share({ files: [file], title: filename.replace(".png", "") }); return; } catch (e) { if (e.name === "AbortError") return; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 const slug = (s) => String(s).trim().replace(/[^\w؀-ۿ-]+/g, "_");
 const rangeName = (ws) => `${MON[new Date(ws * 864e5).getUTCMonth()]}${new Date(ws * 864e5).getUTCDate()}-${MON[new Date((ws + 6) * 864e5).getUTCMonth()]}${new Date((ws + 6) * 864e5).getUTCDate()}`;
@@ -2477,7 +2469,7 @@ function renderTasks() {
     <div class="chips">${TABS.map(([k, l]) => `<button class="chip ${TK.tab === k ? "active" : ""} ${k === "overdue" && cnt[k] ? "warnc" : ""}" data-act="tkTab" data-k="${k}">${l}<small>${cnt[k]}</small></button>`).join("")}</div>
     <div class="tkl">${list.map((t) => { const [sl, sc] = TST[t.status]; const ck = (t.checklist || []).length, cd = (t.checklist || []).filter((c) => c.d).length; return `<div class="tkr ${tOverdue(t, now) ? "od" : ""}" data-act="tkOpen" data-k="${esc(t.id)}">
       <div class="tc"><span class="code">${esc(t.code)}</span><span class="pri ${t.priority}">${TPRI[t.priority] || ""}</span></div>
-      <div class="tt"><b dir="auto">${esc(t.title)}</b><small>${t.desk && respById(D, t.desk) ? esc(respById(D, t.desk).name) + " · " : ""}${ck ? `${cd}/${ck} deliverables · ` : ""}Given ${dmy(Math.floor(cairoAt(t.createdAt) / 1440))} by ${esc((t.createdBy || {}).name || "")}</small></div>
+      <div class="tt"><b dir="auto">${esc(t.title)}</b><small>${t.desk && respById(D, t.desk) ? esc(respById(D, t.desk).name) + " · " : ""}${ck ? `${cd}/${ck} deliverables · ` : ""}${(t.files || []).length ? `📎 ${t.files.length} · ` : ""}Given ${dmy(Math.floor(cairoAt(t.createdAt) / 1440))} by ${esc((t.createdBy || {}).name || "")}</small></div>
       <div class="who"><div class="av" style="--c:${esc(tColor(t))}">${esc(initials(tName(t)))}</div><b>${esc(tName(t))}</b></div>
       <div class="td">${relDue(t, now)}</div>
       <div class="ts"><span class="tks ${sc}">${sl}</span>${t.returns ? `<small>Returned ${t.returns}×</small>` : ""}</div>
@@ -2488,9 +2480,14 @@ function renderTasks() {
 }
 /* ---- create / edit ---- */
 function openTaskForm(t) {
-  const D = V(), now = cairoNow();
-  const f = TK.form = t ? { id: t.id, members: [t.member], title: t.title, details: t.details || "", priority: t.priority, due: t.due, dueTime: t.dueTime, desk: t.desk || "", checklist: (t.checklist || []).map((c) => c.t).join("\n") }
-    : TK.form && !TK.form.id ? TK.form : { members: TK.mem ? [TK.mem] : [], title: "", details: "", priority: "normal", due: iDate(now.idx + 1), dueTime: "18:00", desk: "", checklist: "" };
+  const now = cairoNow();
+  TK.form = t ? { id: t.id, members: [t.member], title: t.title, details: t.details || "", priority: t.priority, due: t.due, dueTime: t.dueTime, desk: t.desk || "", checklist: (t.checklist || []).map((c) => c.t).join("\n"), files: clone(t.files || []) }
+    : TK.form && !TK.form.id ? TK.form : { members: TK.mem ? [TK.mem] : [], title: "", details: "", priority: "normal", due: iDate(now.idx + 1), dueTime: "18:00", desk: "", checklist: "", files: [] };
+  renderTaskForm(true);
+}
+const attTile = (x, act, j, extra) => `<span class="attx"><button class="att" data-act="${act}" data-j="${j}"${extra || ""} title="${esc(x.name)}">${x.kind === "video" ? `<span class="vid">▶</span><span class="an">${esc(x.name)}</span>` : `<img src="${esc(fileUrl(x))}" alt="" loading="lazy">`}</button>`;
+function renderTaskForm(focus) {
+  const D = V(), f = TK.form, t = f.id ? TK.list.find((x) => x.id === f.id) : null;
   const mems = D.members.filter((m) => !m.former);
   $("#modalRoot").innerHTML = `<div class="overlay"><div class="modal tkf"><div class="m-head"><h3>${t ? `Edit ${esc(t.code)}` : "New task"}</h3><button class="btn ghost" data-act="closeModal">✕</button></div>
     <div class="m-body">
@@ -2505,9 +2502,14 @@ function openTaskForm(t) {
         <label class="field">Desk / page<select id="tkDesk"><option value="">—</option>${D.responsibilities.map((r) => `<option value="${esc(r.id)}" ${f.desk === r.id ? "selected" : ""}>${esc(r.name)}</option>`).join("")}</select></label>
       </div>
       <label class="field" style="margin-top:12px">Deliverables checklist <span style="text-transform:none;letter-spacing:0;font-weight:500">— one per line (optional)</span><textarea id="tkCheck" dir="auto" rows="3" placeholder="5 stories for Modex&#10;3 TikTok videos for Porto">${esc(f.checklist)}</textarea></label>
+      <div class="field" style="margin-top:12px">Attachments <span style="text-transform:none;letter-spacing:0;font-weight:500">— photos or videos for the brief (references, examples, products…)</span></div>
+      <div class="row" style="margin-top:6px">${(f.files || []).map((x, j) => attTile(x, "tkFFView", j) + `<button class="rm" data-act="tkFFDel" data-j="${j}" title="Remove">✕</button></span>`).join("")}
+        <label class="btn sm">📎 Add photos / videos<input type="file" id="tkFormFiles" accept="image/*,video/*" multiple class="hidden"></label></div>
+      <div id="upStatus" class="upbar hidden" style="margin-top:8px"></div>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn ghost" data-act="closeModal">Cancel</button><button class="btn primary" data-act="tkSave">${t ? "Save changes" : "Create task &amp; prepare image"}</button></div>
     </div></div></div>`;
-  $("#tkTitle").focus();
+  if (focus) $("#tkTitle").focus();
+  $("#tkFormFiles").onchange = (e) => { readTaskForm(); uploadFiles([...e.target.files], (att) => { if (!TK.form) return; if ($("#tkTitle")) readTaskForm(); TK.form.files.push(att); if ($("#modalRoot .tkf")) renderTaskForm(); }); };
 }
 function readTaskForm() {
   const f = TK.form;
@@ -2522,7 +2524,7 @@ async function saveTaskForm() {
   if (!f.title) return toast("Write a title for the task", true);
   const prev = f.id ? TK.list.find((t) => t.id === f.id) : null;
   const checklist = f.checklist.split("\n").map((x) => x.trim()).filter(Boolean).map((x) => ({ t: x, d: !!(prev && (prev.checklist || []).find((c) => c.t === x && c.d)) }));
-  const fields = { title: f.title, details: f.details, priority: f.priority, due: f.due, dueTime: f.due ? f.dueTime : "", desk: f.desk, checklist };
+  const fields = { title: f.title, details: f.details, priority: f.priority, due: f.due, dueTime: f.due ? f.dueTime : "", desk: f.desk, checklist, files: f.files || [] };
   if (f.id) {
     const r = await tkOp({ op: "update", id: f.id, patch: { ...fields, member: f.members[0], memberName: (memById(D, f.members[0]) || {}).name || "" } }, "Task updated");
     if (r) { TK.form = null; openTask(f.id); }
@@ -2550,14 +2552,15 @@ function taskImageHTML(t) {
       </div>
       ${t.details && t.details.trim() ? `<div class="tkc-s"><h4>Brief</h4><p dir="auto">${esc(t.details.trim())}</p></div>` : ""}
       ${(t.checklist || []).length ? `<div class="tkc-s"><h4>Deliverables</h4><ul>${t.checklist.map((c) => `<li dir="auto"><i></i>${esc(c.t)}</li>`).join("")}</ul></div>` : ""}
+      ${(() => { const F = t.files || [], im = F.filter((x) => x.kind === "image"), vid = F.length - im.length; return F.length ? `<div class="tkc-s"><h4>Attachments · ${F.length}</h4>${im.length ? `<div class="tkc-a">${im.slice(0, 4).map((x) => `<img src="${esc(fileUrl(x))}" alt="">`).join("")}</div>` : ""}<p class="tkc-am">${im.length > 4 ? `+ ${im.length - 4} more photo${im.length - 4 === 1 ? "" : "s"} · ` : ""}${vid ? `▶ ${vid} video${vid === 1 ? "" : "s"} · ` : ""}All attachments are sent with this task.</p></div>` : ""; })()}
       <div class="tkc-n"><b>When it's done</b> reply with <b>“Done ✅ ${esc(t.code)}”</b> and a screenshot or link as proof.<span dir="rtl">بعد التنفيذ ابعتي «تم ✅ ${esc(t.code)}» مع سكرين شوت أو لينك كإثبات.</span></div>
     </div>
     <div class="tkc-f"><span>Issued by ${esc((t.createdBy || {}).name || "Management")} · ${dmy(Math.floor(cairoAt(t.createdAt) / 1440), 1)}</span><span>Vendoor · Marketing Team Operations Management</span></div></div>`;
 }
 async function renderPng(html) {
-  const stage = $("#exportStage");
-  stage.innerHTML = html;
-  const node = stage.firstElementChild;
+  const box = document.createElement("div");
+  box.innerHTML = html; $("#exportStage").appendChild(box);
+  const node = box.firstElementChild;
   try {
     await document.fonts.ready;
     await Promise.all([...node.querySelectorAll("img")].map((im) => (im.complete ? 0 : new Promise((r) => (im.onload = im.onerror = r)))));
@@ -2565,23 +2568,43 @@ async function renderPng(html) {
     let url;
     try { await htmlToImage.toPng(node, o); url = await htmlToImage.toPng(node, o); } catch { url = await htmlToImage.toPng(node, { ...o, skipFonts: true }); }
     return await (await fetch(url)).blob();
-  } finally { stage.innerHTML = ""; }
+  } finally { box.remove(); }
 }
 const tkFile = (t) => `Vendoor_Task_${t.code}_${slug(tName(t))}.png`;
+// image + attachments are prepared ahead of time so Share still counts as a direct tap (Safari / iOS)
+function tkPrep(t) {
+  const key = t.id + "|" + (t.updatedAt || t.createdAt) + "|" + tName(t) + "|" + (t.files || []).map((x) => x.url).join();
+  if (TK.prep && TK.prep.key === key) return TK.prep.p;
+  const p = (async () => {
+    const blob = await renderPng(taskImageHTML(t)), files = [new File([blob], tkFile(t), { type: "image/png" })];
+    let bytes = 0;
+    for (const x of t.files || []) {
+      if (bytes + (x.size || 0) > 60 * 1048576) { files.tooBig = true; break; }
+      try { const bl = await (await fetch(fileUrl(x))).blob(); bytes += bl.size; files.push(new File([bl], x.name, { type: bl.type || (x.kind === "video" ? "video/mp4" : "image/jpeg") })); } catch {}
+    }
+    return files;
+  })();
+  TK.prep = { key, p }; p.catch(() => { TK.prep = null; });
+  return p;
+}
 async function taskImage(t, mode) {
   if (mode === "copy") {
-    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": renderPng(taskImageHTML(t)) })]); toast("Image copied — paste it in WhatsApp"); }
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": tkPrep(t).then((f) => f[0]) })]); toast("Image copied — paste it in WhatsApp"); }
     catch { toast("Your browser can't copy images — use Download instead", true); }
     return;
   }
-  toast("Preparing image…");
-  const blob = await renderPng(taskImageHTML(t)), file = new File([blob], tkFile(t), { type: "image/png" });
-  if (mode === "share" && canShareFiles()) { try { await navigator.share({ files: [file], title: t.code }); return; } catch (e) { if (e.name === "AbortError") return; } }
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+  if (!TK.prep || !TK.prep.key.startsWith(t.id + "|")) toast("Preparing image…");
+  const files = await tkPrep(t);
+  if (mode === "share" && canShareFiles()) {
+    const ok = (L) => { try { return navigator.canShare({ files: L }); } catch { return false; } };
+    if (files.tooBig) toast("Some attachments are too big to share at once — send them from the task", true);
+    try { await navigator.share({ files: ok(files) ? files : [files[0]], title: t.code }); return; } catch (e) { if (e.name === "AbortError") return; }
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(files[0]); a.download = files[0].name; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 /* ---- task detail ---- */
-const EVL = { created: "Task created", edited: "Edited", checklist: "Checklist updated", progress: "Marked in progress", done: "Marked done", approved: "Approved", returned: "Returned for rework", cancelled: "Cancelled", assigned: "Reopened", rated: "Rating changed", proof: "Attachment added", proofRemoved: "Attachment removed" };
+const EVL = { created: "Task created", edited: "Edited", checklist: "Checklist updated", progress: "Marked in progress", done: "Marked done", approved: "Approved", returned: "Returned for rework", cancelled: "Cancelled", assigned: "Reopened", rated: "Rating changed", proof: "Proof added", proofRemoved: "Proof removed", files: "Attachments updated", fileAdded: "Attachment added", fileRemoved: "Attachment removed" };
 function openTask(id, fresh) {
   const t = (TK.list || []).find((x) => x.id === id); if (!t) return;
   TK.sel = id;
@@ -2611,10 +2634,14 @@ function openTask(id, fresh) {
           <div class="tkmeta">${meta.map(([l, v]) => `<div><span>${l}</span><b>${v}</b></div>`).join("")}</div>
           ${t.details ? `<div class="panel"><h4>Brief</h4><p class="tkp" dir="auto">${esc(t.details)}</p></div>` : ""}
           ${(t.checklist || []).length ? `<div class="panel"><h4>Deliverables · ${t.checklist.filter((c) => c.d).length}/${t.checklist.length}</h4>${t.checklist.map((c, j) => `<label class="tkck ${c.d ? "d" : ""}"><input type="checkbox" data-tkck="${j}" ${c.d ? "checked" : ""} ${t.status === "cancelled" ? "disabled" : ""}><span dir="auto">${esc(c.t)}</span></label>`).join("")}</div>` : ""}
+          <div class="panel"><h4>Attachments for her · ${(t.files || []).length}</h4>
+            <div class="row">${(t.files || []).map((x, j) => attTile(x, "tkAtt", j, ` data-k="${esc(t.id)}" data-l="files"`) + `<button class="rm" data-act="tkAttDel" data-l="files" data-j="${j}" title="Remove">✕</button></span>`).join("")}
+            ${t.status !== "cancelled" ? `<label class="btn sm">📎 Add photos / videos<input type="file" id="tkBriefFiles" accept="image/*,video/*" multiple class="hidden"></label>` : ""}</div>
+            ${(t.files || []).length ? `<div class="muted" style="font-size:11.5px;margin-top:8px">Photos show on the task image. <b>Share</b> sends the image together with all attachments${canShareFiles() ? "" : " (on a phone)"}.</div>` : ""}</div>
           ${act}
           ${t.doneNote ? `<div class="panel"><h4>Her note</h4><p class="tkp" dir="auto">${esc(t.doneNote)}</p></div>` : ""}
           <div class="panel"><h4>Proof &amp; replies (${(t.proof || []).length})</h4>
-            <div class="row">${(t.proof || []).map((x, j) => `<span class="attx"><button class="att" data-act="tkAtt" data-k="${esc(t.id)}" data-j="${j}" title="${esc(x.name)}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="" loading="lazy">`}</button><button class="rm" data-act="tkAttDel" data-j="${j}" title="Remove">✕</button></span>`).join("")}
+            <div class="row">${(t.proof || []).map((x, j) => `<span class="attx"><button class="att" data-act="tkAtt" data-l="proof" data-k="${esc(t.id)}" data-j="${j}" title="${esc(x.name)}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="" loading="lazy">`}</button><button class="rm" data-act="tkAttDel" data-l="proof" data-j="${j}" title="Remove">✕</button></span>`).join("")}
             <label class="btn sm">📎 Attach her reply / screenshot<input type="file" id="tkFiles" accept="image/*,video/*" multiple class="hidden"></label></div>
             <div id="upStatus" class="upbar hidden" style="margin-top:10px"></div></div>
         </div>
@@ -2631,13 +2658,15 @@ function openTask(id, fresh) {
   const pv = $(".tkprev"); if (pv) { const k = pv.clientWidth / 1080; pv.firstElementChild.style.setProperty("--k", k); pv.style.height = pv.firstElementChild.firstElementChild.offsetHeight * k + "px"; }
   if (sc0) $(".overlay .tkm .m-body").scrollTop = sc0;
   $("#tkFiles").onchange = (e) => uploadFiles([...e.target.files], async (att) => { await tkOp({ op: "addProof", id: t.id, att }); openTask(t.id); });
+  if (canShareFiles() && t.status !== "cancelled") setTimeout(() => { if (TK.sel === t.id) tkPrep(t).catch(() => {}); }, 300);
+  const bf = $("#tkBriefFiles"); if (bf) bf.onchange = (e) => uploadFiles([...e.target.files], async (att) => { await tkOp({ op: "addProof", id: t.id, att, list: "files" }); openTask(t.id); });
 }
-function taskLightbox(t, j) {
-  const a = t.proof[j];
+function taskLightbox(t, j, list) {
+  const L = list === "files" ? t.files || [] : t.proof || [], a = L[j]; if (!a) return;
   const media = a.kind === "video" ? `<video src="${esc(fileUrl(a))}" controls autoplay playsinline></video>` : `<img src="${esc(fileUrl(a))}" alt="${esc(a.name)}">`;
   $("#lbRoot").innerHTML = `<div class="overlay lbo" data-act="closeLb"><div class="lb">
-    <div class="lb-h"><div><b>${esc(a.name)}</b><span>${esc(t.code)} · ${esc(tName(t))}${a.size ? " · " + fmtSize(a.size) : ""}</span></div>
-      <div class="row">${t.proof.length > 1 ? `<button class="btn sm light" data-act="tkAtt" data-k="${esc(t.id)}" data-j="${(j - 1 + t.proof.length) % t.proof.length}">‹</button><button class="btn sm light" data-act="tkAtt" data-k="${esc(t.id)}" data-j="${(j + 1) % t.proof.length}">›</button>` : ""}
+    <div class="lb-h"><div><b>${esc(a.name)}</b><span>${esc(t.code)} · ${list === "files" ? "Brief attachment" : "Proof"} · ${esc(tName(t))}${a.size ? " · " + fmtSize(a.size) : ""}</span></div>
+      <div class="row">${L.length > 1 ? `<button class="btn sm light" data-act="tkAtt" data-l="${list || "proof"}" data-k="${esc(t.id)}" data-j="${(j - 1 + L.length) % L.length}">‹</button><button class="btn sm light" data-act="tkAtt" data-l="${list || "proof"}" data-k="${esc(t.id)}" data-j="${(j + 1) % L.length}">›</button>` : ""}
       <a class="btn sm light" href="${esc(fileUrl(a))}" download="${esc(a.name)}">Download</a><button class="btn sm light" data-act="closeLb">✕</button></div></div>
     <div class="lb-m">${media}</div></div></div>`;
 }
@@ -2652,8 +2681,10 @@ async function tkAction(act, el, ev) {
     case "tkMemSel": TK.mem = TK.mem === el.dataset.k ? "" : el.dataset.k; return renderTasks();
     case "tkOpen": TK.rate = 0; return openTask(el.dataset.k);
     case "tkClose": if (el.tagName === "BUTTON" || (ev && ev.target === el)) { TK.sel = null; $("#modalRoot").innerHTML = ""; } return;
+    case "tkFFDel": readTaskForm(); TK.form.files.splice(+el.dataset.j, 1); return renderTaskForm();
+    case "tkFFView": { const x = TK.form.files[+el.dataset.j]; if (x) window.open(fileUrl(x), "_blank"); return; }
     case "tkPri": document.querySelectorAll("#tkPri button").forEach((b) => b.classList.toggle("active", b === el)); return;
-    case "tkAtt": { const x = TK.list.find((y) => y.id === el.dataset.k); if (x) taskLightbox(x, +el.dataset.j); return; }
+    case "tkAtt": { const x = TK.list.find((y) => y.id === el.dataset.k); if (x) taskLightbox(x, +el.dataset.j, el.dataset.l); return; }
   }
   if (!t) return;
   switch (act) {
@@ -2682,7 +2713,7 @@ async function tkAction(act, el, ev) {
       return;
     }
     case "tkRerate": if (await tkOp({ op: "update", id: t.id, patch: { status: "approved", rating: +el.dataset.v } }, "Rating updated")) openTask(t.id); return;
-    case "tkAttDel": if (confirm("Remove this attachment?") && (await tkOp({ op: "delProof", id: t.id, j: +el.dataset.j }))) openTask(t.id); return;
+    case "tkAttDel": if (confirm("Remove this attachment?") && (await tkOp({ op: "delProof", id: t.id, j: +el.dataset.j, list: el.dataset.l || "proof" }))) openTask(t.id); return;
     case "tkDel": if (confirm(`Delete ${t.code} permanently? This can't be undone. (Cancel keeps it on record.)`) && (await tkOp({ op: "delete", id: t.id }, `${t.code} deleted`))) { TK.sel = null; $("#modalRoot").innerHTML = ""; } return;
   }
 }
