@@ -590,6 +590,66 @@ tr.cdays .offl{text-decoration:underline dotted var(--bad);text-underline-offset
 .wdb span{color:var(--muted);font-weight:700}
 .wdb i{display:block;height:9px;border-radius:9px;background:linear-gradient(90deg,var(--brand),var(--brand-2));min-width:2px}
 .wdb b{text-align:right;font-variant-numeric:tabular-nums}
+/* ---------- team profiles ---------- */
+.pfctl select,.pfctl input{font-size:13px;padding:7px 10px}
+.pfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.pft2{display:block;text-align:left;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#fff,var(--pale-3));padding:14px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s;font:inherit;color:inherit}
+.pft2:hover{border-color:var(--brand-3);box-shadow:0 8px 24px rgba(10,46,48,.08);transform:translateY(-1px)}
+.pft2 .h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.pft2 .h .av{width:36px;height:36px;font-size:12.5px;box-shadow:none}
+.pft2 .h b{display:block;font-size:14px}.pft2 .h small{display:block;font-size:11.5px;color:var(--muted)}
+.pft2 .rb{margin-left:auto;background:var(--warn-bg);color:var(--warn);font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px}
+.mix{display:flex;height:8px;border-radius:9px;overflow:hidden;gap:2px;background:var(--line-2)}
+.mix.big{height:14px;margin-bottom:12px}
+.mix i{display:block;min-width:3px}
+.pft2 .ln{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;color:var(--ink-2);margin:6px 0 10px}
+.pft2 .ln:last-child{margin-bottom:0}
+.pft2 .ln span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.pft2 .ln i{width:8px;height:8px;border-radius:3px}
+.modal.pfm{max-width:1180px}
+.pfm .m-head select,.pfm .m-head input{font-size:12.5px;padding:6px 9px}
+.pfk{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.pfk>div{border:1px solid var(--line);border-radius:12px;padding:10px 13px;background:var(--pale-3)}
+.pfk span{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pfk b{display:block;font-family:var(--serif);font-variant-numeric:lining-nums;font-size:27px;font-weight:600;color:var(--deep);line-height:1.1;margin-top:2px}
+.pfk small{display:block;font-size:11.5px;color:var(--muted)}
+.pf2c{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.pf2c>.panel{margin-bottom:14px}
+.pf-r small{display:block;font-size:11px;color:var(--muted)}
+table.pft{width:100%}
+table.pft td b{font-family:var(--sans);font-size:13px;font-weight:800}
+table.pft td,table.pft th{white-space:nowrap}
+table.pft td:not(:first-child),table.pft th:not(:first-child){text-align:right}
+.dtl table.pft td:nth-child(2),.dtl table.pft th:nth-child(2){text-align:right}
+.dtl table.pfrl td:nth-child(2),.dtl table.pfrl th:nth-child(2){text-align:left}
+table.pfrl td:nth-child(3),table.pfrl th:nth-child(3){text-align:left}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--c);margin-right:7px;vertical-align:middle}
+table.pfw{width:100%;border-collapse:separate;border-spacing:4px;font-size:12.5px}
+table.pfw th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;text-align:center;padding:4px}
+table.pfw td{text-align:center;padding:0}
+table.pfw td:first-child{text-align:left;white-space:nowrap;font-weight:600;padding-right:8px}
+table.pfw td span.dot{display:inline-block;padding:0;border-radius:3px}
+.dtl table.pfw td{text-align:center;padding:0;border-bottom:none;vertical-align:middle}
+.dtl table.pfw td:first-child{text-align:left;padding-right:8px;width:130px}
+table.pfw td span.c{display:block;border-radius:8px;padding:8px 0;font-weight:700;font-variant-numeric:tabular-nums}
+.pfr{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}
+.pfr>div{border:1px solid var(--line);border-radius:12px;padding:9px 11px;background:#fff}
+.pfr>div.g{background:#F3FAF6;border-color:#CFE7D8}.pfr>div.r{background:#FFF7F8;border-color:#EFC6CB}
+.pfr span{display:block;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pfr b{display:block;font-family:var(--serif);font-variant-numeric:lining-nums;font-size:22px;font-weight:600;color:var(--deep);margin-top:2px;white-space:nowrap}
+.pfr b.pos,.pfr b.neg{font-size:17px;font-family:var(--sans);font-weight:800;margin-top:6px}
+.pfr small{display:block;font-size:10.5px;color:var(--muted)}
+.pfrl{margin-top:12px}
+/* profile image */
+.pfi-b{background:#F8F6F1;color:var(--ink);border-radius:20px;padding:30px 32px 20px;font-size:15px}
+.pfi-b .panel{border:1px solid #E2DED5;border-radius:14px;padding:16px 18px;margin-bottom:16px;background:#fff}
+.pfi-b .panel h4{margin:0 0 12px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#B08544;font-weight:800}
+.pfi-b .pf-n{font-size:38px}.pfi-b .pf-h .av{width:66px;height:66px;font-size:22px}.pfi-b .pf-h .muted{font-size:15px}
+.pfi-b .pfk b{font-size:32px}.pfi-b .pfk span{font-size:11px}.pfi-b .pfk small{font-size:13px}
+.pfi-b table.stbl{font-size:14.5px}.pfi-b table.pfw{font-size:15px}
+.pfi-b .pf2c>.panel{margin-bottom:16px}
+@media (max-width:1000px){ .pfk{grid-template-columns:repeat(2,1fr)} .pf2c{grid-template-columns:1fr} .pfr{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:640px){ .pfr{grid-template-columns:repeat(2,1fr)} .pfm .m-head{flex-wrap:wrap} }
 /* ---------- tasks ---------- */
 .banner.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #CFE7D8}
 .kpi .v.warn{color:var(--warn)}
@@ -805,8 +865,16 @@ table.tkp{min-width:1000px}
 
   <section class="card">
     <div class="sh">
+      <div><div class="eyebrow">Analytics</div><h2>Team Profiles</h2><div class="sub" id="pfSub"></div></div>
+      <div class="row pfctl" id="pfCtl"></div>
+    </div>
+    <div class="pfgrid" id="profiles"></div>
+  </section>
+
+  <section class="card">
+    <div class="sh">
       <div><div class="eyebrow">After the schedule was sent</div><h2>Excuses, Shifts, Bonuses &amp; Deductions</h2><div class="sub" id="reqSub"></div></div>
-      <button class="btn sm" id="reqAdd">+ Add record</button>
+      <div class="row"><button class="btn sm" data-act="recImg" data-v="week">⤓ Week image</button><button class="btn sm" data-act="recImg" data-v="month">⤓ Month image</button><button class="btn sm" id="reqAdd">+ Add record</button></div>
     </div>
     <div id="reqList"></div>
   </section>
@@ -1091,7 +1159,7 @@ async function save() {
 
 /* ============================ render ============================ */
 function renderAll() {
-  renderHeader(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderRequests(); renderLog(); renderSaveBar(); renderReports();
+  renderHeader(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderProfiles(); renderRequests(); renderLog(); renderSaveBar(); renderReports();
   if (S.admin.open) renderAdmin();
 }
 function renderHeader() {
@@ -1245,7 +1313,7 @@ function renderPeople() {
     }).join("");
     return `<div class="pc"><div class="pc-h"><div class="av" style="--c:${esc(m.color)}">${esc(initials(m.name))}</div><div style="min-width:0"><div class="n">${esc(m.name)}</div><div class="r">${m.code ? "ID " + esc(m.code) : ""}</div></div><div class="h"><b>${hrs(p.work)}</b><small>this week</small></div></div>
       <ul>${rows}</ul>
-      <div class="acts"><button class="btn sm primary" data-act="cardSave" data-id="${esc(m.id)}">Save card</button>${canShareFiles() ? `<button class="btn sm" data-act="cardShare" data-id="${esc(m.id)}">Share</button>` : ""}</div></div>`;
+      <div class="acts"><button class="btn sm primary" data-act="cardSave" data-id="${esc(m.id)}">Save card</button><button class="btn sm" data-act="pfOpen" data-id="${esc(m.id)}">Profile</button>${canShareFiles() ? `<button class="btn sm" data-act="cardShare" data-id="${esc(m.id)}">Share</button>` : ""}</div></div>`;
   }).join("");
 }
 function renderSaveBar() {
@@ -2094,6 +2162,186 @@ function sourcesEditor(D) {
   return h;
 }
 
+/* ============================ team member profiles (schedule mix · desks · conduct) ============================ */
+const PF = { period: "thisMonth", from: "", to: "", sel: null };
+const PFPER = [["thisWeek", "This week"], ["lastWeek", "Last week"], ["thisMonth", "This month"], ["lastMonth", "Last month"], ["last90", "Last 90 days"], ["thisYear", "This year"], ["all", "All time"], ["custom", "Custom range"]];
+const PF_IDX = (D) => { const s = +D.settings.weekStart || 0; return Array.from({ length: 7 }, (_, k) => (s + k) % 7); };
+function schedBounds(D) { const ks = Object.keys(D.weeks).sort(); return ks.length ? [dIdx(ks[0]), dIdx(ks[ks.length - 1]) + 6] : [curIdx(), curIdx()]; }
+function pfRange() {
+  const D = V(), t = curIdx(), d = new Date(t * 864e5), y = d.getUTCFullYear(), mo = d.getUTCMonth();
+  let a, b;
+  switch (PF.period) {
+    case "thisWeek": a = wkStart(D, t); b = a + 6; break;
+    case "lastWeek": a = wkStart(D, t) - 7; b = a + 6; break;
+    case "lastMonth": a = U0(y, mo - 1, 1); b = U0(y, mo, 0); break;
+    case "last90": a = t - 89; b = t; break;
+    case "thisYear": a = U0(y, 0, 1); b = U0(y, 11, 31); break;
+    case "all": [a, b] = schedBounds(D); break;
+    case "custom": a = PF.from ? dIdx(PF.from) : t - 29; b = PF.to ? dIdx(PF.to) : t; if (b < a) [a, b] = [b, a]; break;
+    default: a = U0(y, mo, 1); b = U0(y, mo + 1, 0);
+  }
+  return [a, b, t];
+}
+// Everything the schedule says about one person between a and b (days after today are "planned", not counted)
+function memberProfile(D, m, a, b, t) {
+  const end = Math.min(b, t);
+  const P = { sched: 0, work: 0, off: 0, min: 0, byType: {}, byResp: {}, wd: Array.from({ length: 7 }, () => ({})), months: {}, notes: [], planned: 0, plannedOff: 0, noDesk: 0, streak: 0, first: null, last: null };
+  let run = 0;
+  for (let i = a; i <= b; i++) {
+    const c = cellAt(D, m.id, i);
+    if (!c) { run = 0; continue; }
+    if (i > end) { if (c.work) P.planned++; else P.plannedOff++; continue; }
+    P.sched++; if (P.first == null) P.first = i; P.last = i;
+    const T = (P.byType[c.ty.id] = P.byType[c.ty.id] || { days: 0, min: 0 }); T.days++; T.min += c.dur;
+    P.wd[wdOf(i)][c.ty.id] = (P.wd[wdOf(i)][c.ty.id] || 0) + 1;
+    const mk = iDate(i).slice(0, 7), M = (P.months[mk] = P.months[mk] || { sched: 0, work: 0, off: 0, min: 0, byType: {}, byResp: {} });
+    M.sched++; M.byType[c.ty.id] = (M.byType[c.ty.id] || 0) + 1;
+    if (c.n) P.notes.push([i, c.n]);
+    if (c.off) { P.off++; M.off++; run = 0; continue; }
+    P.work++; P.min += c.dur; M.work++; M.min += c.dur; run++; P.streak = Math.max(P.streak, run);
+    if (c.resp) { const R = (P.byResp[c.resp.id] = P.byResp[c.resp.id] || { days: 0, min: 0, byType: {} }); R.days++; R.min += c.dur; R.byType[c.ty.id] = (R.byType[c.ty.id] || 0) + 1; M.byResp[c.resp.id] = (M.byResp[c.resp.id] || 0) + 1; }
+    else P.noDesk++;
+  }
+  // all-time first / last day on the schedule
+  let f = null, l = null;
+  for (const k of Object.keys(D.weeks).sort()) { const w = D.weeks[k]; if (!w.memberIds.includes(m.id)) continue; const ws = dIdx(k); for (let j = 0; j < 7; j++) if (cellAt(D, m.id, ws + j)) { if (f == null) f = ws + j; l = ws + j; } }
+  P.since = f; P.until = l;
+  // records
+  const mine = (r) => r.member === m.id || (r.type === "swap" && r.withMember === m.id);
+  const inR = (r) => { const i = dIdx(r.date), j = r.withDate ? dIdx(r.withDate) : i; return (i >= a && i <= b) || (j >= a && j <= b); };
+  P.recs = (D.requests || []).filter((r) => mine(r) && inR(r)).sort((x, y) => x.date.localeCompare(y.date));
+  const live = P.recs.filter((r) => r.status !== "rejected");
+  const cnt = (ty) => live.filter((r) => r.type === ty).length;
+  P.rc = { excuse: cnt("excuse"), late: cnt("late"), early: cnt("early"), dayoff: cnt("dayoff"), swap: cnt("swap"), other: cnt("other"), rejected: P.recs.length - live.length, pending: live.filter((r) => r.status === "pending").length };
+  const tot = (ty) => live.filter((r) => r.type === ty && r.member === m.id).reduce((x, r) => ({ n: x.n + 1, amount: x.amount + (+r.amount || 0), days: x.days + (+r.days || 0) }), { n: 0, amount: 0, days: 0 });
+  P.bonus = tot("bonus"); P.ded = tot("deduction");
+  P.incidents = P.rc.excuse + P.rc.late + P.rc.early + P.ded.n;
+  return P;
+}
+const pct0 = (x) => (x == null || !isFinite(x) ? "—" : Math.round(x * 100) + "%");
+const mixBar = (segs, big) => { const tot = segs.reduce((x, s) => x + s.v, 0); return `<div class="mix ${big ? "big" : ""}">${tot ? segs.filter((s) => s.v).map((s) => `<i style="flex:${s.v};background:${esc(s.c)}" title="${esc(s.l)} · ${s.v}"></i>`).join("") : "<i style='flex:1;background:var(--line-2)'></i>"}</div>`; };
+function profileBody(D, m, a, b, t, img) {
+  const P = memberProfile(D, m, a, b, t);
+  const types = D.shiftTypes.filter((x) => P.byType[x.id]), work = types.filter((x) => x.kind === "work");
+  const desks = D.responsibilities.filter((r) => P.byResp[r.id]).sort((x, y) => P.byResp[y.id].days - P.byResp[x.id].days);
+  const avg = P.work ? P.min / P.work : 0;
+  const morning = D.shiftTypes.find((x) => /morning/i.test(x.name)), night = D.shiftTypes.find((x) => /night/i.test(x.name));
+  const per = PF.period === "all" ? "All time" : rngTxt(a, b);
+  let h = `<div class="pf-h"><div class="av" style="--c:${esc(m.color)}">${esc(initials(m.name))}</div><div style="min-width:0"><div class="pf-n">${esc(m.name)}${m.former ? ` <span class="stale warn">Former</span>` : ""}</div>
+    <div class="muted">${m.code ? "ID " + esc(m.code) + " · " : ""}${P.since != null ? `On the schedule since ${dmy(P.since, 1)} · ${tenure(P.since, Math.min(t, P.until))}` : "Not on any schedule yet"}</div></div>
+    <div class="pf-r"><span>Period</span><b>${per}</b>${P.planned ? `<small>+ ${P.planned} planned shift${P.planned === 1 ? "" : "s"} after today</small>` : ""}</div></div>`;
+  if (!P.sched) return h + `<div class="empty">No schedule days for ${esc(m.name)} in this period${b > t && a > t ? " yet" : ""}.</div>`;
+  h += `<div class="pfk">
+    <div><span>Days on schedule</span><b>${P.sched}</b><small>up to ${dmy(Math.min(b, t))}</small></div>
+    <div><span>Working days</span><b>${P.work}</b><small>${pct0(P.work / P.sched)} of her days</small></div>
+    <div><span>Days off</span><b>${P.off}</b><small>${pct0(P.off / P.sched)} of her days</small></div>
+    <div><span>Working hours</span><b>${hrs(P.min)}</b><small>${hrs(avg)} per shift</small></div>
+    ${morning ? `<div><span>${esc(morning.name)}</span><b>${(P.byType[morning.id] || {}).days || 0}</b><small>${pct0(((P.byType[morning.id] || {}).days || 0) / (P.work || 1))} of work days</small></div>` : ""}
+    ${night ? `<div><span>${esc(night.name)}</span><b>${(P.byType[night.id] || {}).days || 0}</b><small>${pct0(((P.byType[night.id] || {}).days || 0) / (P.work || 1))} of work days</small></div>` : ""}
+    <div><span>Longest run</span><b>${P.streak}</b><small>work days in a row</small></div>
+    <div><span>Records</span><b>${P.recs.length}</b><small>${P.incidents} incident${P.incidents === 1 ? "" : "s"} · ${P.work ? nf2.format((P.incidents / P.work) * 30) : "0"} per 30 days</small></div></div>`;
+  // shift mix
+  h += `<div class="pf2c"><div class="panel"><h4>Shift mix</h4>${mixBar(types.map((x) => ({ v: P.byType[x.id].days, c: x.color, l: x.name })), 1)}
+    <table class="stbl pft"><thead><tr><th>Shift</th><th>Days</th><th>Share of all days</th><th>Share of work days</th><th>Hours</th></tr></thead><tbody>${types.map((x) => { const v = P.byType[x.id]; return `<tr><td><span class="dot" style="--c:${esc(x.color)}"></span>${esc(x.name)}</td><td><b>${v.days}</b></td><td>${pct0(v.days / P.sched)}</td><td>${x.kind === "work" ? pct0(v.days / (P.work || 1)) : "—"}</td><td>${x.kind === "work" ? hrs(v.min) : "—"}</td></tr>`; }).join("")}</tbody></table></div>`;
+  // desks
+  h += `<div class="panel"><h4>Responsible of</h4>${mixBar(desks.map((r) => ({ v: P.byResp[r.id].days, c: r.color, l: r.name })).concat(P.noDesk ? [{ v: P.noDesk, c: "#E5E2DA", l: "No desk set" }] : []), 1)}
+    <table class="stbl pft"><thead><tr><th>Desk</th><th>Days</th><th>Share</th>${work.map((x) => `<th>${esc(x.name)}</th>`).join("")}<th>Hours</th></tr></thead><tbody>${desks.map((r) => { const v = P.byResp[r.id]; return `<tr><td><span class="dot" style="--c:${esc(r.color)}"></span>${esc(r.name)}</td><td><b>${v.days}</b></td><td>${pct0(v.days / (P.work || 1))}</td>${work.map((x) => `<td>${v.byType[x.id] || "·"}</td>`).join("")}<td>${hrs(v.min)}</td></tr>`; }).join("")}${P.noDesk ? `<tr><td class="muted">No desk set</td><td>${P.noDesk}</td><td>${pct0(P.noDesk / (P.work || 1))}</td>${work.map(() => "<td></td>").join("")}<td></td></tr>` : ""}</tbody></table></div></div>`;
+  // weekday pattern
+  const order = PF_IDX(D);
+  const maxC = Math.max(1, ...order.flatMap((k) => types.map((x) => P.wd[k][x.id] || 0)));
+  const offTy = types.filter((x) => x.kind !== "work"), offBy = order.map((k) => offTy.reduce((s, x) => s + (P.wd[k][x.id] || 0), 0)), offMax = Math.max(...offBy);
+  h += `<div class="panel"><h4>Weekly pattern${offMax > 0 ? ` · usually off on <b style="color:var(--deep)">${order.filter((k, j) => offBy[j] === offMax).map((k) => DAYS[k]).join(" / ")}</b>` : ""}</h4><table class="pfw"><thead><tr><th></th>${order.map((k) => `<th>${DY[k]}</th>`).join("")}</tr></thead><tbody>
+    ${types.map((x) => `<tr><td><span class="dot" style="--c:${esc(x.color)}"></span>${esc(x.name)}</td>${order.map((k) => { const v = P.wd[k][x.id] || 0; return `<td><span class="c" style="background:${v ? `color-mix(in srgb,${esc(x.color)} ${Math.round(18 + (v / maxC) * 72)}%,#fff)` : "transparent"};color:${v / maxC > 0.55 ? txtOn(x.color) : "var(--ink-2)"}">${v || "·"}</span></td>`; }).join("")}</tr>`).join("")}</tbody></table></div>`;
+  // month by month
+  const mk = Object.keys(P.months).sort();
+  if (mk.length > 1) h += `<div class="panel"><h4>Month by month</h4><div class="tw"><table class="stbl pft"><thead><tr><th>Month</th><th>Days</th><th>Work</th><th>Off</th>${work.map((x) => `<th>${esc(x.name)}</th>`).join("")}<th>Hours</th><th>Main desk</th></tr></thead><tbody>${mk.slice().reverse().map((k) => { const M = P.months[k], top = Object.entries(M.byResp).sort((x, y) => y[1] - x[1])[0], r = top && respById(D, top[0]); return `<tr><td>${MONF[+k.slice(5) - 1]} ${k.slice(0, 4)}</td><td>${M.sched}</td><td><b>${M.work}</b></td><td>${M.off}</td>${work.map((x) => `<td>${M.byType[x.id] || "·"}</td>`).join("")}<td>${hrs(M.min)}</td><td>${r ? `${esc(r.name)} <span class="muted">${pct0(top[1] / (M.work || 1))}</span>` : "—"}</td></tr>`; }).join("")}</tbody></table></div></div>`;
+  // conduct & records
+  const net = P.bonus.amount - P.ded.amount;
+  h += `<div class="panel"><h4>Conduct &amp; records</h4><div class="pfr">
+    <div><span>Excuses</span><b>${P.rc.excuse}</b></div><div><span>Late arrivals</span><b>${P.rc.late}</b></div><div><span>Early leave</span><b>${P.rc.early}</b></div><div><span>Day-off changes</span><b>${P.rc.dayoff}</b></div><div><span>Shift swaps</span><b>${P.rc.swap}</b></div>
+    <div class="g"><span>Bonuses</span><b class="pos">${P.bonus.n ? "+ " + money(P.bonus.amount) : "—"}</b><small>${P.bonus.n} record${P.bonus.n === 1 ? "" : "s"}</small></div>
+    <div class="r"><span>Deductions</span><b class="neg">${P.ded.n ? "− " + esc(dedText(P.ded)) : "—"}</b><small>${P.ded.n} record${P.ded.n === 1 ? "" : "s"}</small></div>
+    <div><span>Net</span><b class="${net < 0 ? "neg" : net > 0 ? "pos" : ""}">${net < 0 ? "− " : net > 0 ? "+ " : ""}${money(Math.abs(net))}</b><small>${P.ded.days ? `and − ${dayStr(P.ded.days)}` : P.rc.pending ? `${P.rc.pending} pending` : "&nbsp;"}</small></div></div>
+    ${P.recs.length ? `<table class="stbl pft pfrl"><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody>${P.recs.slice(img ? -14 : 0).reverse().map((r) => { const d = dIdx(r.date); return `<tr><td>${DY[wdOf(d)]} ${dmy(d, 1)}</td><td><span class="tp ${r.type}">${esc(REQ_TYPES[r.type] || r.type)}</span></td><td style="white-space:normal">${r.type === "swap" ? esc(reqBadge(D, r, m.id, true)) + " · " : ""}${esc(isAdj(r) ? (r.reason || "") + (r.details ? " — " + r.details : "") : r.details || "")}${!img && (r.attachments || []).length ? ` <button class="ref" data-act="viewAtt" data-r="${esc(r.id)}" data-j="0" style="border:none;background:none;cursor:pointer">📎 ${r.attachments.length}</button>` : ""}</td><td>${isAdj(r) ? `<b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b>` : "—"}</td><td><span class="ss ${stClass(r)}">${stLabel(r)}</span></td></tr>`; }).join("")}</tbody></table>` : `<div class="muted" style="font-size:12.8px;margin-top:10px">No excuses, swaps, bonuses or deductions in this period — a clean record.</div>`}</div>`;
+  // links to reports and tasks (signed-in, when loaded)
+  if (!img && S.me) {
+    const rp = RS.raw ? repModel().find((x) => x.m && x.m.id === m.id) : null, cp = rp ? compliance(D, rp, a, b, t, "") : null, ag = rp && rp.kind === "metrics" ? agg(rp.rows, a, b, "") : null;
+    const L = TK.list ? TK.list.filter((x) => x.member === m.id && tDay(x) >= a && tDay(x) <= b) : null, k = L ? tkStats(L, cairoNow().abs) : null, [g, gc] = grade(k ? k.score : null);
+    h += `<div class="pf2c"><div class="panel"><h4>Daily reports</h4>${rp ? `<table class="stbl"><tbody><tr><td>Report discipline</td><td><b>${cp.expected ? pct0(cp.done / cp.expected) : "—"}</b> <span class="muted">${cp.done}/${cp.expected} work days${cp.missing.length ? ` · <b style="color:var(--bad)">${cp.missing.length} missing</b>` : ""}</span></td></tr>${ag ? `<tr><td>Sales</td><td><b>EGP ${fN(ag.sales)}</b> <span class="muted">${fN(ag.orders)} orders · AOV ${fN(ag.aov)}</span></td></tr><tr><td>Avg per selling day</td><td><b>EGP ${fN(ag.avgDaily)}</b></td></tr>` : ""}</tbody></table><button class="btn sm ghost" style="margin-top:8px" data-act="pfRep" data-k="${esc(rp.key)}">Full report profile →</button>` : `<div class="muted" style="font-size:12.8px">${RS.raw ? "No report sheet linked to her." : `<button class="btn sm" data-act="pfLoadRep">Load report data</button>`}</div>`}</div>
+      <div class="panel"><h4>Tasks</h4>${k && k.n ? `<table class="stbl"><tbody><tr><td>Task score</td><td><b class="sc ${gc}" style="font-size:20px">${k.score ?? "—"}</b> <span class="muted">${g}</span></td></tr><tr><td>Tasks</td><td><b>${k.n}</b> <span class="muted">· ${k.closed} completed · ${k.open} open${k.overdue ? ` · ${k.overdue} overdue` : ""}</span></td></tr><tr><td>On time · quality</td><td><b>${pct0(k.onTime)}</b> · ${k.quality == null ? "—" : stars(k.quality)}</td></tr></tbody></table>` : `<div class="muted" style="font-size:12.8px">${TK.list ? "No tasks due in this period." : `<button class="btn sm" data-act="pfLoadTk">Load tasks</button>`}</div>`}</div></div>`;
+  }
+  if (P.notes.length && !img) h += `<div class="panel"><h4>Schedule notes</h4>${P.notes.slice(-12).reverse().map(([i, n]) => `<div style="font-size:12.8px;padding:3px 0"><b>${DY[wdOf(i)]} ${dmy(i, 1)}</b> — ${esc(n)}</div>`).join("")}</div>`;
+  return h;
+}
+function profileSel() { return `<select id="pfPeriod">${PFPER.map(([k, l]) => `<option value="${k}" ${PF.period === k ? "selected" : ""}>${l}</option>`).join("")}</select>`; }
+function renderProfiles() {
+  const D = V(), [a, b, t] = pfRange(), el = $("#profiles"); if (!el) return;
+  $("#pfSub").innerHTML = `${PF.period === "all" ? "All time" : rngTxt(a, b)} · counted up to today. Click a name for the full profile.`;
+  $("#pfCtl").innerHTML = `${profileSel()}${PF.period === "custom" ? `<input type="date" id="pfFrom" value="${iDate(a)}"><input type="date" id="pfTo" value="${iDate(b)}">` : ""}`;
+  const mems = D.members.filter((m) => !m.former || memberProfile(D, m, a, b, t).sched);
+  const work = D.shiftTypes.filter((x) => x.kind === "work");
+  el.innerHTML = mems.map((m) => {
+    const P = memberProfile(D, m, a, b, t), types = D.shiftTypes.filter((x) => P.byType[x.id]);
+    const top = D.responsibilities.filter((r) => P.byResp[r.id]).sort((x, y) => P.byResp[y.id].days - P.byResp[x.id].days);
+    return `<button class="pft2" data-act="pfOpen" data-id="${esc(m.id)}"><div class="h"><div class="av" style="--c:${esc(m.color)}">${esc(initials(m.name))}</div><div style="min-width:0"><b>${esc(m.name)}</b><small>${P.sched ? `${P.work} work · ${P.off} off · ${hrs(P.min)}` : "Not scheduled"}</small></div>${P.recs.length ? `<span class="rb">${P.recs.length}</span>` : ""}</div>
+      ${mixBar(types.map((x) => ({ v: P.byType[x.id].days, c: x.color, l: x.name })))}
+      <div class="ln">${work.filter((x) => P.byType[x.id]).map((x) => `<span><i style="background:${esc(x.color)}"></i>${esc(x.name)} <b>${pct0(P.byType[x.id].days / (P.work || 1))}</b></span>`).join("")}${P.off ? `<span><i style="background:#A21616"></i>Off <b>${pct0(P.off / P.sched)}</b></span>` : ""}</div>
+      ${mixBar(top.map((r) => ({ v: P.byResp[r.id].days, c: r.color, l: r.name })))}
+      <div class="ln">${top.slice(0, 3).map((r) => `<span><i style="background:${esc(r.color)}"></i>${esc(r.name)} <b>${pct0(P.byResp[r.id].days / (P.work || 1))}</b></span>`).join("") || `<span class="muted">No desks</span>`}</div></button>`;
+  }).join("") || `<div class="empty" style="grid-column:1/-1">No team members.</div>`;
+}
+function openProfile(id) {
+  const D = V(), m = memById(D, id); if (!m) return;
+  PF.sel = id;
+  const [a, b, t] = pfRange();
+  const sc = $(".overlay .pfm .m-body")?.scrollTop;
+  $("#modalRoot").innerHTML = `<div class="overlay" data-act="pfClose"><div class="modal pfm"><div class="m-head"><h3>Team Member Profile</h3><div class="row">${profileSel()}${PF.period === "custom" ? `<input type="date" id="pfFrom" value="${iDate(a)}"><input type="date" id="pfTo" value="${iDate(b)}">` : ""}
+    <button class="btn sm light" data-act="pfImg">⤓ Download image</button>${canShareFiles() ? `<button class="btn sm light" data-act="pfShare">Share</button>` : ""}<button class="btn ghost" data-act="pfClose">✕</button></div></div>
+    <div class="m-body dtl">${profileBody(D, m, a, b, t)}</div></div></div>`;
+  if (sc) $(".overlay .pfm .m-body").scrollTop = sc;
+}
+function profileImageHTML(D, m) {
+  const [a, b, t] = pfRange();
+  return `<div class="xw pfi" style="width:1400px"><div class="xh"><div><div class="ey">Marketing Team · Operations Management</div><img src="assets/logo-white.png" alt=""></div>
+    <div class="r">Team Member Profile<small>${PF.period === "all" ? "All time" : rngTxt(a, b)} · Cairo</small></div></div>
+    <div class="pfi-b dtl">${profileBody(D, m, a, b, t, true)}</div>
+    <div class="xf"><span>Vendoor · Marketing Team Operations Management</span><span>Issued ${dmy(cairoNow().idx, 1)}</span></div></div>`;
+}
+/* records (excuses, swaps, bonuses, deductions) as an image — week or month */
+function recordsImageHTML(D, a, b, label) {
+  const L = (D.requests || []).filter((r) => { const i = dIdx(r.date), j = r.withDate ? dIdx(r.withDate) : -1; return (i >= a && i <= b) || (j >= a && j <= b); }).sort((x, y) => x.date.localeCompare(y.date));
+  const ids = [...new Set(L.flatMap((r) => (r.type === "swap" ? [r.member, r.withMember] : [r.member])))];
+  const z = () => ({ excuse: 0, late: 0, early: 0, dayoff: 0, swap: 0, bonus: 0, ded: 0, dd: 0, n: 0 });
+  const per = Object.fromEntries(ids.map((id) => [id, z()]));
+  for (const r of L) { if (r.status === "rejected") continue; const p = per[r.member]; p.n++; if (r.type === "bonus") p.bonus += +r.amount || 0; else if (r.type === "deduction") { p.ded += +r.amount || 0; p.dd += +r.days || 0; } else if (p[r.type] != null) p[r.type]++; if (r.type === "swap" && per[r.withMember]) per[r.withMember].swap++; }
+  const T = ids.reduce((s, id) => { for (const k in s) s[k] += per[id][k]; return s; }, z());
+  const netTxt = (p) => { const v = p.bonus - p.ded; return `<b class="${v < 0 ? "neg" : v > 0 ? "pos" : ""}">${v < 0 ? "− " : v > 0 ? "+ " : ""}${esc(money(Math.abs(v)))}</b>${p.dd ? ` <span class="ref">− ${dayStr(p.dd)}</span>` : ""}`; };
+  const sum = ids.length ? `<div class="xr"><h3>Summary by team member</h3><table><thead><tr><th>Team member</th><th>Excuses</th><th>Late</th><th>Early leave</th><th>Day-off changes</th><th>Swaps</th><th>Bonuses</th><th>Deductions</th><th>Net</th></tr></thead><tbody>
+    ${ids.map((id) => { const p = per[id]; return `<tr><td><b>${esc(memName(D, id))}</b></td><td>${p.excuse || "–"}</td><td>${p.late || "–"}</td><td>${p.early || "–"}</td><td>${p.dayoff || "–"}</td><td>${p.swap || "–"}</td><td>${p.bonus ? `<b class="pos">+ ${esc(money(p.bonus))}</b>` : "–"}</td><td>${p.ded || p.dd ? `<b class="neg">− ${esc(dedText({ amount: p.ded, days: p.dd }))}</b>` : "–"}</td><td>${netTxt(p)}</td></tr>`; }).join("")}
+    <tr style="background:#EFECE4"><td><b>Total</b></td><td><b>${T.excuse || "–"}</b></td><td><b>${T.late || "–"}</b></td><td><b>${T.early || "–"}</b></td><td><b>${T.dayoff || "–"}</b></td><td><b>${L.filter((r) => r.type === "swap" && r.status !== "rejected").length || "–"}</b></td><td><b class="pos">${T.bonus ? "+ " + esc(money(T.bonus)) : "–"}</b></td><td><b class="neg">${T.ded || T.dd ? "− " + esc(dedText({ amount: T.ded, days: T.dd })) : "–"}</b></td><td>${netTxt(T)}</td></tr></tbody></table></div>` : "";
+  const list = `<div class="xr"><h3>All records · ${L.length}</h3>${L.length ? `<table><thead><tr><th>Date</th><th>Type</th><th>Team member</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody>${L.map((r) => { const d = dIdx(r.date); return `<tr><td style="white-space:nowrap">${DY[wdOf(d)]} ${dmy(d)}</td><td><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span>${r.ref ? ` <span class="ref">${esc(r.ref)}</span>` : ""}</td><td><b>${esc(r.type === "swap" ? memName(D, r.member) + " ↔ " + memName(D, r.withMember) : memName(D, r.member))}</b></td><td>${esc(isAdj(r) ? (r.reason || "") + (r.details ? " — " + r.details : "") : r.details || "")}</td><td style="white-space:nowrap">${isAdj(r) ? `<b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b>` : "—"}</td><td><span class="ss ${stClass(r)}">${stLabel(r)}</span></td></tr>`; }).join("")}</tbody></table>` : `<p style="font-size:18px;color:var(--muted);margin:0">No excuses, shift changes, bonuses or deductions in this period.</p>`}</div>`;
+  return `<div class="xw" style="width:1500px"><div class="xh"><div><div class="ey">Marketing Team · Operations Management</div><img src="assets/logo-white.png" alt=""></div>
+    <div class="r">Excuses, Shifts, Bonuses &amp; Deductions<small>${label}</small></div></div>${sum}${list}
+    <div class="xf"><span>Vendoor · Marketing Team Operations Management</span><span>Issued ${dmy(cairoNow().idx, 1)}</span></div></div>`;
+}
+async function pfAction(act, el, ev) {
+  const D = V();
+  switch (act) {
+    case "pfOpen": return openProfile(el.dataset.id);
+    case "pfClose": if (el.tagName === "BUTTON" || ev.target === el) { PF.sel = null; $("#modalRoot").innerHTML = ""; } return;
+    case "pfImg": case "pfShare": { const m = memById(D, PF.sel); if (!m) return; toast("Preparing image…"); const [a, b] = pfRange(); return exportImage(profileImageHTML(D, m), `Vendoor_Profile_${slug(m.name)}_${PF.period === "all" ? "All-time" : iDate(a) + "_" + iDate(b)}.png`, act === "pfShare"); }
+    case "pfRep": $("#modalRoot").innerHTML = ""; showView("reports"); return repDetail(el.dataset.k, "history");
+    case "pfLoadRep": await loadReports(); return openProfile(PF.sel);
+    case "pfLoadTk": await loadTasks(true); return openProfile(PF.sel);
+    case "recImg": {
+      const ws = viewWS(); let a, b, label;
+      if (el.dataset.v === "month") { [a, b, label] = monthRange(ws + 3); } else { a = ws; b = ws + 6; label = rangeTxt(ws); }
+      toast("Preparing image…");
+      return exportImage(recordsImageHTML(D, a, b, label), `Vendoor_Records_${el.dataset.v === "month" ? label.replace(" ", "-") : rangeName(ws)}.png`);
+    }
+  }
+}
+
 /* ============================ tasks (assign → send as image → proof → review & rating) ============================ */
 const TK = { list: null, loading: false, error: "", period: "thisMonth", mem: "", tab: "open", q: "", form: null, sel: null, rate: 0, busy: false };
 const TST = { assigned: ["Assigned", "as"], progress: ["In progress", "pr"], done: ["Awaiting review", "rv"], approved: ["Approved", "ap"], returned: ["Returned for rework", "rt"], cancelled: ["Cancelled", "cx"] };
@@ -2745,6 +2993,11 @@ document.addEventListener("input", (e) => {
 document.addEventListener("change", (e) => {
   if (e.target.id === "repFrom" || e.target.id === "repTo") { RS.from = $("#repFrom").value; RS.to = $("#repTo").value; RS.preset = "custom"; return renderReports(); }
   if (e.target.id === "repPreset") { RS.preset = e.target.value; if (RS.preset === "custom") { const r = repRange(); RS.from = RS.from || iDate(r.a); RS.to = RS.to || iDate(r.b); } return renderReports(); }
+  if (e.target.id === "pfPeriod" || e.target.id === "pfFrom" || e.target.id === "pfTo") {
+    if (e.target.id === "pfPeriod") { PF.period = e.target.value; if (PF.period === "custom" && !PF.from) { const r = pfRange(); PF.from = iDate(r[0]); PF.to = iDate(r[1]); } }
+    else { PF[e.target.id === "pfFrom" ? "from" : "to"] = e.target.value; PF.period = "custom"; }
+    renderProfiles(); if (PF.sel && $("#modalRoot .pfm")) openProfile(PF.sel); return;
+  }
   if (e.target.id === "tkPeriod") { TK.period = e.target.value; return renderTasks(); }
   if (e.target.id === "tkMem") { TK.mem = e.target.value; return renderTasks(); }
   if (e.target.dataset && e.target.dataset.tkck != null) { const t = TK.list.find((x) => x.id === TK.sel); if (!t) return; const cl = t.checklist.map((c, j) => (j === +e.target.dataset.tkck ? { ...c, d: e.target.checked } : c)); tkOp({ op: "update", id: t.id, patch: { checklist: cl } }).then((r) => r && openTask(t.id)); return; }
@@ -2782,6 +3035,7 @@ document.addEventListener("click", async (e) => {
   const R = () => renderAll();
   const wkKey = () => iDate(viewWS());
   if (act.startsWith("tk")) return tkAction(act, el, e);
+  if (act.startsWith("pf") || act === "recImg") return pfAction(act, el, e);
   switch (act) {
     case "overlay": if (e.target === el) closeAdmin(); return;
     case "view": if ((el.dataset.v === "reports" || el.dataset.v === "tasks") && !S.me) return openLogin("__" + el.dataset.v); return showView(el.dataset.v);
