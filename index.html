@@ -11,6 +11,9 @@
 @font-face{font-family:"Manrope";font-weight:600;font-display:swap;src:url(assets/fonts/manrope-latin-600-normal.woff2) format("woff2")}
 @font-face{font-family:"Manrope";font-weight:700;font-display:swap;src:url(assets/fonts/manrope-latin-700-normal.woff2) format("woff2")}
 @font-face{font-family:"Manrope";font-weight:800;font-display:swap;src:url(assets/fonts/manrope-latin-800-normal.woff2) format("woff2")}
+@font-face{font-family:"Plex Arabic";font-weight:400;font-display:swap;src:url(assets/fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200E,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:"Plex Arabic";font-weight:600;font-display:swap;src:url(assets/fonts/ibm-plex-sans-arabic-arabic-600-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200E,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:"Plex Arabic";font-weight:700;font-display:swap;src:url(assets/fonts/ibm-plex-sans-arabic-arabic-700-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200E,U+FB50-FDFF,U+FE70-FEFC}
 @font-face{font-family:"Cormorant Garamond";font-weight:500;font-display:swap;src:url(assets/fonts/cormorant-garamond-latin-500-normal.woff2) format("woff2")}
 @font-face{font-family:"Cormorant Garamond";font-weight:600;font-display:swap;src:url(assets/fonts/cormorant-garamond-latin-600-normal.woff2) format("woff2")}
 @font-face{font-family:"Cormorant Garamond";font-weight:700;font-display:swap;src:url(assets/fonts/cormorant-garamond-latin-700-normal.woff2) format("woff2")}
@@ -24,7 +27,7 @@
   --gold:#C9A063; --orange:#E6A45C; --amber:#F0B84A;
   --ok:#1E7A4C; --ok-bg:#E5F3EA; --warn:#9C5C0B; --warn-bg:#FBF1E2; --bad:#A8232F; --bad-bg:#FBEAEC;
   --r:16px; --shadow:0 1px 2px rgba(10,46,48,.05),0 8px 28px rgba(10,46,48,.07);
-  --serif:"Cormorant Garamond",Georgia,serif; --sans:"Manrope",system-ui,-apple-system,sans-serif; --head:"Outfit",system-ui,sans-serif;
+  --serif:"Cormorant Garamond","Plex Arabic",Georgia,serif; --sans:"Manrope","Plex Arabic",system-ui,-apple-system,sans-serif; --head:"Outfit","Plex Arabic",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -587,6 +590,121 @@ tr.cdays .offl{text-decoration:underline dotted var(--bad);text-underline-offset
 .wdb span{color:var(--muted);font-weight:700}
 .wdb i{display:block;height:9px;border-radius:9px;background:linear-gradient(90deg,var(--brand),var(--brand-2));min-width:2px}
 .wdb b{text-align:right;font-variant-numeric:tabular-nums}
+/* ---------- tasks ---------- */
+.banner.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #CFE7D8}
+.kpi .v.warn{color:var(--warn)}
+.chip.warnc:not(.active){border-color:#EFC6CB;color:var(--bad);background:#FFF6F7}
+textarea{border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff;font-size:13.5px;resize:vertical;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink);line-height:1.6;width:100%}
+textarea:focus{outline:3px solid var(--pale);border-color:var(--brand-3)}
+.pri{display:inline-flex;align-items:center;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-radius:6px;padding:3px 8px;white-space:nowrap}
+.pri.urgent{background:#7A1F2A;color:#fff}.pri.high{background:#FBE7CF;color:#8A4E0B}.pri.normal{background:var(--pale-2);color:var(--brand)}.pri.low{background:var(--line-2);color:var(--muted)}
+.tks{display:inline-flex;font-size:11px;font-weight:700;border-radius:999px;padding:4px 11px;white-space:nowrap}
+.tks.as{background:#E3ECF8;color:#2F5A8A}.tks.pr{background:var(--warn-bg);color:var(--warn)}.tks.rv{background:#F3E8FB;color:#6B3A8A}.tks.ap{background:var(--ok-bg);color:var(--ok)}.tks.rt{background:var(--bad-bg);color:var(--bad)}.tks.cx{background:var(--line-2);color:var(--muted)}
+.stars{display:inline-flex;gap:1px;font-style:normal;letter-spacing:0;vertical-align:middle}
+.stars i{font-style:normal;color:#DED9CC;font-size:13px}.stars i.on{color:var(--gold)}
+.stars.big i{font-size:22px}
+.tkl{display:flex;flex-direction:column;gap:8px}
+.tkr{display:grid;grid-template-columns:120px minmax(220px,1fr) 170px 190px 170px 110px;gap:14px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px 16px;background:#fff;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.tkr:hover{border-color:var(--brand-3);box-shadow:0 6px 20px rgba(10,46,48,.07);transform:translateY(-1px)}
+.tkr.od{border-left:4px solid var(--bad);background:linear-gradient(90deg,#FFF8F8,#fff 30%)}
+.tkr .tc{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.code{font-family:var(--head);font-weight:600;font-size:13px;letter-spacing:.04em;color:var(--gold)}
+.tkr .tt b{display:block;font-size:14px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;unicode-bidi:plaintext;text-align:start}
+.tkr .tt small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
+.tkr .who{display:flex;align-items:center;gap:9px;font-size:13px;min-width:0}
+.tkr .who .av{width:30px;height:30px;font-size:11px;box-shadow:none}
+.tkr .who b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tkr .td b,.tkr .td small{display:block;font-size:12.5px}.tkr .td small{color:var(--muted);font-size:11px;margin-top:2px}
+.due.bad{color:var(--bad)}.due.warn{color:var(--warn)}
+.tkr .ts small{display:block;font-size:11px;color:var(--bad);margin-top:3px}
+.tkr .tr2{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.tkr .pf{font-size:11.5px;color:var(--muted);font-weight:600}
+table.tkp{min-width:1000px}
+.scw{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+.sc{font-variant-numeric:lining-nums;font-family:var(--serif);font-size:24px;font-weight:600;color:var(--deep)}
+.sc.ok,.scw small.ok{color:var(--ok)}.sc.warn,.scw small.warn{color:var(--warn)}.sc.bad,.scw small.bad{color:var(--bad)}
+.scw small{font-size:10.5px;font-weight:700}
+.modal.tkf{max-width:760px}
+.tkmem{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.tkmem label{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:5px 14px 5px 5px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;transition:all .12s}
+.tkmem label:has(input:checked){border-color:var(--brand);background:var(--pale-2);color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+.tkmem input{display:none}
+.tkmem .av{width:28px;height:28px;font-size:10.5px;box-shadow:none}
+.tkgrid{display:grid;grid-template-columns:auto 1fr 130px 1fr;gap:12px;margin-top:12px;align-items:end}
+.tkgrid .seg{margin-top:0}
+.modal.tkm{max-width:1220px}
+.m-head .code{color:var(--amber);font-size:15px;margin-right:6px}
+.tkd{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+.tkd .panel{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;background:#fff}
+.tkd .panel h4{margin:0 0 10px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.tkd .panel.rvw{border-color:#E4D3F0;background:linear-gradient(180deg,#FDFAFF,#fff)}
+.tkh{margin-bottom:14px}
+.tkh h2{font-variant-numeric:lining-nums;font-family:var(--serif);font-size:30px;font-weight:600;color:var(--deep);margin:8px 0 0;line-height:1.15;unicode-bidi:plaintext;text-align:start}
+.tkmeta{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.tkmeta>div{padding:10px 14px;border-bottom:1px solid var(--line-2);border-right:1px solid var(--line-2);background:var(--pale-3)}
+.tkmeta>div:nth-child(2n){border-right:none}
+.tkmeta>div:nth-last-child(-n+2){border-bottom:none}
+.tkmeta>div>span{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tkmeta b{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13.5px;font-weight:600;margin-top:3px}
+.tkmeta .who{display:inline-flex;align-items:center;gap:8px}.tkmeta .av{width:24px;height:24px;font-size:9.5px;box-shadow:none}
+.tkp{white-space:pre-line;font-size:13.5px;line-height:1.75;color:var(--ink-2);margin:0;unicode-bidi:plaintext;text-align:start}
+.tkck{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line-2);font-size:13.5px;cursor:pointer}
+.tkck:last-child{border-bottom:none}
+.tkck input{margin-top:3px;accent-color:var(--brand);width:16px;height:16px}
+.tkck.d span{color:var(--muted);text-decoration:line-through}
+.tkck span{unicode-bidi:plaintext;text-align:start;flex:1}
+.rate{display:flex;align-items:center;gap:4px}
+.rate button{border:none;background:none;font-size:30px;line-height:1;color:#DED9CC;padding:0 2px;transition:transform .12s,color .12s}
+.rate button:hover{transform:scale(1.15)}.rate button.on{color:var(--gold)}
+.rate span{margin-left:10px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.tl>div{display:grid;grid-template-columns:14px 1fr;gap:10px;padding:0 0 12px;position:relative}
+.tl>div:not(:last-child)::before{content:"";position:absolute;left:5px;top:14px;bottom:0;width:2px;background:var(--line-2)}
+.tl i{width:12px;height:12px;border-radius:50%;background:var(--brand-3);margin-top:3px;box-shadow:0 0 0 3px #fff}
+.tl i.approved{background:var(--ok)}.tl i.returned,.tl i.cancelled{background:var(--bad)}.tl i.done{background:#8B5CB0}.tl i.created{background:var(--gold)}
+.tl b{display:block;font-size:13px}.tl span{display:block;font-size:12.5px;color:var(--ink-2);unicode-bidi:plaintext}.tl small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.tkprev{border-radius:12px;overflow:hidden;background:var(--deep);width:100%}
+.tkprev-in{width:1080px;transform:scale(var(--k,.44));transform-origin:top left}
+/* the task image (1080px wide) */
+.tkc{width:1080px;background:#0F3A3C;font-family:var(--sans);padding:46px 44px 36px;color:#fff}
+.tkc-h{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:30px}
+.tkc-h img{height:46px;display:block}
+.tkc-h .r{text-align:right;color:var(--amber);font-family:var(--head);font-size:21px;font-weight:500}
+.tkc-h .r small{display:block;font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.tkc-b{background:#F8F6F1;color:var(--ink);border-radius:22px;padding:34px 38px 30px}
+.tkc-top{display:flex;justify-content:space-between;align-items:center}
+.tkc-top .code{font-size:22px;color:#B08544;letter-spacing:.08em}
+.tkc-top .pri{font-size:13px;padding:7px 14px;border-radius:999px;letter-spacing:.12em}
+.tkc h1{font-variant-numeric:lining-nums;font-family:var(--serif);font-size:46px;font-weight:600;color:var(--deep);line-height:1.15;margin:14px 0 24px;unicode-bidi:plaintext;text-align:start}
+.tkc-meta{display:grid;grid-template-columns:1.2fr 1fr 1fr;border:1px solid #E2DED5;border-radius:16px;background:#fff;margin-bottom:22px}
+.tkc-meta>div{padding:16px 20px;border-left:1px solid #E2DED5}.tkc-meta>div:first-child{border-left:none}
+.tkc-meta span{display:block;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9A8A6A}
+.tkc-meta b{display:flex;align-items:center;gap:10px;font-family:var(--head);font-size:23px;font-weight:600;color:var(--deep);margin-top:6px}
+.tkc-meta small{display:block;font-size:14px;color:var(--muted);margin-top:4px}
+.tkc-meta .av{width:34px;height:34px;font-size:12px;box-shadow:none;font-style:normal;font-family:var(--sans)}
+.tkc-s{margin-bottom:20px}
+.tkc-s h4{font-size:13px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#B08544;margin:0 0 10px}
+.tkc-s p{white-space:pre-line;font-size:20px;line-height:1.75;color:var(--ink-2);margin:0;unicode-bidi:plaintext;text-align:start}
+.tkc-s ul{list-style:none;margin:0;padding:0}
+.tkc-s li{display:flex;align-items:flex-start;gap:14px;font-size:19.5px;line-height:1.5;padding:10px 0;border-bottom:1px dashed #E2DED5;unicode-bidi:plaintext}
+.tkc-s li:last-child{border-bottom:none}
+.tkc-s li i{flex:none;width:22px;height:22px;border:2px solid var(--brand-2);border-radius:6px;margin-top:3px}
+.tkc-n{background:#0F3A3C0D;border:1px solid #DCE7E4;border-radius:14px;padding:14px 18px;font-size:15.5px;color:var(--brand);line-height:1.6}
+.tkc-n span{display:block;font-size:16px;margin-top:4px;text-align:right}
+.tkc-f{display:flex;justify-content:space-between;margin-top:20px;font-size:13px;color:rgba(255,255,255,.5)}
+@media (max-width:1100px){
+  .tkr{grid-template-columns:110px 1fr 160px;row-gap:8px}
+  .tkr .td,.tkr .ts,.tkr .tr2{grid-column:auto}
+  .tkd{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .tkr{grid-template-columns:1fr auto;padding:12px}
+  .tkr .tc{flex-direction:row;grid-column:1/-1}
+  .tkr .tt{grid-column:1/-1}
+  .tkr .tr2{align-items:flex-end}
+  .tkgrid{grid-template-columns:1fr 1fr}
+  .tkmeta{grid-template-columns:1fr}
+  .tkmeta>div{border-right:none!important;border-bottom:1px solid var(--line-2)!important}
+}
 .srcrow{display:grid;grid-template-columns:200px 150px 1fr auto auto;gap:10px;align-items:end;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--pale-3)}
 .srcrow .st3{font-size:11.5px;color:var(--muted);padding-bottom:9px;white-space:nowrap}
 .srcrow .st3.bad{color:var(--bad)}
@@ -624,7 +742,7 @@ tr.cdays .offl{text-decoration:underline dotted var(--bad);text-underline-offset
       <button class="btn light" id="adminBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Manage</span></button>
     </div>
   </div>
-  <div class="wrap viewrow"><nav class="views"><button class="active" data-v="ops" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Operations</button><button data-v="reports" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg>Team Reports</button></nav></div>
+  <div class="wrap viewrow"><nav class="views"><button class="active" data-v="ops" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Operations</button><button data-v="reports" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg>Team Reports</button><button data-v="tasks" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Tasks</button></nav></div>
 </header>
 
 <main class="wrap" id="opsView">
@@ -700,6 +818,7 @@ tr.cdays .offl{text-decoration:underline dotted var(--bad);text-underline-offset
 </main>
 
 <main class="wrap hidden" id="repView"></main>
+<main class="wrap hidden" id="tkView"></main>
 
 <div id="exportStage"></div>
 <div id="modalRoot"></div>
@@ -1926,6 +2045,7 @@ function repDetail(key, tab) {
         <div class="panel"><h4>Average sales by weekday</h4><div class="wdb">${H.wd.map((x, k) => { const v = x.n ? x.s / x.n : 0; return `<div><span>${DY[k]}</span><i style="width:${((v / wdMax) * 100).toFixed(1)}%"></i><b>${x.n ? fN(v) : "—"}</b></div>`; }).join("")}</div></div>` : ""}
         <div class="panel"><h4>On the schedule</h4><table class="stbl"><tbody>${Object.entries(H.shiftsS).sort((x, y) => y[1] - x[1]).map(([k, n]) => `<tr><td>${esc(k)} shifts</td><td><b>${n}</b></td></tr>`).join("")}${Object.entries(H.desks).sort((x, y) => y[1] - x[1]).map(([k, n]) => `<tr><td>${esc(k)}</td><td><b>${n}</b> days</td></tr>`).join("") || ""}${!H.schedDays ? `<tr><td class="muted">No schedule weeks for her yet — import the schedule history.</td></tr>` : ""}</tbody></table></div>
         <div class="panel"><h4>Records</h4><table class="stbl"><tbody><tr><td>Bonuses</td><td><b class="pos">${H.bonus.n ? "+ " + money(H.bonus.amount) : "—"}</b> ${H.bonus.n ? `<span class="muted">(${H.bonus.n})</span>` : ""}</td></tr><tr><td>Deductions</td><td><b class="neg">${H.ded.n ? "− " + esc(dedText(H.ded)) : "—"}</b> ${H.ded.n ? `<span class="muted">(${H.ded.n})</span>` : ""}</td></tr><tr><td>Excuses &amp; day-off changes</td><td><b>${H.excuses}</b></td></tr><tr><td>Late arrivals</td><td><b>${H.lates}</b></td></tr><tr><td>Shift swaps</td><td><b>${H.swaps}</b></td></tr></tbody></table></div>
+        ${p.m && TK.list ? (() => { const L = TK.list.filter((x) => x.member === p.m.id), k = tkStats(L, cairoNow().abs), [g, c] = grade(k.score); return `<div class="panel"><h4>Tasks · all time</h4>${L.length ? `<table class="stbl"><tbody><tr><td>Task score</td><td><b class="sc ${c}" style="font-size:20px">${k.score ?? "—"}</b> <span class="muted">${g}</span></td></tr><tr><td>Tasks given</td><td><b>${k.n}</b> · ${k.closed} completed · ${k.open} open${k.overdue ? ` · <b style="color:var(--bad)">${k.overdue} overdue</b>` : ""}</td></tr><tr><td>On-time delivery</td><td><b>${fPct(k.onTime, 0)}</b></td></tr><tr><td>Quality rating</td><td>${k.quality == null ? "—" : `${stars(k.quality)} <b>${nf2.format(k.quality)}</b>`}</td></tr><tr><td>Right first time</td><td><b>${fPct(k.ftr, 0)}</b></td></tr></tbody></table>` : `<div class="muted" style="font-size:12.8px">No tasks given yet.</div>`}</div>`; })() : ""}
       </div>
       ${cp.missing.length ? `<div class="panel"><h4>Missing reports · all time (${cp.missing.length})</h4>${Object.entries(byMonth(cp.missing)).reverse().map(([mn, Ls]) => `<div style="font-size:12.8px;padding:3px 0"><b>${mn}</b> · ${Ls.length}: ${daysTxt(Ls)}</div>`).join("")}</div>` : ""}
       ${H.fbRows.length ? `<div class="panel"><h4>Latest feedback</h4>${H.fbRows.slice(0, 4).map((r) => `<div class="fbi" style="grid-template-columns:130px 1fr;padding:10px 0"><div class="muted" style="font-size:12px">${DY[wdOf(r.i)]}, ${dmy(r.i, 1)}${r.shift ? `<br>${esc(r.shift)}` : ""}</div><p class="fbt open" dir="auto">${esc(r.fb)}</p></div>`).join("")}</div>` : ""}`;
@@ -1949,9 +2069,11 @@ function showView(v) {
   RS.view = v;
   $("#opsView").classList.toggle("hidden", v !== "ops");
   $("#repView").classList.toggle("hidden", v !== "reports");
+  $("#tkView").classList.toggle("hidden", v !== "tasks");
   document.querySelectorAll(".views button").forEach((b) => b.classList.toggle("active", b.dataset.v === v));
-  history.replaceState(null, "", v === "reports" ? "#reports" : location.pathname + location.search);
-  if (v === "reports") { renderReports(); if (!RS.raw && !RS.loading) loadReports(); }
+  history.replaceState(null, "", v === "reports" || v === "tasks" ? "#" + v : location.pathname + location.search);
+  if (v === "reports") { renderReports(); if (!RS.raw && !RS.loading) loadReports(); if (!TK.list && S.me) loadTasks(true); }
+  if (v === "tasks") { renderTasks(); if (S.me) loadTasks(!!TK.list); }
   window.scrollTo({ top: 0 });
 }
 function sourcesEditor(D) {
@@ -1970,6 +2092,356 @@ function sourcesEditor(D) {
     <label class="field" style="flex:1;min-width:140px">Other name<input type="text" id="srcNewName" placeholder="e.g. Shams"></label><button class="btn primary" data-act="srcAdd">Add sheet</button></div>
     <div class="muted" style="font-size:12px;margin-top:8px">The sheet must be yours or shared with you (the account that owns the Apps Script). Save changes, then press Refresh on the Reports page.</div></div>`;
   return h;
+}
+
+/* ============================ tasks (assign → send as image → proof → review & rating) ============================ */
+const TK = { list: null, loading: false, error: "", period: "thisMonth", mem: "", tab: "open", q: "", form: null, sel: null, rate: 0, busy: false };
+const TST = { assigned: ["Assigned", "as"], progress: ["In progress", "pr"], done: ["Awaiting review", "rv"], approved: ["Approved", "ap"], returned: ["Returned for rework", "rt"], cancelled: ["Cancelled", "cx"] };
+const TPRI = { urgent: "Urgent", high: "High", normal: "Normal", low: "Low" };
+const TPER = [["thisWeek", "This week"], ["lastWeek", "Last week"], ["thisMonth", "This month"], ["lastMonth", "Last month"], ["last30", "Last 30 days"], ["last90", "Last 90 days"], ["thisYear", "This year"], ["all", "All time"]];
+const OPEN = new Set(["assigned", "progress", "returned"]);
+function cairoAt(d) {
+  const p = Object.fromEntries(cairoFmt.formatToParts(new Date(d)).map((x) => [x.type, x.value]));
+  const idx = dIdx(`${p.year}-${p.month}-${p.day}`);
+  return idx * 1440 + (+p.hour % 24) * 60 + +p.minute;
+}
+const tDueAbs = (t) => (t.due ? dIdx(t.due) * 1440 + (t.dueTime ? hm(t.dueTime) : 23 * 60 + 59) : null);
+const tDueTxt = (t, yr) => (t.due ? `${DY[wdOf(dIdx(t.due))]} ${dmy(dIdx(t.due), yr)}${t.dueTime ? " · " + fmtT(hm(t.dueTime)) : ""}` : "No deadline");
+const tMem = (t) => memById(V(), t.member);
+const tName = (t) => (tMem(t) || {}).name || t.memberName || "—";
+const tColor = (t) => (tMem(t) || {}).color || "#8C7A5B";
+const tOverdue = (t, now) => OPEN.has(t.status) && t.due && tDueAbs(t) < now;
+const tOnTime = (t) => (t.doneAt && t.due ? cairoAt(t.doneAt) <= tDueAbs(t) : null);
+const stars = (n, big) => `<span class="stars ${big ? "big" : ""}">${[1, 2, 3, 4, 5].map((k) => `<i class="${k <= Math.round(n || 0) ? "on" : ""}">★</i>`).join("")}</span>`;
+const durTxt = (min) => (min == null ? "—" : min < 60 ? `${Math.max(1, Math.round(min))} min` : min < 2880 ? `${(min / 60).toFixed(min < 600 ? 1 : 0)} h` : `${(min / 1440).toFixed(1)} days`);
+function relDue(t, now) {
+  if (!t.due) return `<span class="muted">No deadline</span>`;
+  const d = tDueAbs(t) - now;
+  if (!OPEN.has(t.status)) return `<span class="muted">${tDueTxt(t)}</span>`;
+  if (d < 0) return `<b class="due bad">Overdue ${durTxt(-d)}</b><small>${tDueTxt(t)}</small>`;
+  if (d < 1440) return `<b class="due warn">Due in ${durTxt(d)}</b><small>${tDueTxt(t)}</small>`;
+  return `<b class="due">${tDueTxt(t)}</b><small>in ${durTxt(d)}</small>`;
+}
+function tkRange() {
+  const D = V(), t = cairoNow().idx, d = new Date(t * 864e5), y = d.getUTCFullYear(), mo = d.getUTCMonth();
+  switch (TK.period) {
+    case "thisWeek": return [wkStart(D, t), wkStart(D, t) + 6];
+    case "lastWeek": return [wkStart(D, t) - 7, wkStart(D, t) - 1];
+    case "lastMonth": return [U0(y, mo - 1, 1), U0(y, mo, 0)];
+    case "last30": return [t - 29, t];
+    case "last90": return [t - 89, t];
+    case "thisYear": return [U0(y, 0, 1), U0(y, 11, 31)];
+    case "all": return [-1e9, 1e9];
+    default: return [U0(y, mo, 1), U0(y, mo + 1, 0)];
+  }
+}
+// a task belongs to the period of its deadline (or the day it was given, if it has none)
+const tDay = (t) => (t.due ? dIdx(t.due) : Math.floor(cairoAt(t.createdAt) / 1440));
+// Task score (0–100): on-time delivery 35% · quality rating 35% · completion 15% · right first time 15%.
+// Parts with nothing to measure yet are left out and the rest re-weighted.
+function tkStats(list, now) {
+  const L = list.filter((t) => t.status !== "cancelled");
+  const closed = L.filter((t) => t.status === "done" || t.status === "approved");
+  const dueOrClosed = L.filter((t) => !OPEN.has(t.status) || (t.due && tDueAbs(t) < now));
+  const timed = closed.filter((t) => t.due && t.doneAt), onTime = timed.filter((t) => tOnTime(t));
+  const rated = L.filter((t) => t.status === "approved" && t.rating);
+  const ftr = rated.filter((t) => !(+t.returns));
+  const tat = closed.filter((t) => t.doneAt).map((t) => cairoAt(t.doneAt) - cairoAt(t.createdAt)).filter((x) => x >= 0);
+  const s = {
+    n: L.length, open: L.filter((t) => OPEN.has(t.status)).length, overdue: L.filter((t) => tOverdue(t, now)).length, review: L.filter((t) => t.status === "done").length,
+    closed: closed.length, approved: rated.length, returns: L.reduce((x, t) => x + (+t.returns || 0), 0),
+    completion: dueOrClosed.length ? closed.length / dueOrClosed.length : null,
+    onTime: timed.length ? onTime.length / timed.length : null, late: timed.length - onTime.length,
+    quality: rated.length ? rated.reduce((x, t) => x + t.rating, 0) / rated.length : null,
+    ftr: rated.length ? ftr.length / rated.length : null,
+    tat: tat.length ? tat.sort((a, b) => a - b)[Math.floor(tat.length / 2)] : null,
+  };
+  const parts = [[s.onTime, 0.35], [s.quality == null ? null : (s.quality - 1) / 4, 0.35], [s.completion, 0.15], [s.ftr, 0.15]].filter((x) => x[0] != null);
+  const w = parts.reduce((x, p) => x + p[1], 0);
+  s.score = w ? Math.round((parts.reduce((x, p) => x + p[0] * p[1], 0) / w) * 100) : null;
+  return s;
+}
+const grade = (sc) => (sc == null ? ["", ""] : sc >= 90 ? ["Excellent", "ok"] : sc >= 80 ? ["Very good", "ok"] : sc >= 70 ? ["Good", "warn"] : sc >= 60 ? ["Needs improvement", "warn"] : ["Below standard", "bad"]);
+async function loadTasks(quiet) {
+  if (!S.me) return;
+  if (!quiet) { TK.loading = true; renderTasks(); }
+  try { const j = await call("/api/tasks", "GET"); TK.list = j.tasks || []; TK.error = ""; }
+  catch (e) { if (e.status === 401) { TK.loading = false; return signedOut("Please sign in again."); } TK.error = e.message; }
+  TK.loading = false; renderTasks();
+  if (TK.sel && $("#modalRoot .tkm")) openTask(TK.sel);
+}
+async function tkOp(body, okMsg) {
+  if (TK.busy) return null;
+  TK.busy = true;
+  try { const j = await call("/api/tasks", "POST", body); TK.list = j.tasks; if (okMsg) toast(okMsg); renderTasks(); load(true); return j.task || true; }
+  catch (e) { if (e.status === 401) signedOut("Please sign in again."); else toast(e.message, true); return null; }
+  finally { TK.busy = false; }
+}
+function renderTasks() {
+  if (RS.view !== "tasks") return;
+  const D = V(), root = $("#tkView");
+  if (!S.me) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>Sign in to manage tasks</h3><p class="muted">Tasks are for managers — assign work, send it to the team as an image, and close it with proof and a rating.</p><button class="btn primary" data-act="tkLogin">Sign in</button></div></section>`; return; }
+  if (!TK.list) { root.innerHTML = `<section class="card"><div class="empty">${TK.error ? esc(TK.error) : "Loading tasks…"}</div></section>`; if (!TK.loading && !TK.error) loadTasks(); return; }
+  const now = cairoNow().abs, [a, b] = tkRange();
+  const all = TK.list.filter((t) => !TK.mem || t.member === TK.mem);
+  const inP = all.filter((t) => { const i = tDay(t); return i >= a && i <= b; });
+  const S0 = tkStats(inP, now), live = tkStats(all, now);
+  const dueToday = all.filter((t) => OPEN.has(t.status) && t.due && dIdx(t.due) === cairoNow().idx).length;
+  const [gl, gc] = grade(S0.score);
+  const mems = D.members.filter((m) => !m.former || TK.list.some((t) => t.member === m.id));
+  let h = `<section class="card rfilter"><div class="rctl">
+    <button class="btn primary" data-act="tkNew"><b style="font-size:16px;line-height:0">+</b>&nbsp;New task</button>
+    <label class="field">Performance period<select id="tkPeriod">${TPER.map(([k, l]) => `<option value="${k}" ${TK.period === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    <label class="field">Team member<select id="tkMem"><option value="">Everyone</option>${mems.map((m) => `<option value="${esc(m.id)}" ${TK.mem === m.id ? "selected" : ""}>${esc(m.name)}</option>`).join("")}</select></label>
+    <label class="field" style="flex:1;min-width:200px;max-width:340px">Search<input type="text" id="tkQ" placeholder="Code, title or details…" value="${esc(TK.q)}"></label>
+    <div class="rbtns"><button class="btn sm" data-act="tkRefresh">${TK.loading ? "Refreshing…" : "↻ Refresh"}</button></div></div>
+    <div class="rmeta">Performance covers tasks due ${TK.period === "all" ? "at any time" : rngTxt(a, b)}${TK.mem ? ` · <b>${esc((memById(D, TK.mem) || {}).name || "")}</b> only` : ""} · ${TK.list.length} task${TK.list.length === 1 ? "" : "s"} on record</div></section>`;
+  if (TK.error) h += `<div class="banner warn">${esc(TK.error)}</div>`;
+  h += `<div class="kpis">
+    <div class="kpi"><div class="l">Open tasks</div><div class="v">${live.open}</div><div class="s">${dueToday ? `${dueToday} due today` : "Nothing due today"}</div></div>
+    <div class="kpi"><div class="l">Overdue now</div><div class="v ${live.overdue ? "bad" : "ok"}">${live.overdue}</div><div class="s">Open past their deadline</div></div>
+    <div class="kpi"><div class="l">Awaiting your review</div><div class="v ${live.review ? "warn" : ""}">${live.review}</div><div class="s">Done — rate &amp; approve</div></div>
+    <div class="kpi"><div class="l">Completed · period</div><div class="v">${S0.closed}<small>/ ${S0.n}</small></div><div class="s">${S0.completion == null ? "—" : fPct(S0.completion, 0) + " completion"}</div></div>
+    <div class="kpi"><div class="l">On-time delivery</div><div class="v ${S0.onTime == null ? "" : S0.onTime >= 0.9 ? "ok" : S0.onTime >= 0.75 ? "" : "bad"}">${fPct(S0.onTime, 0)}</div><div class="s">${S0.late ? `${S0.late} late` : "Before the deadline"}</div></div>
+    <div class="kpi"><div class="l">Quality rating</div><div class="v">${S0.quality == null ? "—" : nf2.format(S0.quality)}<small>/ 5</small></div><div class="s">${S0.quality == null ? "No rated tasks yet" : stars(S0.quality)}</div></div>
+    <div class="kpi"><div class="l">Right first time</div><div class="v">${fPct(S0.ftr, 0)}</div><div class="s">${S0.returns ? `${S0.returns} rework request${S0.returns === 1 ? "" : "s"}` : "No rework requests"}</div></div>
+    <div class="kpi"><div class="l">Task score</div><div class="v ${gc}">${S0.score ?? "—"}<small>/ 100</small></div><div class="s">${gl}</div></div></div>`;
+  // performance by member
+  const rows = mems.map((m) => ({ m, s: tkStats(inP.filter((t) => t.member === m.id), now), all: tkStats(TK.list.filter((t) => t.member === m.id), now) })).filter((x) => x.s.n || x.all.open);
+  rows.sort((x, y) => (y.s.score ?? -1) - (x.s.score ?? -1) || y.s.n - x.s.n);
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Accountability</div><h2>Task Performance</h2><div class="sub">Score = on-time delivery 35% · quality rating 35% · completion 15% · right first time 15%.</div></div></div>
+    <div class="lbw"><table class="lbt tkp"><thead><tr><th>#</th><th>Team member</th><th>Score</th><th>Tasks</th><th>Completed</th><th>On time</th><th>Quality</th><th>Right 1st time</th><th>Typical turnaround</th><th>Open</th><th>Overdue</th></tr></thead><tbody>
+    ${rows.map(({ m, s, all: A2 }, k) => { const [g, c] = grade(s.score); return `<tr class="click" data-act="tkMemSel" data-k="${esc(m.id)}"><td class="rk">${s.score == null ? "–" : k + 1}</td><td><div class="who"><div class="av" style="--c:${esc(m.color)}">${esc(initials(m.name))}</div><div><b>${esc(m.name)}</b><small>${m.code ? "ID " + esc(m.code) : ""}</small></div></div></td>
+      <td><div class="scw"><b class="sc ${c}">${s.score ?? "—"}</b><small class="${c}">${g}</small></div></td><td>${s.n}</td><td>${s.closed}${s.completion == null ? "" : ` <span class="muted">· ${fPct(s.completion, 0)}</span>`}</td>
+      <td>${s.onTime == null ? "—" : `<span class="stale ${s.onTime >= 0.9 ? "ok" : s.onTime >= 0.75 ? "warn" : "bad"}">${fPct(s.onTime, 0)}</span>`}</td><td>${s.quality == null ? "—" : `${stars(s.quality)} <span class="muted">${nf2.format(s.quality)}</span>`}</td>
+      <td>${fPct(s.ftr, 0)}</td><td>${durTxt(s.tat)}</td><td>${A2.open || "0"}</td><td>${A2.overdue ? `<b style="color:var(--bad)">${A2.overdue}</b>` : "0"}</td></tr>`; }).join("") || `<tr><td colspan="11" class="muted" style="text-align:left">No tasks in this period yet — press <b>New task</b> to assign the first one.</td></tr>`}
+    </tbody></table></div></section>`;
+  // board
+  const q = TK.q.trim().toLowerCase();
+  const match = (t) => !q || [t.code, t.title, t.details, tName(t)].join(" ").toLowerCase().includes(q);
+  const groups = { open: (t) => OPEN.has(t.status), overdue: (t) => tOverdue(t, now), review: (t) => t.status === "done", approved: (t) => t.status === "approved", returned: (t) => t.status === "returned", cancelled: (t) => t.status === "cancelled", all: () => true };
+  const base = all.filter(match);
+  const cnt = Object.fromEntries(Object.entries(groups).map(([k, f]) => [k, base.filter(f).length]));
+  const PR = { urgent: 0, high: 1, normal: 2, low: 3 };
+  const list = base.filter(groups[TK.tab] || groups.open).sort((x, y) => TK.tab === "open" || TK.tab === "overdue" ? (tOverdue(y, now) - tOverdue(x, now)) || ((tDueAbs(x) ?? 9e12) - (tDueAbs(y) ?? 9e12)) || PR[x.priority] - PR[y.priority] : (y.updatedAt || y.createdAt).localeCompare(x.updatedAt || x.createdAt));
+  const TABS = [["open", "Open"], ["overdue", "Overdue"], ["review", "Awaiting review"], ["approved", "Approved"], ["returned", "Returned"], ["cancelled", "Cancelled"], ["all", "All"]];
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Task board</div><h2>Assignments</h2><div class="sub">Click a task to send its image, record her reply and proof, and rate it.</div></div></div>
+    <div class="chips">${TABS.map(([k, l]) => `<button class="chip ${TK.tab === k ? "active" : ""} ${k === "overdue" && cnt[k] ? "warnc" : ""}" data-act="tkTab" data-k="${k}">${l}<small>${cnt[k]}</small></button>`).join("")}</div>
+    <div class="tkl">${list.map((t) => { const [sl, sc] = TST[t.status]; const ck = (t.checklist || []).length, cd = (t.checklist || []).filter((c) => c.d).length; return `<div class="tkr ${tOverdue(t, now) ? "od" : ""}" data-act="tkOpen" data-k="${esc(t.id)}">
+      <div class="tc"><span class="code">${esc(t.code)}</span><span class="pri ${t.priority}">${TPRI[t.priority] || ""}</span></div>
+      <div class="tt"><b dir="auto">${esc(t.title)}</b><small>${t.desk && respById(D, t.desk) ? esc(respById(D, t.desk).name) + " · " : ""}${ck ? `${cd}/${ck} deliverables · ` : ""}Given ${dmy(Math.floor(cairoAt(t.createdAt) / 1440))} by ${esc((t.createdBy || {}).name || "")}</small></div>
+      <div class="who"><div class="av" style="--c:${esc(tColor(t))}">${esc(initials(tName(t)))}</div><b>${esc(tName(t))}</b></div>
+      <div class="td">${relDue(t, now)}</div>
+      <div class="ts"><span class="tks ${sc}">${sl}</span>${t.returns ? `<small>Returned ${t.returns}×</small>` : ""}</div>
+      <div class="tr2">${t.rating ? stars(t.rating) : ""}${(t.proof || []).length ? `<span class="pf">📎 ${t.proof.length}</span>` : ""}</div></div>`; }).join("") || `<div class="empty">${TK.tab === "open" ? "No open tasks — everything is closed." : "Nothing here."}</div>`}</div></section>`;
+  const fq = document.activeElement && document.activeElement.id === "tkQ" ? document.activeElement.selectionStart : null;
+  root.innerHTML = h;
+  if (fq != null) { const el = $("#tkQ"); el.focus(); el.setSelectionRange(fq, fq); }
+}
+/* ---- create / edit ---- */
+function openTaskForm(t) {
+  const D = V(), now = cairoNow();
+  const f = TK.form = t ? { id: t.id, members: [t.member], title: t.title, details: t.details || "", priority: t.priority, due: t.due, dueTime: t.dueTime, desk: t.desk || "", checklist: (t.checklist || []).map((c) => c.t).join("\n") }
+    : TK.form && !TK.form.id ? TK.form : { members: TK.mem ? [TK.mem] : [], title: "", details: "", priority: "normal", due: iDate(now.idx + 1), dueTime: "18:00", desk: "", checklist: "" };
+  const mems = D.members.filter((m) => !m.former);
+  $("#modalRoot").innerHTML = `<div class="overlay"><div class="modal tkf"><div class="m-head"><h3>${t ? `Edit ${esc(t.code)}` : "New task"}</h3><button class="btn ghost" data-act="closeModal">✕</button></div>
+    <div class="m-body">
+      <div class="field">Assign to${t ? "" : ` <span style="text-transform:none;letter-spacing:0;font-weight:500">— pick several to give each one her own copy</span>`}</div>
+      <div class="tkmem">${mems.map((m) => `<label class="${f.members.includes(m.id) ? "on" : ""}"><input type="${t ? "radio" : "checkbox"}" name="tkm" value="${esc(m.id)}" ${f.members.includes(m.id) ? "checked" : ""}><span class="av" style="--c:${esc(m.color)}">${esc(initials(m.name))}</span>${esc(m.name)}</label>`).join("")}</div>
+      <label class="field" style="margin-top:14px">Task title<input type="text" id="tkTitle" dir="auto" maxlength="200" value="${esc(f.title)}" placeholder="e.g. تجهيز 10 ستوريز لموديكس — Black Friday"></label>
+      <label class="field" style="margin-top:12px">Brief / details<textarea id="tkDetails" dir="auto" rows="5" placeholder="What exactly is needed, links, references, standards…">${esc(f.details)}</textarea></label>
+      <div class="tkgrid">
+        <div class="field">Priority<div class="seg" id="tkPri">${Object.entries(TPRI).reverse().map(([k, l]) => `<button type="button" class="${f.priority === k ? "active" : ""}" data-act="tkPri" data-p="${k}">${l}</button>`).join("")}</div></div>
+        <label class="field">Deadline<input type="date" id="tkDue" value="${esc(f.due)}"></label>
+        <label class="field">Time<input type="time" id="tkTime" value="${esc(f.dueTime)}"></label>
+        <label class="field">Desk / page<select id="tkDesk"><option value="">—</option>${D.responsibilities.map((r) => `<option value="${esc(r.id)}" ${f.desk === r.id ? "selected" : ""}>${esc(r.name)}</option>`).join("")}</select></label>
+      </div>
+      <label class="field" style="margin-top:12px">Deliverables checklist <span style="text-transform:none;letter-spacing:0;font-weight:500">— one per line (optional)</span><textarea id="tkCheck" dir="auto" rows="3" placeholder="5 stories for Modex&#10;3 TikTok videos for Porto">${esc(f.checklist)}</textarea></label>
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn ghost" data-act="closeModal">Cancel</button><button class="btn primary" data-act="tkSave">${t ? "Save changes" : "Create task &amp; prepare image"}</button></div>
+    </div></div></div>`;
+  $("#tkTitle").focus();
+}
+function readTaskForm() {
+  const f = TK.form;
+  f.members = [...document.querySelectorAll("input[name=tkm]:checked")].map((x) => x.value);
+  f.title = $("#tkTitle").value.trim(); f.details = $("#tkDetails").value; f.due = $("#tkDue").value; f.dueTime = $("#tkTime").value; f.desk = $("#tkDesk").value; f.checklist = $("#tkCheck").value;
+  f.priority = ($("#tkPri .active") || {}).dataset?.p || "normal";
+  return f;
+}
+async function saveTaskForm() {
+  const f = readTaskForm(), D = V();
+  if (!f.members.length) return toast("Choose who the task is for", true);
+  if (!f.title) return toast("Write a title for the task", true);
+  const prev = f.id ? TK.list.find((t) => t.id === f.id) : null;
+  const checklist = f.checklist.split("\n").map((x) => x.trim()).filter(Boolean).map((x) => ({ t: x, d: !!(prev && (prev.checklist || []).find((c) => c.t === x && c.d)) }));
+  const fields = { title: f.title, details: f.details, priority: f.priority, due: f.due, dueTime: f.due ? f.dueTime : "", desk: f.desk, checklist };
+  if (f.id) {
+    const r = await tkOp({ op: "update", id: f.id, patch: { ...fields, member: f.members[0], memberName: (memById(D, f.members[0]) || {}).name || "" } }, "Task updated");
+    if (r) { TK.form = null; openTask(f.id); }
+    return;
+  }
+  let first = null;
+  for (const mid of f.members) { const r = await tkOp({ op: "create", task: { ...fields, member: mid, memberName: (memById(D, mid) || {}).name || "" } }); if (!r) return; first = first || r; }
+  toast(f.members.length > 1 ? `${f.members.length} tasks created` : `${first.code} created`);
+  TK.form = null; TK.tab = "open";
+  openTask(first.id, true);
+}
+/* ---- the image she receives ---- */
+function taskImageHTML(t) {
+  const D = V(), m = tMem(t), desk = t.desk && respById(D, t.desk);
+  const P = { urgent: ["#7A1F2A", "#fff"], high: ["#E6A45C", "#2A1A06"], normal: ["#DDEBE8", "#14494B"], low: ["#ECEAE4", "#5C6B6B"] }[t.priority] || ["#DDEBE8", "#14494B"];
+  return `<div class="tkc">
+    <div class="tkc-h"><img src="assets/logo-white.png" alt=""><div class="r"><small>Task assignment</small>Marketing Team</div></div>
+    <div class="tkc-b">
+      <div class="tkc-top"><span class="code">${esc(t.code)}</span><span class="pri" style="background:${P[0]};color:${P[1]}">${TPRI[t.priority]} priority</span></div>
+      <h1 dir="auto">${esc(t.title)}</h1>
+      <div class="tkc-meta">
+        <div><span>Assigned to</span><b><i class="av" style="--c:${esc(tColor(t))}">${esc(initials(tName(t)))}</i>${esc(tName(t))}</b>${m && m.code ? `<small>ID ${esc(m.code)}</small>` : ""}</div>
+        <div><span>Deadline</span><b>${t.due ? `${DY[wdOf(dIdx(t.due))]} ${dmy(dIdx(t.due), 1)}` : "Open"}</b><small>${t.due && t.dueTime ? fmtT(hm(t.dueTime)) + " · Cairo time" : t.due ? "End of day" : "No deadline"}</small></div>
+        <div><span>${desk ? "Desk / page" : "Issued"}</span><b>${desk ? esc(desk.name) : dmy(Math.floor(cairoAt(t.createdAt) / 1440), 1)}</b><small>${desk ? "Issued " + dmy(Math.floor(cairoAt(t.createdAt) / 1440), 1) : "by " + esc((t.createdBy || {}).name || "")}</small></div>
+      </div>
+      ${t.details && t.details.trim() ? `<div class="tkc-s"><h4>Brief</h4><p dir="auto">${esc(t.details.trim())}</p></div>` : ""}
+      ${(t.checklist || []).length ? `<div class="tkc-s"><h4>Deliverables</h4><ul>${t.checklist.map((c) => `<li dir="auto"><i></i>${esc(c.t)}</li>`).join("")}</ul></div>` : ""}
+      <div class="tkc-n"><b>When it's done</b> reply with <b>“Done ✅ ${esc(t.code)}”</b> and a screenshot or link as proof.<span dir="rtl">بعد التنفيذ ابعتي «تم ✅ ${esc(t.code)}» مع سكرين شوت أو لينك كإثبات.</span></div>
+    </div>
+    <div class="tkc-f"><span>Issued by ${esc((t.createdBy || {}).name || "Management")} · ${dmy(Math.floor(cairoAt(t.createdAt) / 1440), 1)}</span><span>Vendoor · Marketing Team Operations Management</span></div></div>`;
+}
+async function renderPng(html) {
+  const stage = $("#exportStage");
+  stage.innerHTML = html;
+  const node = stage.firstElementChild;
+  try {
+    await document.fonts.ready;
+    await Promise.all([...node.querySelectorAll("img")].map((im) => (im.complete ? 0 : new Promise((r) => (im.onload = im.onerror = r)))));
+    const o = { pixelRatio: 2, cacheBust: false };
+    let url;
+    try { await htmlToImage.toPng(node, o); url = await htmlToImage.toPng(node, o); } catch { url = await htmlToImage.toPng(node, { ...o, skipFonts: true }); }
+    return await (await fetch(url)).blob();
+  } finally { stage.innerHTML = ""; }
+}
+const tkFile = (t) => `Vendoor_Task_${t.code}_${slug(tName(t))}.png`;
+async function taskImage(t, mode) {
+  if (mode === "copy") {
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/png": renderPng(taskImageHTML(t)) })]); toast("Image copied — paste it in WhatsApp"); }
+    catch { toast("Your browser can't copy images — use Download instead", true); }
+    return;
+  }
+  toast("Preparing image…");
+  const blob = await renderPng(taskImageHTML(t)), file = new File([blob], tkFile(t), { type: "image/png" });
+  if (mode === "share" && canShareFiles()) { try { await navigator.share({ files: [file], title: t.code }); return; } catch (e) { if (e.name === "AbortError") return; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+/* ---- task detail ---- */
+const EVL = { created: "Task created", edited: "Edited", checklist: "Checklist updated", progress: "Marked in progress", done: "Marked done", approved: "Approved", returned: "Returned for rework", cancelled: "Cancelled", assigned: "Reopened", rated: "Rating changed", proof: "Attachment added", proofRemoved: "Attachment removed" };
+function openTask(id, fresh) {
+  const t = (TK.list || []).find((x) => x.id === id); if (!t) return;
+  TK.sel = id;
+  const D = V(), now = cairoNow().abs, [sl, sc] = TST[t.status], ot = tOnTime(t), admin = S.me && S.me.role === "admin";
+  const sc0 = $(".overlay .tkm .m-body")?.scrollTop;
+  const nowLocal = (() => { const c = cairoNow(); return `${c.date}T${pad(Math.floor(c.min / 60))}:${pad(Math.floor(c.min % 60))}`; })();
+  let act = "";
+  if (OPEN.has(t.status)) act = `<div class="panel"><h4>Record completion</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">When she replies that it's done, attach her reply / proof below, then mark it done.</p>
+      <div class="tkgrid" style="grid-template-columns:1fr 2fr"><label class="field">Completed at<input type="datetime-local" id="tkDoneAt" value="${nowLocal}"></label><label class="field">Her note<input type="text" id="tkDoneNote" dir="auto" placeholder="e.g. Done — link in the drive"></label></div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px">${t.status === "assigned" ? `<button class="btn" data-act="tkSt" data-v="progress">Mark in progress</button>` : ""}<button class="btn primary" data-act="tkDone">✓ Mark as done</button></div></div>`;
+  else if (t.status === "done") act = `<div class="panel rvw"><h4>Review &amp; rate</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">Delivered ${t.doneAt ? logFmt.format(new Date(t.doneAt)) + " " + logTime.format(new Date(t.doneAt)) : ""}${ot == null ? "" : ot ? ` · <b style="color:var(--ok)">on time</b>` : ` · <b style="color:var(--bad)">late</b>`}. How good is the work?</p>
+      <div class="rate" id="tkRate">${[1, 2, 3, 4, 5].map((k) => `<button type="button" data-act="tkStar" data-v="${k}" class="${k <= TK.rate ? "on" : ""}">★</button>`).join("")}<span>${["Choose a rating", "Poor", "Below expectations", "Meets expectations", "Very good", "Outstanding"][TK.rate]}</span></div>
+      <label class="field" style="margin-top:10px">Review note<input type="text" id="tkRevNote" dir="auto" placeholder="Optional — what was good, what to improve"></label>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" data-act="tkReturn">↩ Return for rework</button><button class="btn primary" data-act="tkApprove">Approve</button></div></div>`;
+  else if (t.status === "approved") act = `<div class="panel rvw"><h4>Approved</h4><div class="row" style="gap:12px">${stars(t.rating, 1)}<b>${["", "Poor", "Below expectations", "Meets expectations", "Very good", "Outstanding"][t.rating]}</b><span class="muted" style="font-size:12.5px">by ${esc((t.ratedBy || {}).name || "")}${t.reviewNote ? ` — “${esc(t.reviewNote)}”` : ""}</span></div>
+      <div class="row" style="margin-top:10px"><span class="muted" style="font-size:12px">Change rating:</span>${[1, 2, 3, 4, 5].map((k) => `<button class="btn sm ghost" data-act="tkRerate" data-v="${k}">${k}★</button>`).join("")}</div></div>`;
+  const meta = [["Assigned to", `<span class="who"><span class="av" style="--c:${esc(tColor(t))}">${esc(initials(tName(t)))}</span>${esc(tName(t))}</span>`], ["Deadline", t.due ? `${tDueTxt(t, 1)}` : "No deadline"], ["Priority", `<span class="pri ${t.priority}">${TPRI[t.priority]}</span>`], ["Desk / page", t.desk && respById(D, t.desk) ? esc(respById(D, t.desk).name) : "—"], ["Given", `${logFmt.format(new Date(t.createdAt))} · ${esc((t.createdBy || {}).name || "")}`],
+    ["Delivered", t.doneAt ? `${logFmt.format(new Date(t.doneAt))} ${logTime.format(new Date(t.doneAt))}${ot == null ? "" : ot ? ` <span class="stale ok">On time</span>` : ` <span class="stale bad">Late ${durTxt(cairoAt(t.doneAt) - tDueAbs(t))}</span>`}` : tOverdue(t, now) ? `<span class="stale bad">Overdue ${durTxt(now - tDueAbs(t))}</span>` : "—"], ["Turnaround", t.doneAt ? durTxt(cairoAt(t.doneAt) - cairoAt(t.createdAt)) : "—"], ["Returned", t.returns ? `${t.returns}×` : "Never"]];
+  $("#modalRoot").innerHTML = `<div class="overlay" data-act="tkClose"><div class="modal tkm"><div class="m-head"><h3><span class="code">${esc(t.code)}</span> ${esc(sl)}</h3><div class="row">
+      <button class="btn sm light" data-act="tkImg" data-v="download">⤓ Image</button>${canShareFiles() ? `<button class="btn sm light" data-act="tkImg" data-v="share">Share</button>` : ""}${window.ClipboardItem ? `<button class="btn sm light" data-act="tkImg" data-v="copy">Copy image</button>` : ""}
+      <button class="btn ghost" data-act="tkClose">✕</button></div></div>
+    <div class="m-body">
+      ${fresh ? `<div class="banner ok" style="margin-bottom:14px"><b>${esc(t.code)} is ready.</b> Send her the image below (Download / Share / Copy) — when she replies that it's done, come back here to attach her reply and rate it.</div>` : ""}
+      <div class="tkd">
+        <div>
+          <div class="tkh"><span class="tks ${sc}">${sl}</span><h2 dir="auto">${esc(t.title)}</h2></div>
+          <div class="tkmeta">${meta.map(([l, v]) => `<div><span>${l}</span><b>${v}</b></div>`).join("")}</div>
+          ${t.details ? `<div class="panel"><h4>Brief</h4><p class="tkp" dir="auto">${esc(t.details)}</p></div>` : ""}
+          ${(t.checklist || []).length ? `<div class="panel"><h4>Deliverables · ${t.checklist.filter((c) => c.d).length}/${t.checklist.length}</h4>${t.checklist.map((c, j) => `<label class="tkck ${c.d ? "d" : ""}"><input type="checkbox" data-tkck="${j}" ${c.d ? "checked" : ""} ${t.status === "cancelled" ? "disabled" : ""}><span dir="auto">${esc(c.t)}</span></label>`).join("")}</div>` : ""}
+          ${act}
+          ${t.doneNote ? `<div class="panel"><h4>Her note</h4><p class="tkp" dir="auto">${esc(t.doneNote)}</p></div>` : ""}
+          <div class="panel"><h4>Proof &amp; replies (${(t.proof || []).length})</h4>
+            <div class="row">${(t.proof || []).map((x, j) => `<span class="attx"><button class="att" data-act="tkAtt" data-k="${esc(t.id)}" data-j="${j}" title="${esc(x.name)}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="" loading="lazy">`}</button><button class="rm" data-act="tkAttDel" data-j="${j}" title="Remove">✕</button></span>`).join("")}
+            <label class="btn sm">📎 Attach her reply / screenshot<input type="file" id="tkFiles" accept="image/*,video/*" multiple class="hidden"></label></div>
+            <div id="upStatus" class="upbar hidden" style="margin-top:10px"></div></div>
+        </div>
+        <div>
+          <div class="panel"><h4>Image she receives</h4><div class="tkprev"><div class="tkprev-in">${taskImageHTML(t)}</div></div></div>
+          <div class="panel"><h4>Timeline</h4><div class="tl">${(t.events || []).slice().reverse().map((e) => `<div><i class="${e.type}"></i><div><b>${EVL[e.type] || e.type}${e.rating ? ` · ${e.rating}★` : ""}</b>${e.note ? `<span dir="auto">${esc(e.note)}</span>` : ""}${e.fields ? `<span>${esc(e.fields.join(", "))}</span>` : ""}<small>${logFmt.format(new Date(e.at))} · ${logTime.format(new Date(e.at))} · ${esc((e.by || {}).name || "")}</small></div></div>`).join("")}</div></div>
+          <div class="row" style="justify-content:flex-end;flex-wrap:wrap">
+            ${t.status !== "cancelled" ? `<button class="btn sm" data-act="tkEdit">Edit</button>` : ""}
+            ${["approved", "done", "cancelled"].includes(t.status) ? `<button class="btn sm" data-act="tkSt" data-v="assigned">Reopen</button>` : ""}
+            ${OPEN.has(t.status) ? `<button class="btn sm ghost" data-act="tkSt" data-v="cancelled">Cancel task</button>` : ""}
+            ${admin ? `<button class="btn sm danger" data-act="tkDel">Delete</button>` : ""}</div>
+        </div>
+      </div></div></div></div>`;
+  const pv = $(".tkprev"); if (pv) { const k = pv.clientWidth / 1080; pv.firstElementChild.style.setProperty("--k", k); pv.style.height = pv.firstElementChild.firstElementChild.offsetHeight * k + "px"; }
+  if (sc0) $(".overlay .tkm .m-body").scrollTop = sc0;
+  $("#tkFiles").onchange = (e) => uploadFiles([...e.target.files], async (att) => { await tkOp({ op: "addProof", id: t.id, att }); openTask(t.id); });
+}
+function taskLightbox(t, j) {
+  const a = t.proof[j];
+  const media = a.kind === "video" ? `<video src="${esc(fileUrl(a))}" controls autoplay playsinline></video>` : `<img src="${esc(fileUrl(a))}" alt="${esc(a.name)}">`;
+  $("#lbRoot").innerHTML = `<div class="overlay lbo" data-act="closeLb"><div class="lb">
+    <div class="lb-h"><div><b>${esc(a.name)}</b><span>${esc(t.code)} · ${esc(tName(t))}${a.size ? " · " + fmtSize(a.size) : ""}</span></div>
+      <div class="row">${t.proof.length > 1 ? `<button class="btn sm light" data-act="tkAtt" data-k="${esc(t.id)}" data-j="${(j - 1 + t.proof.length) % t.proof.length}">‹</button><button class="btn sm light" data-act="tkAtt" data-k="${esc(t.id)}" data-j="${(j + 1) % t.proof.length}">›</button>` : ""}
+      <a class="btn sm light" href="${esc(fileUrl(a))}" download="${esc(a.name)}">Download</a><button class="btn sm light" data-act="closeLb">✕</button></div></div>
+    <div class="lb-m">${media}</div></div></div>`;
+}
+async function tkAction(act, el, ev) {
+  const t = (TK.list || []).find((x) => x.id === TK.sel);
+  switch (act) {
+    case "tkLogin": return openLogin("__tasks");
+    case "tkNew": TK.sel = null; return openTaskForm(null);
+    case "tkSave": return saveTaskForm();
+    case "tkRefresh": return loadTasks();
+    case "tkTab": TK.tab = el.dataset.k; return renderTasks();
+    case "tkMemSel": TK.mem = TK.mem === el.dataset.k ? "" : el.dataset.k; return renderTasks();
+    case "tkOpen": TK.rate = 0; return openTask(el.dataset.k);
+    case "tkClose": if (el.tagName === "BUTTON" || (ev && ev.target === el)) { TK.sel = null; $("#modalRoot").innerHTML = ""; } return;
+    case "tkPri": document.querySelectorAll("#tkPri button").forEach((b) => b.classList.toggle("active", b === el)); return;
+    case "tkAtt": { const x = TK.list.find((y) => y.id === el.dataset.k); if (x) taskLightbox(x, +el.dataset.j); return; }
+  }
+  if (!t) return;
+  switch (act) {
+    case "tkImg": return taskImage(t, el.dataset.v);
+    case "tkEdit": return openTaskForm(t);
+    case "tkStar": TK.rate = +el.dataset.v; return openTask(t.id);
+    case "tkSt": {
+      const v = el.dataset.v;
+      if (v === "cancelled" && !confirm(`Cancel ${t.code}? It won't count in anyone's score.`)) return;
+      if (await tkOp({ op: "update", id: t.id, patch: { status: v } }, `${t.code}: ${TST[v][0]}`)) openTask(t.id);
+      return;
+    }
+    case "tkDone": {
+      const at = $("#tkDoneAt").value, note = $("#tkDoneNote").value.trim();
+      const doneAt = at ? new Date(Date.parse(at + ":00Z") - cairoOffsetMin(at) * 60e3).toISOString() : new Date().toISOString();
+      if (await tkOp({ op: "update", id: t.id, patch: { status: "done", doneAt, doneNote: note } }, `${t.code} marked done — now rate it`)) { TK.rate = 0; openTask(t.id); }
+      return;
+    }
+    case "tkApprove":
+      if (!TK.rate) return toast("Choose a rating (1–5 stars) first", true);
+      if (await tkOp({ op: "update", id: t.id, patch: { status: "approved", rating: TK.rate }, note: $("#tkRevNote").value.trim() }, `${t.code} approved · ${TK.rate}★`)) { TK.rate = 0; openTask(t.id); }
+      return;
+    case "tkReturn": {
+      const note = $("#tkRevNote").value.trim() || prompt("What needs to be fixed?") || "";
+      if (await tkOp({ op: "update", id: t.id, patch: { status: "returned" }, note }, `${t.code} returned for rework`)) { TK.rate = 0; openTask(t.id); }
+      return;
+    }
+    case "tkRerate": if (await tkOp({ op: "update", id: t.id, patch: { status: "approved", rating: +el.dataset.v } }, "Rating updated")) openTask(t.id); return;
+    case "tkAttDel": if (confirm("Remove this attachment?") && (await tkOp({ op: "delProof", id: t.id, j: +el.dataset.j }))) openTask(t.id); return;
+    case "tkDel": if (confirm(`Delete ${t.code} permanently? This can't be undone. (Cancel keeps it on record.)`) && (await tkOp({ op: "delete", id: t.id }, `${t.code} deleted`))) { TK.sel = null; $("#modalRoot").innerHTML = ""; } return;
+  }
+}
+// minutes Cairo is ahead of UTC around a given local date-time (handles summer time)
+function cairoOffsetMin(local) {
+  const guess = new Date(local + ":00Z");
+  return cairoAt(guess) - Math.floor(guess.getTime() / 60000);
 }
 
 /* ============================ admin ============================ */
@@ -1994,13 +2466,13 @@ function openLogin(tab, msg) {
       const j = await call("/api/auth", "POST", { username: $("#liUser").value.trim(), password: $("#liPass").value });
       S.token = j.token; S.me = j.user; localStorage.setItem("vmo_token", S.token);
       toast(`Welcome, ${S.me.name}`); renderHeader();
-      if (tab === "__reports") { $("#modalRoot").innerHTML = ""; RS.raw = null; showView("reports"); } else openAdmin(tab);
+      if (tab === "__reports") { $("#modalRoot").innerHTML = ""; RS.raw = null; showView("reports"); } else if (tab === "__tasks") { $("#modalRoot").innerHTML = ""; TK.list = null; showView("tasks"); } else openAdmin(tab);
     } catch (err) { toast(err.status === 401 ? "Wrong username or password" : err.message, true); }
   };
 }
 function signedOut(msg) {
   S.token = ""; S.me = null; S.users = null; localStorage.removeItem("vmo_token");
-  RS.raw = null; RS.error = ""; renderReports();
+  RS.raw = null; RS.error = ""; renderReports(); TK.list = null; TK.sel = null; renderTasks();
   const keep = S.admin.open; S.admin.open = false;
   renderHeader();
   if (keep || msg) openLogin(S.admin.tab, msg);
@@ -2010,6 +2482,7 @@ async function checkSession() {
   try { const j = await call("/api/auth", "GET"); S.me = j.user; } catch (e) { if (e.status === 401) { S.token = ""; localStorage.removeItem("vmo_token"); } }
   renderAll();
   if (location.hash === "#reports") showView("reports");
+  if (location.hash === "#tasks") showView("tasks");
 }
 async function loadUsers() {
   try { S.users = (await call("/api/users", "GET")).users; } catch (e) { S.users = []; if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
@@ -2267,10 +2740,14 @@ document.addEventListener("change", (e) => {
 });
 document.addEventListener("input", (e) => {
   if (e.target.id === "repFq") { RS.fq = e.target.value; RS.feedAll = false; renderReports(); }
+  if (e.target.id === "tkQ") { TK.q = e.target.value; renderTasks(); }
 });
 document.addEventListener("change", (e) => {
   if (e.target.id === "repFrom" || e.target.id === "repTo") { RS.from = $("#repFrom").value; RS.to = $("#repTo").value; RS.preset = "custom"; return renderReports(); }
   if (e.target.id === "repPreset") { RS.preset = e.target.value; if (RS.preset === "custom") { const r = repRange(); RS.from = RS.from || iDate(r.a); RS.to = RS.to || iDate(r.b); } return renderReports(); }
+  if (e.target.id === "tkPeriod") { TK.period = e.target.value; return renderTasks(); }
+  if (e.target.id === "tkMem") { TK.mem = e.target.value; return renderTasks(); }
+  if (e.target.dataset && e.target.dataset.tkck != null) { const t = TK.list.find((x) => x.id === TK.sel); if (!t) return; const cl = t.checklist.map((c, j) => (j === +e.target.dataset.tkck ? { ...c, d: e.target.checked } : c)); tkOp({ op: "update", id: t.id, patch: { checklist: cl } }).then((r) => r && openTask(t.id)); return; }
   if (e.target.id === "repCmp") { RS.cmp = e.target.value; return renderReports(); }
   if (e.target.id === "repMem") { RS.mem = e.target.value; RS.fmem = ""; RS.feedAll = false; return renderReports(); }
   if (e.target.id === "repShift") { RS.shift = e.target.value; return renderReports(); }
@@ -2304,9 +2781,10 @@ document.addEventListener("click", async (e) => {
   const act = el.dataset.act, D = S.draft, p = el.dataset.path, i = +el.dataset.i;
   const R = () => renderAll();
   const wkKey = () => iDate(viewWS());
+  if (act.startsWith("tk")) return tkAction(act, el, e);
   switch (act) {
     case "overlay": if (e.target === el) closeAdmin(); return;
-    case "view": if (el.dataset.v === "reports" && !S.me) return openLogin("__reports"); return showView(el.dataset.v);
+    case "view": if ((el.dataset.v === "reports" || el.dataset.v === "tasks") && !S.me) return openLogin("__" + el.dataset.v); return showView(el.dataset.v);
     case "repLogin": return openLogin("__reports");
     case "repReset": Object.assign(RS, { preset: "thisMonth", cmp: "prev", mem: "", shift: "", from: "", to: "", fmem: "", fq: "" }); return renderReports();
     case "repRefresh": return loadReports(true);
@@ -2476,6 +2954,8 @@ setInterval(() => { renderHeader(); renderKpis(); renderLive(); renderDay(); }, 
 setInterval(() => { if (!S.admin.open) load(true); }, 120000);
 setInterval(() => { if (RS.view === "reports" && S.me && !RS.loading && (!RS.raw || !RS.raw.fetchedAt || Date.now() - new Date(RS.raw.fetchedAt) > 10 * 60e3)) loadReports(); }, 60000);
 if (location.hash === "#reports" && !S.token) showView("reports");
+if (location.hash === "#tasks" && !S.token) showView("tasks");
+setInterval(() => { if (RS.view === "tasks" && S.me && !TK.busy && !$("#modalRoot .tkf")) loadTasks(true); }, 120000);
 renderAll();
 load();
 checkSession();
