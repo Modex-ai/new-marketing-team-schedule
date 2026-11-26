@@ -552,11 +552,49 @@ table.lbt tr.tot td{font-weight:700;background:var(--pale-3);border-bottom:none}
 .dtl td{padding:9px 6px;border-bottom:1px solid var(--line-2);text-align:right;vertical-align:top;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dtl td.f{white-space:pre-line;text-align:start;unicode-bidi:plaintext;min-width:260px;max-width:440px;font-size:12.5px;line-height:1.6;color:var(--ink-2)}
 .dtl tr.off td{color:var(--soft)}
+.rfilter{position:sticky;top:8px;z-index:20;padding:14px 18px!important;backdrop-filter:blur(8px);background:rgba(255,255,255,.94)!important}
+.rctl{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.rctl .field select,.rctl .field input{font-size:13px;padding:7px 10px;min-width:130px;text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink)}
+.rctl .field input[type=date]{min-width:0}
+.rctl .rbtns{margin-left:auto;display:flex;gap:8px}
+.rfilter .rmeta{margin-top:10px}
+table.ctb{min-width:900px}
+.cpc2{font-family:var(--serif);font-size:19px;font-weight:600;min-width:44px;text-align:right}
+.cpc2.ok{color:var(--ok)} .cpc2.warn{color:var(--warn)} .cpc2.bad{color:var(--bad)}
+tr.cdays td{background:var(--pale-3);white-space:normal!important;text-align:left!important;font-size:12.8px;line-height:1.8;color:var(--ink-2);padding:10px 14px!important}
+tr.cdays b{color:var(--deep)}
+tr.cdays .offl{text-decoration:underline dotted var(--bad);text-underline-offset:3px}
+.dtl .mk small{display:block;font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dtl .panel{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;background:#fff}
+.dtl .panel h4{margin:0 0 10px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.dtl .tw{overflow-x:auto}
+.pf-h{display:flex;gap:16px;align-items:center;padding:4px 0 18px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.pf-h .av{width:58px;height:58px;font-size:19px}
+.pf-n{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--deep);line-height:1.1}
+.pf-h .muted{font-size:12.5px;margin-top:3px}
+.pf-r{margin-left:auto;text-align:right}
+.pf-r span{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pf-r b{font-family:var(--serif);font-size:20px;color:var(--deep);font-weight:600}
+.hls{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.hls>div{border:1px solid #EADFC8;border-radius:12px;padding:10px 12px;background:linear-gradient(180deg,#FFFDF8,#FBF6EA)}
+.hls span{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.hls b{display:block;font-family:var(--serif);font-size:20px;font-weight:600;color:var(--deep);margin-top:2px}
+.hls small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.pf2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.pf2 .panel{margin-bottom:0}
+.pf2+.panel,.pf2+div{margin-top:14px}
+.wdb>div{display:grid;grid-template-columns:40px 1fr 70px;gap:10px;align-items:center;font-size:12.5px;padding:4px 0}
+.wdb span{color:var(--muted);font-weight:700}
+.wdb i{display:block;height:9px;border-radius:9px;background:linear-gradient(90deg,var(--brand),var(--brand-2));min-width:2px}
+.wdb b{text-align:right;font-variant-numeric:tabular-nums}
 .srcrow{display:grid;grid-template-columns:200px 150px 1fr auto auto;gap:10px;align-items:end;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--pale-3)}
 .srcrow .st3{font-size:11.5px;color:var(--muted);padding-bottom:9px;white-space:nowrap}
 .srcrow .st3.bad{color:var(--bad)}
 @media (max-width:1000px){
   .dtl .mk{grid-template-columns:repeat(3,1fr)}
+  .hls{grid-template-columns:repeat(2,1fr)}
+  .pf2{grid-template-columns:1fr}
+  .rfilter{position:static}
   .srcrow{grid-template-columns:1fr 1fr}
 }
 @media (max-width:640px){
@@ -752,13 +790,22 @@ function fmtT(min, compact) {
 }
 function fmtDur(min) { min = Math.max(0, Math.round(min)); const h = Math.floor(min / 60), m = min % 60; return h ? `${h}h${m ? " " + m + "m" : ""}` : `${m}m`; }
 const hrs = (min) => Math.round((min / 60) * 10) / 10 + "h";
+// "11:00-19:00" → { s:660, e:1140 }; end at/before start runs past midnight.
+// Split shifts are comma-separated ("11:00-15:00,19:00-23:00"): s/e span the whole shift, dur counts only the worked parts.
 function tRange(t) {
-  const m = /^(\d{1,2}:\d{2})-(\d{1,2}:\d{2})$/.exec(String(t || ""));
-  if (!m) return null;
-  const s = hm(m[1]); let e = hm(m[2]); if (e <= s) e += 1440;
-  return { s, e };
+  const parts = String(t || "").split(",").map((x) => /^\s*(\d{1,2}:\d{2})-(\d{1,2}:\d{2})\s*$/.exec(x));
+  if (!parts.length || parts.some((m) => !m)) return null;
+  let base = null, dur = 0, end = 0;
+  const ps = parts.map((m) => {
+    let s = hm(m[1]); if (base != null && s < base) s += 1440;
+    let e = hm(m[2]); while (e <= s) e += 1440;
+    if (base == null) base = s;
+    dur += e - s; end = Math.max(end, e);
+    return { s, e };
+  });
+  return { s: ps[0].s, e: end, dur, parts: ps };
 }
-const tLabel = (t, compact) => { const r = tRange(t); return r ? `${fmtT(r.s, compact)} – ${fmtT(r.e, compact)}` : ""; };
+const tLabel = (t, compact) => { const r = tRange(t); return r ? r.parts.map((x) => `${fmtT(x.s, compact)} – ${fmtT(x.e, compact)}`).join(" · ") : ""; };
 function txtOn(hex) {
   const h = String(hex || "#ffffff").replace("#", ""); if (h.length < 6) return "#0F2526";
   const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
@@ -804,7 +851,7 @@ function cellAt(D, mid, i) {
   if (!c || !c.s) return null;
   const ty = typeById(D, c.s); if (!ty) return null;
   const off = ty.kind === "off", r = off ? null : tRange(c.t);
-  return { ty, resp: off ? null : respById(D, c.r), t: off ? "" : c.t || "", n: c.n || "", off, work: !off, s: r ? i * 1440 + r.s : null, e: r ? i * 1440 + r.e : null, dur: r ? r.e - r.s : 0, i };
+  return { ty, resp: off ? null : respById(D, c.r), t: off ? "" : c.t || "", n: c.n || "", off, work: !off, s: r ? i * 1440 + r.s : null, e: r ? i * 1440 + r.e : null, dur: r ? r.dur : 0, i };
 }
 const dayNote = (D, i) => { const ws = wkStart(D, i), w = weekAt(D, ws); return w ? (w.notes || {})[i - ws] || "" : ""; };
 const trackedTypes = (D) => D.shiftTypes.filter((t) => t.kind === "work" && t.track !== false);
@@ -1279,9 +1326,11 @@ function diffData(A, B) {
   A.timeSlots.filter((t) => !B.timeSlots.includes(t)).forEach((t) => out.push(`Time slots: removed ${tLabel(t, 1)}`));
   const nm = (id) => (memById(B, id) || memById(A, id) || { name: "(removed)" }).name;
   const keys = new Set([...Object.keys(A.weeks || {}), ...Object.keys(B.weeks || {})]);
+  const imported = [];
   for (const key of [...keys].sort()) {
     const a = A.weeks[key], b = B.weeks[key], ws = dIdx(key), W = `Week ${dmy(ws)} – ${dmy(ws + 6)}`;
     if (!b) { out.push(`${W}: deleted the week`); continue; }
+    if (!a && /^imported/.test(b.src || "")) { imported.push(ws); continue; }
     if (!a) { out.push(`${W}: created the week${b.src ? " (" + b.src + ")" : ""} — ${b.memberIds.length} people`); continue; }
     b.memberIds.filter((id) => !a.memberIds.includes(id)).forEach((id) => out.push(`${W}: added ${nm(id)} to the week`));
     a.memberIds.filter((id) => !b.memberIds.includes(id)).forEach((id) => out.push(`${W}: removed ${nm(id)} from the week`));
@@ -1296,6 +1345,8 @@ function diffData(A, B) {
       if (na !== nb) out.push(nb ? `${ctx}: note — “${nb}”` : `${ctx}: removed the note`);
     }
   }
+  if (imported.length) out.push(`Schedule: imported ${imported.length} weeks of history from the Google Sheet (${dmy(Math.min(...imported), 1)} – ${dmy(Math.max(...imported) + 6, 1)})`);
+
   const rn = (r) => `${REQ_TYPES[r.type] || r.type}${r.ref ? " " + r.ref : ""} — ${reqTitle(B, r)}${isAdj(r) ? ` · ${ADJ[r.type].sign} ${dedText(r)} · ${r.reason || ""}` : ""}`;
   for (const r of B.requests || []) {
     const o = (A.requests || []).find((x) => x.id === r.id);
@@ -1396,7 +1447,11 @@ async function saveCard(id, share) {
 // Each team member keeps her own Google Sheet with a "Daily Log" tab (Date · Moderator · Shift · Total Sales ·
 // Orders · Items · … · Out of Stock · Refund Requests · Exchanged Orders · Feedback). /api/reports returns
 // those rows; everything below turns them into the Reports view.
-const RS = { view: "ops", loading: false, raw: null, error: "", preset: "thisMonth", from: "", to: "", fq: "", fmem: "", feedAll: false, open: {} };
+const RS = { view: "ops", loading: false, raw: null, error: "", preset: "thisMonth", from: "", to: "", cmp: "prev", mem: "", shift: "", fq: "", fmem: "", feedAll: false, open: {}, compOpen: {}, dtab: "history" };
+const PRESETS = [["today", "Today"], ["yesterday", "Yesterday"], ["thisWeek", "This week"], ["lastWeek", "Last week"], ["last7", "Last 7 days"], ["thisMonth", "This month"], ["lastMonth", "Last month"], ["last30", "Last 30 days"], ["last90", "Last 90 days"], ["thisYear", "This year"], ["all", "All time"], ["custom", "Custom range"]];
+const CMPS = [["prev", "Previous period"], ["month", "Same days last month"], ["year", "Same days last year"], ["none", "No comparison"]];
+const EXCUSED = new Set(["excuse", "dayoff"]);
+const MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const sheetUrl = (id) => `https://docs.google.com/spreadsheets/d/${id}/edit`;
 const sheetIdOf = (s) => { const m = /\/d\/([\w-]{20,})/.exec(String(s || "")) || /^([\w-]{20,})$/.exec(String(s || "").trim()); return m ? m[1] : ""; };
 const nf0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
@@ -1452,6 +1507,7 @@ function repModel() {
       p.rows.sort((a, b) => a.i - b.i);
       const today = cairoNow().idx, rep = p.rows.filter((r) => (r.hasNums || r.fb) && r.i <= today);
       p.last = rep.length ? rep[rep.length - 1].i : null;
+      p.first = rep.length ? rep[0].i : null;
       const aovs = p.rows.filter((r) => r.orders > 0 && r.sales > 0).map((r) => r.sales / r.orders).sort((a, b) => a - b);
       p.medAov = aovs.length ? aovs[Math.floor(aovs.length / 2)] : null;
     }
@@ -1459,45 +1515,6 @@ function repModel() {
   });
   _rm = { key, val: people };
   return people;
-}
-function repRange() {
-  const t = cairoNow().idx, d = new Date(t * 864e5), y = d.getUTCFullYear(), mo = d.getUTCMonth(), dd = d.getUTCDate();
-  const U = (yy, mm, day) => Math.round(Date.UTC(yy, mm, day) / 864e5);
-  let a, b, pa, pb;
-  switch (RS.preset) {
-    case "thisWeek": a = wkStart(V(), t); b = t; pa = a - 7; pb = b - 7; break;
-    case "lastWeek": a = wkStart(V(), t) - 7; b = a + 6; pa = a - 7; pb = b - 7; break;
-    case "last30": a = t - 29; b = t; pa = a - 30; pb = a - 1; break;
-    case "lastMonth": a = U(y, mo - 1, 1); b = U(y, mo, 0); pa = U(y, mo - 2, 1); pb = U(y, mo - 1, 0); break;
-    case "custom": {
-      a = RS.from ? dIdx(RS.from) : t - 29; b = RS.to ? dIdx(RS.to) : t; if (b < a) [a, b] = [b, a];
-      const n = b - a + 1; pa = a - n; pb = a - 1; break;
-    }
-    default: a = U(y, mo, 1); b = t; pa = U(y, mo - 1, 1); pb = Math.min(U(y, mo - 1, dd), U(y, mo, 0));
-  }
-  return { a, b, pa, pb, t };
-}
-const rngTxt = (a, b) => { const A = new Date(a * 864e5), B = new Date(b * 864e5); return a === b ? dmy(a, 1) : A.getUTCFullYear() === B.getUTCFullYear() && A.getUTCMonth() === B.getUTCMonth() ? `${A.getUTCDate()} – ${dmy(b, 1)}` : `${dmy(a)} – ${dmy(b, 1)}`; };
-function agg(rows, a, b) {
-  const t = { sales: 0, orders: 0, items: 0, oos: 0, refunds: 0, exch: 0, days: 0, selling: 0, off: 0, fb: 0, byDay: {}, byShift: {} };
-  for (const r of rows) {
-    if (r.i < a || r.i > b) continue;
-    if (r.fb) t.fb++;
-    if (r.off && !r.hasNums) { t.off++; continue; }
-    if (!r.hasNums) continue;
-    t.days++;
-    t.sales += r.sales || 0; t.orders += r.orders || 0; t.items += r.items || 0; t.oos += r.oos || 0; t.refunds += r.refunds || 0; t.exch += r.exch || 0;
-    if ((r.sales || 0) > 0) t.selling++;
-    t.byDay[r.i] = (t.byDay[r.i] || 0) + (r.sales || 0);
-    const s = (t.byShift[r.sk] = t.byShift[r.sk] || { days: 0, sales: 0, orders: 0, items: 0 });
-    s.days++; s.sales += r.sales || 0; s.orders += r.orders || 0; s.items += r.items || 0;
-  }
-  t.aov = t.orders ? t.sales / t.orders : null;
-  t.ipo = t.orders ? t.items / t.orders : null;
-  t.avgDaily = t.selling ? t.sales / t.selling : null;
-  t.refundRate = t.orders ? t.refunds / t.orders : null;
-  t.exchRate = t.orders ? t.exch / t.orders : null;
-  return t;
 }
 function sumAgg(list) {
   const t = { sales: 0, orders: 0, items: 0, oos: 0, refunds: 0, exch: 0, days: 0, selling: 0, off: 0, fb: 0, byDay: {}, byShift: {} };
@@ -1523,21 +1540,6 @@ function dlt(cur, prev, lower, pts) {
 }
 const pctChg = (cur, prev) => (prev ? (cur - prev) / Math.abs(prev) : null);
 // scheduled working days vs days with a report (only days that exist in the Weekly Schedule, up to yesterday)
-function compliance(D, p, a, b, t) {
-  const out = { expected: 0, done: 0, missing: [], offMismatch: [] };
-  if (!p.m) return out;
-  const byI = Object.fromEntries(p.rows.map((r) => [r.i, r]));
-  for (let i = a; i <= Math.min(b, t - 1); i++) {
-    const c = cellAt(D, p.m.id, i);
-    if (!c || !c.work) continue;
-    out.expected++;
-    const r = byI[i];
-    if (r && (r.hasNums || r.fb)) out.done++;
-    else if (r && r.off) { out.offMismatch.push(i); out.missing.push(i); }
-    else out.missing.push(i);
-  }
-  return out;
-}
 function qualityFlags(D, people, a, b, t) {
   const F = [];
   for (const p of people) {
@@ -1557,15 +1559,17 @@ function qualityFlags(D, people, a, b, t) {
   }
   return F.sort((x, y) => (y.err ? 1 : 0) - (x.err ? 1 : 0) || (y.i ?? 1e9) - (x.i ?? 1e9));
 }
-function trendSVG(people, a, b) {
-  const days = b - a + 1, W = 1000, H = 230, L = 46, T = 10, Bm = 26, cw = (W - L) / days;
+function trendSVG(people, a, b, buckets) {
+  const BK = buckets || Array.from({ length: b - a + 1 }, (_, k) => ({ a: a + k, b: a + k }));
+  const days = BK.length, W = 1000, H = 230, L = 46, T = 10, Bm = 26, cw = (W - L) / days;
   const stacks = [];
   let max = 0;
-  for (let k = 0; k < days; k++) {
+  for (const bk of BK) {
     let y = 0; const segs = [];
-    for (const p of people) { const v = p.cur.byDay[a + k] || 0; if (v > 0) { segs.push({ p, v, y0: y }); y += v; } }
-    stacks.push({ i: a + k, segs, tot: y }); max = Math.max(max, y);
+    for (const p of people) { let v = 0; for (let i = bk.a; i <= bk.b; i++) v += p.cur.byDay[i] || 0; if (v > 0) { segs.push({ p, v, y0: y }); y += v; } }
+    stacks.push({ i: bk.a, bk, segs, tot: y }); max = Math.max(max, y);
   }
+  const tipOf = (s) => (buckets ? s.bk.tip : `${DY[wdOf(s.i)]} ${dmy(s.i)}`);
   if (!max) return `<div class="empty">No sales logged in this period yet.</div>`;
   const step = Math.pow(10, Math.floor(Math.log10(max))), nice = Math.ceil(max / step) * step, sc = (H - T - Bm) / nice;
   let g = "";
@@ -1573,14 +1577,14 @@ function trendSVG(people, a, b) {
   const bw = Math.max(3, Math.min(34, cw * 0.62)), labEvery = Math.ceil(days / 16);
   stacks.forEach((s, k) => {
     const x = L + k * cw + (cw - bw) / 2;
-    for (const sg of s.segs) { const h = sg.v * sc, y = H - Bm - (sg.y0 + sg.v) * sc; g += `<rect class="seg" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.5, h).toFixed(1)}" rx="${Math.min(3, bw / 4)}" fill="${esc(sg.p.color)}"><title>${esc(sg.p.name)} · ${DY[wdOf(s.i)]} ${dmy(s.i)} · EGP ${fN(sg.v)}</title></rect>`; }
-    if (s.tot) g += `<rect x="${(L + k * cw).toFixed(1)}" y="${T}" width="${cw.toFixed(1)}" height="${H - T - Bm}" fill="transparent"><title>${DY[wdOf(s.i)]} ${dmy(s.i)} · Team EGP ${fN(s.tot)}${s.segs.map((x) => `\n${x.p.name}: ${fN(x.v)}`).join("")}</title></rect>`;
-    if (k % labEvery === 0) g += `<text class="ax" x="${(L + k * cw + cw / 2).toFixed(1)}" y="${H - 8}" text-anchor="middle">${new Date(s.i * 864e5).getUTCDate()} ${MON[new Date(s.i * 864e5).getUTCMonth()]}</text>`;
+    for (const sg of s.segs) { const h = sg.v * sc, y = H - Bm - (sg.y0 + sg.v) * sc; g += `<rect class="seg" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.5, h).toFixed(1)}" rx="${Math.min(3, bw / 4)}" fill="${esc(sg.p.color)}"><title>${esc(sg.p.name)} · ${tipOf(s)} · EGP ${fN(sg.v)}</title></rect>`; }
+    if (s.tot) g += `<rect x="${(L + k * cw).toFixed(1)}" y="${T}" width="${cw.toFixed(1)}" height="${H - T - Bm}" fill="transparent"><title>${tipOf(s)} · Team EGP ${fN(s.tot)}${s.segs.map((x) => `\n${x.p.name}: ${fN(x.v)}`).join("")}</title></rect>`;
+    if (k % labEvery === 0) g += `<text class="ax" x="${(L + k * cw + cw / 2).toFixed(1)}" y="${H - 8}" text-anchor="middle">${buckets ? s.bk.label : `${new Date(s.i * 864e5).getUTCDate()} ${MON[new Date(s.i * 864e5).getUTCMonth()]}`}</text>`;
   });
   const sold = stacks.filter((s) => s.tot > 0), avg = sold.reduce((x, s) => x + s.tot, 0) / sold.length, ay = H - Bm - avg * sc;
-  g += `<line class="avg" x1="${L}" x2="${W}" y1="${ay}" y2="${ay}"/><text class="ax" x="${W}" y="${ay - 5}" text-anchor="end" style="fill:#B9762F;font-weight:700">Daily avg ${fK(avg)}</text>`;
+  g += `<line class="avg" x1="${L}" x2="${W}" y1="${ay}" y2="${ay}"/><text class="ax" x="${W}" y="${ay - 5}" text-anchor="end" style="fill:#B9762F;font-weight:700">${buckets ? "Monthly" : "Daily"} avg ${fK(avg)}</text>`;
   return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily team sales">${g}</svg></div>
-    <div class="legend2">${people.filter((p) => p.cur.sales > 0).map((p) => `<span><i style="--c:${esc(p.color)}"></i>${esc(p.name)}</span>`).join("")}<span><i style="--c:var(--orange);height:2px"></i>Daily average</span></div>`;
+    <div class="legend2">${people.filter((p) => p.cur.sales > 0).map((p) => `<span><i style="--c:${esc(p.color)}"></i>${esc(p.name)}</span>`).join("")}<span><i style="--c:var(--orange);height:2px"></i>${buckets ? "Monthly" : "Daily"} average</span></div>`;
 }
 function hilite(text, q) {
   const t = esc(text);
@@ -1588,6 +1592,97 @@ function hilite(text, q) {
   const qq = esc(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return t.replace(new RegExp(qq, "gi"), (m) => `<mark>${m}</mark>`);
 }
+const U0 = (y, m, d) => Math.round(Date.UTC(y, m, d) / 864e5);
+// same calendar day k months away (clamped to the month's length)
+function addMonths(i, k) {
+  const x = new Date(i * 864e5), y = x.getUTCFullYear(), m = x.getUTCMonth() + k;
+  const last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  return U0(y, m, Math.min(x.getUTCDate(), last));
+}
+function repFirstDay() {
+  let f = null;
+  for (const p of repModel()) for (const r of p.rows) if ((r.hasNums || r.fb) && (f == null || r.i < f)) { f = r.i; break; }
+  return f;
+}
+function repRange() {
+  const D = V(), t = cairoNow().idx, d = new Date(t * 864e5), y = d.getUTCFullYear(), mo = d.getUTCMonth();
+  let a, b;
+  switch (RS.preset) {
+    case "today": a = b = t; break;
+    case "yesterday": a = b = t - 1; break;
+    case "thisWeek": a = wkStart(D, t); b = t; break;
+    case "lastWeek": a = wkStart(D, t) - 7; b = a + 6; break;
+    case "last7": a = t - 6; b = t; break;
+    case "lastMonth": a = U0(y, mo - 1, 1); b = U0(y, mo, 0); break;
+    case "last30": a = t - 29; b = t; break;
+    case "last90": a = t - 89; b = t; break;
+    case "thisYear": a = U0(y, 0, 1); b = t; break;
+    case "all": a = repFirstDay() ?? t - 364; b = t; break;
+    case "custom": a = RS.from ? dIdx(RS.from) : t - 29; b = RS.to ? dIdx(RS.to) : t; if (b < a) [a, b] = [b, a]; break;
+    default: a = U0(y, mo, 1); b = t;
+  }
+  const n = b - a + 1;
+  let pa = null, pb = null;
+  if (RS.preset !== "all") {
+    if (RS.cmp === "month") { pa = addMonths(a, -1); pb = addMonths(b, -1); }
+    else if (RS.cmp === "year") { pa = addMonths(a, -12); pb = addMonths(b, -12); }
+    else if (RS.cmp === "prev") {
+      if (RS.preset === "thisMonth") { pa = U0(y, mo - 1, 1); pb = Math.min(addMonths(t, -1), U0(y, mo, 0)); }
+      else if (RS.preset === "lastMonth") { pa = U0(y, mo - 2, 1); pb = U0(y, mo - 1, 0); }
+      else if (RS.preset === "thisYear") { pa = U0(y - 1, 0, 1); pb = addMonths(t, -12); }
+      else { pa = a - n; pb = a - 1; }
+    }
+  }
+  return { a, b, pa, pb, t, cmp: pa != null };
+}
+const rngTxt = (a, b) => { const A = new Date(a * 864e5), B = new Date(b * 864e5); return a === b ? dmy(a, 1) : A.getUTCFullYear() === B.getUTCFullYear() && A.getUTCMonth() === B.getUTCMonth() ? `${A.getUTCDate()} – ${dmy(b, 1)}` : A.getUTCFullYear() === B.getUTCFullYear() ? `${dmy(a)} – ${dmy(b, 1)}` : `${dmy(a, 1)} – ${dmy(b, 1)}`; };
+function agg(rows, a, b, shift = RS.shift) {
+  const t = { sales: 0, orders: 0, items: 0, oos: 0, refunds: 0, exch: 0, days: 0, selling: 0, off: 0, fb: 0, byDay: {}, byShift: {}, best: null };
+  if (a == null) return Object.assign(t, { aov: null, ipo: null, avgDaily: null, refundRate: null, exchRate: null });
+  for (const r of rows) {
+    if (r.i < a || r.i > b) continue;
+    if (shift && r.sk !== shift) continue;
+    if (r.fb) t.fb++;
+    if (r.off && !r.hasNums) { t.off++; continue; }
+    if (!r.hasNums) continue;
+    t.days++;
+    t.sales += r.sales || 0; t.orders += r.orders || 0; t.items += r.items || 0; t.oos += r.oos || 0; t.refunds += r.refunds || 0; t.exch += r.exch || 0;
+    if ((r.sales || 0) > 0) t.selling++;
+    if (!t.best || (r.sales || 0) > t.best.sales) t.best = r;
+    t.byDay[r.i] = (t.byDay[r.i] || 0) + (r.sales || 0);
+    const s = (t.byShift[r.sk] = t.byShift[r.sk] || { days: 0, sales: 0, orders: 0, items: 0 });
+    s.days++; s.sales += r.sales || 0; s.orders += r.orders || 0; s.items += r.items || 0;
+  }
+  t.aov = t.orders ? t.sales / t.orders : null;
+  t.ipo = t.orders ? t.items / t.orders : null;
+  t.avgDaily = t.selling ? t.sales / t.selling : null;
+  t.refundRate = t.orders ? t.refunds / t.orders : null;
+  t.exchRate = t.orders ? t.exch / t.orders : null;
+  return t;
+}
+// Scheduled working days (from the Weekly Schedule, up to yesterday) vs days with a report.
+// Days with an approved excuse / day-off change don't count; neither do days before her sheet started.
+function compliance(D, p, a, b, t, shift = RS.shift) {
+  const out = { expected: 0, done: 0, missing: [], offLogged: [], excused: [], schedDays: 0 };
+  if (!p.m) return out;
+  const byI = Object.fromEntries(p.rows.map((r) => [r.i, r]));
+  const exc = new Set((D.requests || []).filter((r) => r.member === p.m.id && EXCUSED.has(r.type) && r.status !== "rejected").map((r) => dIdx(r.date)));
+  for (let i = a; i <= Math.min(b, t - 1); i++) {
+    if (weekAt(D, wkStart(D, i))) out.schedDays++;
+    if (p.first != null && i < p.first) continue;
+    const c = cellAt(D, p.m.id, i);
+    if (!c || !c.work) continue;
+    if (shift && c.ty.name !== shift) continue;
+    if (exc.has(i)) { out.excused.push(i); continue; }
+    out.expected++;
+    const r = byI[i];
+    if (r && (r.hasNums || r.fb)) out.done++;
+    else { out.missing.push(i); if (r && r.off) out.offLogged.push(i); }
+  }
+  return out;
+}
+const byMonth = (list) => { const g = {}; for (const i of list) { const d = new Date(i * 864e5), k = MON[d.getUTCMonth()] + " " + d.getUTCFullYear(); (g[k] = g[k] || []).push(i); } return g; };
+const daysTxt = (list, max) => { const L = max ? list.slice(-max) : list; return L.map((i) => `${DY[wdOf(i)]} ${new Date(i * 864e5).getUTCDate()}`).join(", "); };
 function renderReports() {
   if (RS.view !== "reports") return;
   const D = V(), root = $("#repView");
@@ -1602,93 +1697,234 @@ function renderReports() {
       <li>Add <code>REPORTS_URL</code> (that URL) and <code>REPORTS_KEY</code> (the key in the script) to the Vercel project, then redeploy.</li></ol></div></section>`;
     return;
   }
-  const people = repModel(), { a, b, pa, pb, t } = repRange();
-  for (const p of people) { p.cur = agg(p.rows, a, b); p.prev = agg(p.rows, pa, pb); p.comp = compliance(D, p, a, b, t); }
+  const all = repModel(), { a, b, pa, pb, t, cmp } = repRange();
+  const people = RS.mem ? all.filter((p) => p.key === RS.mem) : all;
+  for (const p of all) { p.cur = agg(p.rows, a, b); p.prev = agg(p.rows, pa, pb); p.comp = compliance(D, p, a, b, t); }
   const sales = people.filter((p) => p.kind === "metrics" && p.loaded);
   const T = sumAgg(sales.map((p) => p.cur)), P = sumAgg(sales.map((p) => p.prev));
+  const X = (cur, prev, lower, pts) => (cmp ? dlt(cur, prev, lower, pts) : `<div class="dl flat">&nbsp;</div>`);
   const exp = people.reduce((x, p) => x + p.comp.expected, 0), done = people.reduce((x, p) => x + p.comp.done, 0);
   const fresh = raw && raw.fetchedAt ? Math.round((Date.now() - new Date(raw.fetchedAt)) / 60000) : null;
-  const presets = [["thisWeek", "This week"], ["lastWeek", "Last week"], ["thisMonth", "This month"], ["lastMonth", "Last month"], ["last30", "Last 30 days"], ["custom", "Custom"]];
-  let h = `<div class="kpis">
-    <div class="kpi"><div class="l">Team sales</div><div class="v"><span class="cur">EGP</span>${fN(T.sales)}</div>${dlt(T.sales, P.sales)}</div>
-    <div class="kpi"><div class="l">Orders · items</div><div class="v">${fN(T.orders)}<small>· ${fN(T.items)} items</small></div>${dlt(T.orders, P.orders)}</div>
-    <div class="kpi"><div class="l">Average order value</div><div class="v"><span class="cur">EGP</span>${fN(T.aov)}</div>${dlt(T.aov, P.aov)}</div>
-    <div class="kpi"><div class="l">Avg daily sales</div><div class="v"><span class="cur">EGP</span>${fN(T.avgDaily)}</div>${dlt(T.avgDaily, P.avgDaily)}</div>
-    <div class="kpi"><div class="l">Items per order</div><div class="v">${T.ipo == null ? "—" : nf2.format(T.ipo)}</div>${dlt(T.ipo, P.ipo)}</div>
-    <div class="kpi"><div class="l">Refund rate</div><div class="v">${fPct(T.refundRate)}<small>· ${fN(T.refunds)}</small></div>${dlt(T.refundRate, P.refundRate, true, true)}</div>
-    <div class="kpi"><div class="l">Exchange rate</div><div class="v">${fPct(T.exchRate)}<small>· ${fN(T.exch)}</small></div>${dlt(T.exchRate, P.exchRate, true, true)}</div>
-    <div class="kpi"><div class="l">Reports submitted</div><div class="v ${exp && done < exp ? "bad" : exp ? "ok" : ""}">${exp ? `${done} / ${exp}` : "—"}</div><div class="dl flat">${exp ? `${exp - done} missing on scheduled days` : "No scheduled days in this period yet"}</div></div></div>`;
+  const shiftNames = [...new Set(D.shiftTypes.filter((s) => s.kind === "work").map((s) => s.name))];
+  let h = `<section class="card rfilter"><div class="rctl">
+    <label class="field">Period<select id="repPreset">${PRESETS.map(([k, l]) => `<option value="${k}" ${RS.preset === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    <label class="field">From<input type="date" id="repFrom" value="${iDate(a)}"></label>
+    <label class="field">To<input type="date" id="repTo" value="${iDate(b)}"></label>
+    <label class="field">Compare with<select id="repCmp" ${RS.preset === "all" ? "disabled" : ""}>${CMPS.map(([k, l]) => `<option value="${k}" ${RS.cmp === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    <label class="field">Team member<select id="repMem"><option value="">Everyone</option>${all.map((p) => `<option value="${esc(p.key)}" ${RS.mem === p.key ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>
+    <label class="field">Shift<select id="repShift"><option value="">All shifts</option>${shiftNames.map((s) => `<option ${RS.shift === s ? "selected" : ""}>${esc(s)}</option>`).join("")}</select></label>
+    <div class="rbtns">${RS.mem || RS.shift || RS.preset !== "thisMonth" || RS.cmp !== "prev" ? `<button class="btn sm ghost" data-act="repReset">Reset</button>` : ""}<button class="btn sm" data-act="repRefresh" ${RS.loading ? "disabled" : ""}>${RS.loading ? "Refreshing…" : "↻ Refresh"}</button></div></div>
+    <div class="rmeta">${rngTxt(a, b)} · ${b - a + 1} day${b === a ? "" : "s"}${cmp ? ` · compared with ${rngTxt(pa, pb)}` : ""}${RS.mem ? ` · <b>${esc((all.find((p) => p.key === RS.mem) || {}).name || "")}</b> only` : ""}${RS.shift ? ` · <b>${esc(RS.shift)}</b> shifts only` : ""}${fresh == null ? "" : ` · sheets read <b>${fresh < 1 ? "just now" : fresh + " min ago"}</b>`}</div></section>`;
   if (RS.error) h += `<div class="banner warn">${raw && raw.stale ? "Showing the last saved copy — " : ""}${esc(RS.error)}</div>`;
-  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Team Reports · Sales Performance</div><h2>${rngTxt(a, b)}</h2><div class="sub">Compared with ${rngTxt(pa, pb)} · from ${sales.length} team sheet${sales.length === 1 ? "" : "s"}</div></div>
-    <div class="rbar"><div class="chips">${presets.map(([k, l]) => `<button class="chip ${RS.preset === k ? "active" : ""}" data-act="repPreset" data-v="${k}">${l}</button>`).join("")}</div>
-    ${RS.preset === "custom" ? `<input type="date" id="repFrom" value="${esc(RS.from || iDate(a))}"><span class="muted">→</span><input type="date" id="repTo" value="${esc(RS.to || iDate(b))}">` : ""}
-    <button class="btn sm" data-act="repRefresh" ${RS.loading ? "disabled" : ""}>${RS.loading ? "Refreshing…" : "↻ Refresh"}</button></div></div>
-    <div class="rmeta" style="margin:-8px 0 14px">${fresh == null ? "" : `Sheets read <b>${fresh < 1 ? "just now" : fresh + " min ago"}</b> · updates every 10 minutes`}</div>
-    ${trendSVG(sales, a, b)}</section>`;
+  const histMissing = !Object.keys(D.weeks).some((k) => dIdx(k) < wkStart(D, t) - 7);
+  if (histMissing) h += `<div class="banner info">Report checks only use weeks that exist in the Weekly Schedule. <b>Import the schedule history</b> (15 Feb – 28 Nov 2026) to check every month. <button class="btn sm primary" style="margin-left:8px" data-act="importHistory">Import now</button></div>`;
+  h += `<div class="kpis">
+    <div class="kpi"><div class="l">Team sales</div><div class="v"><span class="cur">EGP</span>${fN(T.sales)}</div>${X(T.sales, P.sales)}</div>
+    <div class="kpi"><div class="l">Orders · items</div><div class="v">${fN(T.orders)}<small>· ${fN(T.items)} items</small></div>${X(T.orders, P.orders)}</div>
+    <div class="kpi"><div class="l">Average order value</div><div class="v"><span class="cur">EGP</span>${fN(T.aov)}</div>${X(T.aov, P.aov)}</div>
+    <div class="kpi"><div class="l">Avg daily sales</div><div class="v"><span class="cur">EGP</span>${fN(T.avgDaily)}</div>${X(T.avgDaily, P.avgDaily)}</div>
+    <div class="kpi"><div class="l">Items per order</div><div class="v">${T.ipo == null ? "—" : nf2.format(T.ipo)}</div>${X(T.ipo, P.ipo)}</div>
+    <div class="kpi"><div class="l">Refund rate</div><div class="v">${fPct(T.refundRate)}<small>· ${fN(T.refunds)}</small></div>${X(T.refundRate, P.refundRate, true, true)}</div>
+    <div class="kpi"><div class="l">Exchange rate</div><div class="v">${fPct(T.exchRate)}<small>· ${fN(T.exch)}</small></div>${X(T.exchRate, P.exchRate, true, true)}</div>
+    <div class="kpi"><div class="l">Reports on scheduled days</div><div class="v ${exp && done < exp ? "bad" : exp ? "ok" : ""}">${exp ? fPct(done / exp, 0) : "—"}<small>${exp ? `· ${done}/${exp}` : ""}</small></div><div class="dl ${exp - done ? "bad" : "flat"}">${exp ? `${exp - done} missing report${exp - done === 1 ? "" : "s"}` : "No scheduled days in this period"}</div></div></div>`;
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Team Reports · Sales Performance</div><h2>${rngTxt(a, b)}</h2><div class="sub">Daily sales from ${sales.length} team sheet${sales.length === 1 ? "" : "s"}${RS.shift ? ` · ${esc(RS.shift)} shifts` : ""}</div></div></div>
+    ${b - a > 400 ? monthBarsSVG(sales, a, b) : trendSVG(sales, a, b)}</section>`;
   // leaderboard
   const ranked = sales.slice().sort((x, y) => y.cur.sales - x.cur.sales);
-  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Leaderboard</div><h2>Performance by Team Member</h2><div class="sub">Click a name for her daily log, feedback and records.</div></div></div><div class="lbw"><table class="lbt"><thead><tr><th>#</th><th>Team member</th><th>Sales</th><th>vs prev.</th><th>Orders</th><th>Items</th><th>AOV</th><th>Items / order</th><th>Avg / day</th><th>Refunds</th><th>Exch.</th><th>OOS</th><th>Days logged</th><th>Last report</th></tr></thead><tbody>`;
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Leaderboard</div><h2>Performance by Team Member</h2><div class="sub">Click a name for her full profile — every day from her first day to today.</div></div></div><div class="lbw"><table class="lbt"><thead><tr><th>#</th><th>Team member</th><th>Sales</th>${cmp ? "<th>vs prev.</th>" : ""}<th>Orders</th><th>Items</th><th>AOV</th><th>Items / order</th><th>Avg / day</th><th>Refunds</th><th>Exch.</th><th>OOS</th><th>Reports</th><th>Last report</th></tr></thead><tbody>`;
   ranked.forEach((p, k) => {
-    const c = p.cur, ch = pctChg(c.sales, p.prev.sales), age = p.last == null ? null : t - p.last;
+    const c = p.cur, ch = pctChg(c.sales, p.prev.sales), age = p.last == null ? null : t - p.last, cp = p.comp;
     h += `<tr class="click" data-act="repDetail" data-k="${esc(p.key)}"><td class="rk">${c.sales ? k + 1 : "–"}</td><td><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${p.code ? "ID " + esc(p.code) : esc(p.title)}</small></div></div></td>
       <td class="sl"><b>${fN(c.sales)}</b><div class="share" style="--c:${esc(p.color)}"><i style="width:${T.sales ? ((c.sales / T.sales) * 100).toFixed(1) : 0}%"></i></div></td>
-      <td>${ch == null ? `<span class="muted">—</span>` : `<span class="dl ${ch >= 0 ? "good" : "bad"}" style="margin:0">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch * 100).toFixed(0)}%</span>`}</td>
+      ${cmp ? `<td>${ch == null ? `<span class="muted">—</span>` : `<span class="dl ${ch >= 0 ? "good" : "bad"}" style="margin:0">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch * 100).toFixed(0)}%</span>`}</td>` : ""}
       <td>${fN(c.orders)}</td><td>${fN(c.items)}</td><td>${fN(c.aov)}</td><td>${c.ipo == null ? "—" : nf2.format(c.ipo)}</td><td>${fN(c.avgDaily)}</td>
-      <td>${fN(c.refunds)}</td><td>${fN(c.exch)}</td><td>${fN(c.oos)}</td><td>${c.days}${c.off ? ` <span class="muted">· ${c.off} off</span>` : ""}</td>
-      <td>${p.error ? `<span class="stale bad">Sheet error</span>` : age == null ? `<span class="stale bad">Never</span>` : `<span class="stale ${age <= 2 ? "ok" : age <= 6 ? "warn" : "bad"}">${age <= 0 ? "Today" : age === 1 ? "Yesterday" : dmy(p.last)}</span>`}</td></tr>`;
+      <td>${fN(c.refunds)}</td><td>${fN(c.exch)}</td><td>${fN(c.oos)}</td>
+      <td>${cp.expected ? `<span class="stale ${cp.missing.length ? (cp.done / cp.expected >= 0.9 ? "warn" : "bad") : "ok"}">${cp.done}/${cp.expected}${cp.missing.length ? ` · ${cp.missing.length} missing` : ""}</span>` : `<span class="muted">${c.days} logged</span>`}</td>
+      <td>${p.error ? `<span class="stale bad">Sheet error</span>` : age == null ? `<span class="stale bad">Never</span>` : `<span class="stale ${age <= 2 ? "ok" : age <= 6 ? "warn" : "bad"}">${age <= 0 ? "Today" : age === 1 ? "Yesterday" : dmy(p.last, age > 300)}</span>`}</td></tr>`;
   });
-  h += `<tr class="tot"><td></td><td>Team total</td><td>${fN(T.sales)}</td><td>${(() => { const ch = pctChg(T.sales, P.sales); return ch == null ? "—" : `<span class="dl ${ch >= 0 ? "good" : "bad"}" style="margin:0">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch * 100).toFixed(0)}%</span>`; })()}</td><td>${fN(T.orders)}</td><td>${fN(T.items)}</td><td>${fN(T.aov)}</td><td>${T.ipo == null ? "—" : nf2.format(T.ipo)}</td><td>${fN(T.avgDaily)}</td><td>${fN(T.refunds)}</td><td>${fN(T.exch)}</td><td>${fN(T.oos)}</td><td>${T.days}</td><td></td></tr></tbody></table></div>`;
+  if (ranked.length > 1) h += `<tr class="tot"><td></td><td>Team total</td><td>${fN(T.sales)}</td>${cmp ? `<td>${(() => { const ch = pctChg(T.sales, P.sales); return ch == null ? "—" : `<span class="dl ${ch >= 0 ? "good" : "bad"}" style="margin:0">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch * 100).toFixed(0)}%</span>`; })()}</td>` : ""}<td>${fN(T.orders)}</td><td>${fN(T.items)}</td><td>${fN(T.aov)}</td><td>${T.ipo == null ? "—" : nf2.format(T.ipo)}</td><td>${fN(T.avgDaily)}</td><td>${fN(T.refunds)}</td><td>${fN(T.exch)}</td><td>${fN(T.oos)}</td><td>${exp ? `${done}/${exp}` : ""}</td><td></td></tr>`;
+  if (!ranked.length) h += `<tr><td colspan="14" class="muted" style="text-align:left">No sales sheets match this filter.</td></tr>`;
+  h += `</tbody></table></div>`;
   const fbOnly = people.filter((p) => p.kind === "feedback" && p.loaded);
   if (fbOnly.length) h += `<div class="fn">Feedback-only logs: ${fbOnly.map((p) => `<b>${esc(p.name)}</b> (${p.cur.fb} entr${p.cur.fb === 1 ? "y" : "ies"} in this period)`).join(", ")} — see Team Feedback below.</div>`;
   h += `</section>`;
-  // compliance + shifts/quality
+  // report discipline
   const withSched = people.filter((p) => p.m);
-  h += `<div class="grid2"><section class="card"><div class="sh"><div><div class="eyebrow">Discipline</div><h2>Report Submission</h2><div class="sub">Days she was on the Weekly Schedule vs days with a report, up to yesterday.</div></div></div><div class="comp">`;
+  const firstWeek = Object.keys(D.weeks).sort()[0];
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Discipline · checked against the Weekly Schedule</div><h2>Report Submission</h2><div class="sub">Every day she was scheduled to work in this period (up to yesterday) vs the days she wrote a report. Days off, approved excuses and days before her sheet started aren't counted.${firstWeek ? ` Schedule available from ${dmy(dIdx(firstWeek), 1)}.` : ""}</div></div></div>
+    <div class="lbw"><table class="lbt ctb"><thead><tr><th>Team member</th><th>Rate</th><th>Scheduled</th><th>Reported</th><th>Missing</th><th>Logged “Off” on a work day</th><th>Excused</th><th>Last report</th><th></th></tr></thead><tbody>`;
   h += withSched.map((p) => {
-    const c = p.comp, pc = c.expected ? c.done / c.expected : null;
-    return `<div class="crow"><div class="nm"><span class="dot" style="--c:${esc(p.color)}"></span><div>${esc(p.name)}<small>Last report: ${p.last == null ? "never" : dmy(p.last, 1)}</small></div></div>
-      <div class="cb"><div class="cbar">${c.expected ? `<i style="width:${(pc * 100).toFixed(1)}%"></i><i class="miss" style="width:${(100 - pc * 100).toFixed(1)}%"></i>` : ""}</div>${c.missing.length ? `<div class="ms">Missing: ${c.missing.slice(-6).map((i) => `${DY[wdOf(i)]} ${dmy(i)}${c.offMismatch.includes(i) ? " (logged Off)" : ""}`).join(", ")}${c.missing.length > 6 ? ` +${c.missing.length - 6} more` : ""}</div>` : c.expected ? "" : `<div class="ms" style="color:var(--muted)">No scheduled days in this period</div>`}</div>
-      <div class="cpc">${pc == null ? "—" : Math.round(pc * 100) + "%"}<small>${c.done}/${c.expected} days</small></div></div>`;
-  }).join("") || `<div class="empty">Link each sheet to a team member (Manage → Reports) to track submissions.</div>`;
+    const c = p.comp, pc = c.expected ? c.done / c.expected : null, open = RS.compOpen[p.key];
+    const miss = byMonth(c.missing);
+    return `<tr><td><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${p.first != null ? "Sheet since " + dmy(p.first, 1) : "No reports yet"}</small></div></div></td>
+      <td style="min-width:170px"><div class="row" style="gap:10px;flex-wrap:nowrap;justify-content:flex-end"><div class="cbar" style="width:110px">${c.expected ? `<i style="width:${(pc * 100).toFixed(1)}%"></i><i class="miss" style="width:${(100 - pc * 100).toFixed(1)}%"></i>` : ""}</div><b class="cpc2 ${pc == null ? "" : pc >= 0.95 ? "ok" : pc >= 0.8 ? "warn" : "bad"}">${pc == null ? "—" : Math.round(pc * 100) + "%"}</b></div></td>
+      <td>${c.expected}</td><td>${c.done}</td><td>${c.missing.length ? `<b style="color:var(--bad)">${c.missing.length}</b>` : "0"}</td><td>${c.offLogged.length || "0"}</td><td>${c.excused.length || "0"}</td>
+      <td>${p.last == null ? "—" : dmy(p.last, true)}</td>
+      <td>${c.missing.length ? `<button class="btn sm ghost" data-act="repCompOpen" data-k="${esc(p.key)}">${open ? "Hide days" : "Show days"}</button>` : ""}</td></tr>
+      ${open && c.missing.length ? `<tr class="cdays"><td colspan="9">${Object.entries(miss).map(([mn, L]) => `<div><b>${mn}</b> · ${L.length} day${L.length === 1 ? "" : "s"}: ${L.map((i) => `<span class="${c.offLogged.includes(i) ? "offl" : ""}">${DY[wdOf(i)]} ${new Date(i * 864e5).getUTCDate()}</span>`).join(", ")}</div>`).join("")}${c.offLogged.length ? `<div class="muted" style="font-size:11.5px;margin-top:4px">Underlined days: she wrote “off” in her sheet but the schedule has her working.</div>` : ""}</td></tr>` : ""}`;
+  }).join("") || `<tr><td colspan="9" class="muted" style="text-align:left">Link each sheet to a team member (Manage → Reports) to track submissions.</td></tr>`;
+  h += `</tbody></table></div></section>`;
+  // shifts + quality
   const shifts = Object.entries(T.byShift).sort((x, y) => y[1].sales - x[1].sales);
   const flags = qualityFlags(D, people, a, b, t);
-  h += `</div></section><section class="card"><div class="sh"><div><div class="eyebrow">Shifts &amp; data quality</div><h2>By Shift</h2><div class="sub">Sales split by the shift written in the reports.</div></div></div>
-    <table class="stbl shtbl"><thead><tr><th>Shift</th><th>Days</th><th>Sales</th><th>Share</th><th>Orders</th><th>AOV</th></tr></thead><tbody>${shifts.map(([k, s]) => `<tr><td>${esc(k)}</td><td>${s.days}</td><td><b>${fN(s.sales)}</b></td><td>${T.sales ? fPct(s.sales / T.sales) : "—"}</td><td>${fN(s.orders)}</td><td>${s.orders ? fN(s.sales / s.orders) : "—"}</td></tr>`).join("") || `<tr><td colspan="6" class="muted">No sales in this period.</td></tr>`}</tbody></table>
-    <h4 style="margin:20px 0 10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#B98A4B">Needs checking (${flags.length})</h4>
-    <div class="flags">${flags.slice(0, 8).map((f) => `<div class="flag ${f.err ? "err" : ""}"><span class="ic">${f.err ? "!" : "?"}</span><div><b>${esc(f.p.name)}</b> — ${esc(f.t)}<small>${esc(f.s)}</small></div><span class="muted" style="font-size:11.5px;white-space:nowrap">${f.i == null ? "" : `${DY[wdOf(f.i)]} ${dmy(f.i)}`}</span></div>`).join("") || `<div class="muted" style="font-size:13px">Nothing unusual in this period.</div>`}${flags.length > 8 ? `<div class="muted" style="font-size:12px">+${flags.length - 8} more</div>` : ""}</div></section></div>`;
+  h += `<div class="grid2"><section class="card"><div class="sh"><div><div class="eyebrow">Shifts</div><h2>By Shift</h2><div class="sub">Sales split by the shift written in the reports.</div></div></div>
+    <table class="stbl shtbl"><thead><tr><th>Shift</th><th>Days</th><th>Sales</th><th>Share</th><th>Orders</th><th>AOV</th><th>Avg / day</th></tr></thead><tbody>${shifts.map(([k, s]) => `<tr><td>${esc(k)}</td><td>${s.days}</td><td><b>${fN(s.sales)}</b></td><td>${T.sales ? fPct(s.sales / T.sales) : "—"}</td><td>${fN(s.orders)}</td><td>${s.orders ? fN(s.sales / s.orders) : "—"}</td><td>${s.days ? fN(s.sales / s.days) : "—"}</td></tr>`).join("") || `<tr><td colspan="7" class="muted">No sales in this period.</td></tr>`}</tbody></table></section>
+    <section class="card"><div class="sh"><div><div class="eyebrow">Data quality</div><h2>Needs Checking</h2><div class="sub">${flags.length} item${flags.length === 1 ? "" : "s"} in this period that look like typing mistakes.</div></div></div>
+    <div class="flags">${flags.slice(0, RS.flagAll ? 200 : 6).map((f) => `<div class="flag ${f.err ? "err" : ""}"><span class="ic">${f.err ? "!" : "?"}</span><div><b>${esc(f.p.name)}</b> — ${esc(f.t)}<small>${esc(f.s)}</small></div><span class="muted" style="font-size:11.5px;white-space:nowrap">${f.i == null ? "" : `${DY[wdOf(f.i)]} ${dmy(f.i, f.i > t)}`}</span></div>`).join("") || `<div class="muted" style="font-size:13px">Nothing unusual in this period.</div>`}${flags.length > 6 ? `<button class="btn sm" data-act="repFlagAll">${RS.flagAll ? "Show less" : `Show all ${flags.length}`}</button>` : ""}</div></section></div>`;
   // feedback feed
   let fb = [];
-  for (const p of people) for (const r of p.rows) if (r.fb && r.i >= a && r.i <= b) fb.push({ p, r });
+  for (const p of people) for (const r of p.rows) if (r.fb && r.i >= a && r.i <= b && (!RS.shift || r.sk === RS.shift)) fb.push({ p, r });
   const allFb = fb.length;
-  if (RS.fmem) fb = fb.filter((x) => x.p.key === RS.fmem);
+  if (RS.fmem && !RS.mem) fb = fb.filter((x) => x.p.key === RS.fmem);
   if (RS.fq) { const q = RS.fq.toLowerCase(); fb = fb.filter((x) => x.r.fb.toLowerCase().includes(q)); }
   fb.sort((x, y) => y.r.i - x.r.i || x.p.name.localeCompare(y.p.name));
   const shown = RS.feedAll ? fb : fb.slice(0, 12);
   h += `<section class="card"><div class="sh"><div><div class="eyebrow">Voice of the team</div><h2>Team Feedback</h2><div class="sub">${allFb} note${allFb === 1 ? "" : "s"} written in this period — newest first.</div></div></div>
-    <div class="fbbar"><div class="chips" style="margin:0"><button class="chip ${RS.fmem ? "" : "active"}" data-act="repFbMem" data-k="">Everyone</button>${people.filter((p) => p.rows.some((r) => r.fb && r.i >= a && r.i <= b)).map((p) => `<button class="chip ${RS.fmem === p.key ? "active" : ""}" data-act="repFbMem" data-k="${esc(p.key)}">${esc(p.name)}</button>`).join("")}</div>
+    <div class="fbbar">${RS.mem ? "" : `<div class="chips" style="margin:0"><button class="chip ${RS.fmem ? "" : "active"}" data-act="repFbMem" data-k="">Everyone</button>${people.filter((p) => p.rows.some((r) => r.fb && r.i >= a && r.i <= b)).map((p) => `<button class="chip ${RS.fmem === p.key ? "active" : ""}" data-act="repFbMem" data-k="${esc(p.key)}">${esc(p.name)}</button>`).join("")}</div>`}
     <input type="text" id="repFq" placeholder="Search feedback… (e.g. مقاسات, Porto)" value="${esc(RS.fq)}"></div>
     ${shown.map(({ p, r }) => { const id = p.key + ":" + r.i, open = RS.open[id] || !!RS.fq; return `<div class="fbi"><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${DY[wdOf(r.i)]}, ${dmy(r.i, 1)}${r.shift ? ` · ${esc(r.shift)}` : ""}${r.hasNums ? `<br>EGP ${fN(r.sales)} · ${fN(r.orders)} orders` : ""}</small></div></div>
       <div><p class="fbt ${open ? "open" : ""}" dir="auto" data-act="repFbOpen" data-id="${esc(id)}">${hilite(r.fb, RS.fq)}</p>${!open && (r.fb.length > 260 || r.fb.split("\n").length > 5) ? `<button class="more" data-act="repFbOpen" data-id="${esc(id)}">Read more</button>` : ""}</div></div>`; }).join("") || `<div class="empty">No feedback ${RS.fq || RS.fmem ? "matches this filter" : "in this period"}.</div>`}
     ${fb.length > 12 ? `<button class="btn sm" style="margin-top:12px" data-act="repFbAll">${RS.feedAll ? "Show less" : `Show all ${fb.length}`}</button>` : ""}</section>`;
   // sources
   h += `<section class="card"><div class="sh"><div><div class="eyebrow">Sources</div><h2>Team Sheets</h2><div class="sub">Each girl's own Google Sheet. Add or change sheets from Manage → Reports.</div></div>${S.me.role === "admin" ? `<button class="btn sm" data-act="repSources">Manage sheets</button>` : ""}</div>
-    <table class="stbl"><thead><tr><th>Sheet</th><th>Linked to</th><th>Rows</th><th>Last edited</th><th>Status</th><th></th></tr></thead><tbody>${people.map((p) => `<tr><td style="white-space:normal">${esc(p.title || "—")}</td><td><span class="row" style="gap:7px;flex-wrap:nowrap"><span class="dot" style="--c:${esc(p.color)}"></span>${esc(p.name)}${p.m ? "" : ` <span class="muted">(not on the schedule)</span>`}</span></td><td>${p.loaded ? p.rows.length : "—"}</td><td>${p.updated ? logFmt.format(new Date(p.updated)) : "—"}</td><td>${p.error ? `<span class="stale bad" title="${esc(p.error)}">Error</span>` : p.loaded ? `<span class="stale ok">Connected</span>` : `<span class="stale warn">Waiting</span>`}</td><td><a class="btn sm ghost" href="${esc(p.url)}" target="_blank" rel="noopener">Open ↗</a></td></tr>`).join("")}</tbody></table></section>`;
+    <table class="stbl"><thead><tr><th>Sheet</th><th>Linked to</th><th>Rows</th><th>Last edited</th><th>Status</th><th></th></tr></thead><tbody>${all.map((p) => `<tr><td style="white-space:normal">${esc(p.title || "—")}</td><td><span class="row" style="gap:7px;flex-wrap:nowrap"><span class="dot" style="--c:${esc(p.color)}"></span>${esc(p.name)}${p.m ? "" : ` <span class="muted">(not on the schedule)</span>`}</span></td><td>${p.loaded ? p.rows.length : "—"}</td><td>${p.updated ? logFmt.format(new Date(p.updated)) : "—"}</td><td>${p.error ? `<span class="stale bad" title="${esc(p.error)}">Error</span>` : p.loaded ? `<span class="stale ok">Connected</span>` : `<span class="stale warn">Waiting</span>`}</td><td><a class="btn sm ghost" href="${esc(p.url)}" target="_blank" rel="noopener">Open ↗</a></td></tr>`).join("")}</tbody></table></section>`;
   const fq = document.activeElement && document.activeElement.id === "repFq" ? [document.activeElement.selectionStart] : null;
   root.innerHTML = h;
   if (fq) { const el = $("#repFq"); el.focus(); el.setSelectionRange(fq[0], fq[0]); }
 }
-function repDetail(key) {
-  const D = V(), p = repModel().find((x) => x.key === key); if (!p) return;
-  const { a, b, pa, pb } = repRange(), c = agg(p.rows, a, b), pv = agg(p.rows, pa, pb);
-  const rows = p.rows.filter((r) => r.i >= a && r.i <= b).sort((x, y) => y.i - x.i);
-  const recs = (D.requests || []).filter((r) => r.member === p.src.memberId && p.src.memberId && dIdx(r.date) >= a && dIdx(r.date) <= b);
-  const mk = [["Sales", `EGP ${fN(c.sales)}`, dlt(c.sales, pv.sales)], ["Orders", fN(c.orders), dlt(c.orders, pv.orders)], ["AOV", `EGP ${fN(c.aov)}`, dlt(c.aov, pv.aov)], ["Items / order", c.ipo == null ? "—" : nf2.format(c.ipo), dlt(c.ipo, pv.ipo)], ["Refund rate", fPct(c.refundRate), dlt(c.refundRate, pv.refundRate, true, true)], ["Exchange rate", fPct(c.exchRate), dlt(c.exchRate, pv.exchRate, true, true)]];
-  $("#modalRoot").innerHTML = `<div class="overlay" data-act="repClose"><div class="modal"><div class="m-head"><h3>${esc(p.name)} · ${rngTxt(a, b)}</h3><div class="row"><a class="btn sm light" href="${esc(p.url)}" target="_blank" rel="noopener">Open sheet ↗</a><button class="btn ghost" data-act="repClose">✕</button></div></div>
-    <div class="m-body dtl">${p.kind === "metrics" ? `<div class="mk">${mk.map(([l, v, d]) => `<div><span>${l}</span><b>${v}</b>${d}</div>`).join("")}</div>` : ""}
-    ${recs.length ? `<div class="panel"><h4>Records in this period</h4>${recs.map((r) => `<div style="font-size:13px;padding:4px 0"><span class="tp ${r.type}">${esc(REQ_TYPES[r.type] || r.type)}</span> ${DY[wdOf(dIdx(r.date))]} ${dmy(dIdx(r.date))}${isAdj(r) ? ` · <b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "")}` : ""}${r.details ? ` — ${esc(r.details)}` : ""} <span class="ss ${stClass(r)}">${stLabel(r)}</span></div>`).join("")}</div>` : ""}
-    <div class="tw"><table><thead><tr><th>Day</th><th>Shift</th>${p.kind === "metrics" ? `<th>Sales</th><th>Orders</th><th>Items</th><th>AOV</th><th>OOS</th><th>Refunds</th><th>Exch.</th>` : ""}<th style="text-align:left">Feedback</th></tr></thead><tbody>
-    ${rows.map((r) => `<tr class="${r.off ? "off" : ""}"><td>${DY[wdOf(r.i)]} ${dmy(r.i)}</td><td>${esc(r.shift || "—")}</td>${p.kind === "metrics" ? `<td><b>${fN(r.sales)}</b></td><td>${fN(r.orders)}</td><td>${fN(r.items)}</td><td>${r.orders ? fN(r.sales / r.orders) : "—"}</td><td>${fN(r.oos)}</td><td>${fN(r.refunds)}</td><td>${fN(r.exch)}</td>` : ""}<td class="f" dir="auto">${esc(r.fb)}</td></tr>`).join("") || `<tr><td colspan="10" class="muted">Nothing logged in this period.</td></tr>`}</tbody></table></div></div></div></div>`;
+// monthly bars for long ranges (e.g. All time / This year)
+function monthBarsSVG(people, a, b) {
+  const B = [];
+  for (let d = new Date(a * 864e5); ; ) { const y = d.getUTCFullYear(), m = d.getUTCMonth(), m0 = U0(y, m, 1); if (m0 > b) break; B.push({ a: Math.max(a, m0), b: Math.min(b, U0(y, m + 1, 0)), label: MON[m] + " " + String(y).slice(2), tip: MONF[m] + " " + y }); d = new Date(Date.UTC(y, m + 1, 1)); }
+  return trendSVG(people, a, b, B);
 }
+/* ---- member profile: period view + full history from her first day ---- */
+function profileData(D, p, t) {
+  const rows = p.rows.filter((r) => r.i <= t);
+  const sched = [], offDays = [], desks = {}, shiftsS = {};
+  if (p.m) for (const [key, w] of Object.entries(D.weeks)) {
+    if (!w.memberIds.includes(p.m.id)) continue;
+    const ws = dIdx(key);
+    for (let k = 0; k < 7; k++) {
+      const i = ws + k; if (i > t) continue;
+      const c = cellAt(D, p.m.id, i); if (!c) continue;
+      if (c.off) { offDays.push(i); continue; }
+      sched.push(i); shiftsS[c.ty.name] = (shiftsS[c.ty.name] || 0) + 1;
+      if (c.resp) desks[c.resp.name] = (desks[c.resp.name] || 0) + 1;
+    }
+  }
+  sched.sort((x, y) => x - y);
+  const data = rows.filter((r) => r.hasNums || r.fb);
+  const start = Math.min(data.length ? data[0].i : Infinity, sched.length ? sched[0] : Infinity);
+  if (!isFinite(start)) return null;
+  const life = agg(rows, start, t, ""), comp = compliance(D, p, start, t, t, "");
+  const months = [];
+  for (let d = new Date(start * 864e5); ; ) {
+    const y = d.getUTCFullYear(), m = d.getUTCMonth(), m0 = U0(y, m, 1), m1 = Math.min(U0(y, m + 1, 0), t);
+    if (m0 > t) break;
+    months.push({ label: `${MON[m]} ${y}`, short: `${MON[m]} ${String(y).slice(2)}`, a: Math.max(m0, start), b: m1, ag: agg(rows, Math.max(m0, start), m1, ""), cp: compliance(D, p, Math.max(m0, start), m1, t, ""), partial: m1 === t && t < U0(y, m + 1, 0) });
+    d = new Date(Date.UTC(y, m + 1, 1));
+  }
+  const weeks = {};
+  for (const r of rows) if (r.hasNums) { const w = wkStart(D, r.i); weeks[w] = (weeks[w] || 0) + (r.sales || 0); }
+  const bestWeek = Object.entries(weeks).sort((x, y) => y[1] - x[1])[0];
+  const fullMonths = months.filter((m) => !m.partial && m.ag.selling >= 5);
+  const bestMonth = months.filter((m) => m.ag.sales > 0).sort((x, y) => y.ag.sales - x.ag.sales)[0];
+  const worstMonth = fullMonths.slice().sort((x, y) => x.ag.sales - y.ag.sales)[0];
+  // reporting streaks over scheduled working days (after her sheet started)
+  const byI = Object.fromEntries(p.rows.map((r) => [r.i, r]));
+  const exc = new Set((D.requests || []).filter((r) => p.m && r.member === p.m.id && EXCUSED.has(r.type) && r.status !== "rejected").map((r) => dIdx(r.date)));
+  let cur = 0, best = 0;
+  for (const i of sched) { if (i >= t || (p.first != null && i < p.first) || exc.has(i)) continue; const r = byI[i]; if (r && (r.hasNums || r.fb)) { cur++; best = Math.max(best, cur); } else cur = 0; }
+  const sell = rows.filter((r) => r.hasNums && r.sales > 0).map((r) => r.sales);
+  const mean = sell.length ? sell.reduce((x, y) => x + y, 0) / sell.length : 0;
+  const cv = sell.length > 2 && mean ? Math.sqrt(sell.reduce((x, y) => x + (y - mean) ** 2, 0) / sell.length) / mean : null;
+  const wd = Array.from({ length: 7 }, () => ({ n: 0, s: 0 }));
+  for (const r of rows) if (r.hasNums && r.sales > 0) { const o = wd[wdOf(r.i)]; o.n++; o.s += r.sales; }
+  const recs = (D.requests || []).filter((r) => p.m && r.member === p.m.id && r.status !== "rejected");
+  const sumT = (type) => recs.filter((r) => r.type === type).reduce((x, r) => ({ amount: x.amount + (+r.amount || 0), days: x.days + (+r.days || 0), n: x.n + 1 }), { amount: 0, days: 0, n: 0 });
+  // team rank on lifetime totals (sheets with sales)
+  const peers = repModel().filter((q) => q.kind === "metrics" && q.loaded).map((q) => ({ q, ag: agg(q.rows, -1e9, t, "") }));
+  const rankBy = (f) => { const L = peers.filter((x) => f(x.ag) != null).sort((x, y) => f(y.ag) - f(x.ag)); const k = L.findIndex((x) => x.q.key === p.key); return k < 0 ? null : [k + 1, L.length]; };
+  return { start, end: Math.max(data.length ? data[data.length - 1].i : -Infinity, sched.length ? sched[sched.length - 1] : -Infinity), life, comp, months, bestWeek, bestMonth, worstMonth, streakBest: best, streakCur: cur, cv, wd, desks, shiftsS, offDays: offDays.length, schedDays: sched.length, bonus: sumT("bonus"), ded: sumT("deduction"), excuses: recs.filter((r) => EXCUSED.has(r.type)).length, swaps: recs.filter((r) => r.type === "swap").length, lates: recs.filter((r) => r.type === "late").length, fbRows: data.filter((r) => r.fb).sort((x, y) => y.i - x.i), rankSales: rankBy((g) => g.sales || null), rankAvg: rankBy((g) => g.avgDaily) };
+}
+const tenure = (a, b) => { const d = b - a + 1; if (d < 60) return `${d} days`; const m = Math.round(d / 30.44); return m < 24 ? `${m} months` : `${(d / 365.25).toFixed(1)} years`; };
+function monthChart(months) {
+  const W = 1000, H = 200, L = 46, T = 12, B = 24, n = months.length, cw = (W - L) / Math.max(n, 1);
+  const max = Math.max(...months.map((m) => m.ag.sales), 1), step = Math.pow(10, Math.floor(Math.log10(max))), nice = Math.ceil(max / step) * step, sc = (H - T - B) / nice;
+  let g = "";
+  for (let q = 0; q <= 4; q++) { const v = (nice / 4) * q, y = H - B - v * sc; g += `<line class="gl" x1="${L}" x2="${W}" y1="${y}" y2="${y}"/><text class="ax" x="${L - 8}" y="${y + 3.5}" text-anchor="end">${fK(v)}</text>`; }
+  const bw = Math.min(46, cw * 0.62), labEvery = Math.ceil(n / 14);
+  months.forEach((m, k) => {
+    const x = L + k * cw + (cw - bw) / 2, h = m.ag.sales * sc;
+    g += `<rect x="${x.toFixed(1)}" y="${(H - B - h).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.5, h).toFixed(1)}" rx="4" fill="${m.partial ? "var(--brand-3)" : "var(--brand)"}"><title>${m.label}${m.partial ? " (so far)" : ""} · EGP ${fN(m.ag.sales)} · ${m.ag.orders} orders</title></rect>`;
+    if (m.ag.sales && n <= 14) g += `<text class="ax" x="${(x + bw / 2).toFixed(1)}" y="${(H - B - h - 5).toFixed(1)}" text-anchor="middle" style="fill:var(--ink-2);font-weight:700">${fK(m.ag.sales)}</text>`;
+    if (k % labEvery === 0) g += `<text class="ax" x="${(L + k * cw + cw / 2).toFixed(1)}" y="${H - 6}" text-anchor="middle">${m.short}</text>`;
+  });
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Monthly sales">${g}</svg></div>`;
+}
+function repDetail(key, tab) {
+  const D = V(), p = repModel().find((x) => x.key === key); if (!p) return;
+  if (tab) RS.dtab = tab;
+  if (p.kind !== "metrics" && RS.dtab === "history" && !p.m) RS.dtab = "period";
+  const { a, b, pa, pb, t, cmp } = repRange();
+  let body = "";
+  if (RS.dtab === "period") {
+    const c = agg(p.rows, a, b), pv = agg(p.rows, pa, pb), cp = compliance(D, p, a, b, t);
+    const X = (x, y, l, pt) => (cmp ? dlt(x, y, l, pt) : "");
+    const rows = p.rows.filter((r) => r.i >= a && r.i <= b && (!RS.shift || r.sk === RS.shift)).sort((x, y) => y.i - x.i);
+    const recs = (D.requests || []).filter((r) => r.member === p.src.memberId && p.src.memberId && dIdx(r.date) >= a && dIdx(r.date) <= b);
+    const mk = [["Sales", `EGP ${fN(c.sales)}`, X(c.sales, pv.sales)], ["Orders", fN(c.orders), X(c.orders, pv.orders)], ["AOV", `EGP ${fN(c.aov)}`, X(c.aov, pv.aov)], ["Items / order", c.ipo == null ? "—" : nf2.format(c.ipo), X(c.ipo, pv.ipo)], ["Refund rate", fPct(c.refundRate), X(c.refundRate, pv.refundRate, true, true)], ["Reports", cp.expected ? `${cp.done}/${cp.expected}` : "—", cp.missing.length ? `<div class="dl bad">${cp.missing.length} missing</div>` : ""]];
+    const missSet = new Set(cp.missing);
+    body = `${p.kind === "metrics" ? `<div class="mk">${mk.map(([l, v, d]) => `<div><span>${l}</span><b>${v}</b>${d}</div>`).join("")}</div>` : ""}
+    ${recs.length ? `<div class="panel"><h4>Records in this period</h4>${recs.map((r) => `<div style="font-size:13px;padding:4px 0"><span class="tp ${r.type}">${esc(REQ_TYPES[r.type] || r.type)}</span> ${DY[wdOf(dIdx(r.date))]} ${dmy(dIdx(r.date))}${isAdj(r) ? ` · <b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "")}` : ""}${r.details ? ` — ${esc(r.details)}` : ""} <span class="ss ${stClass(r)}">${stLabel(r)}</span></div>`).join("")}</div>` : ""}
+    ${cp.missing.length ? `<div class="banner warn" style="margin-bottom:12px"><b>Missing reports (${cp.missing.length}):</b> ${daysTxt(cp.missing)}</div>` : ""}
+    <div class="tw"><table><thead><tr><th>Day</th><th>Shift</th>${p.kind === "metrics" ? `<th>Sales</th><th>Orders</th><th>Items</th><th>AOV</th><th>OOS</th><th>Refunds</th><th>Exch.</th>` : ""}<th style="text-align:left">Feedback</th></tr></thead><tbody>
+    ${rows.map((r) => `<tr class="${r.off ? "off" : ""}"><td>${DY[wdOf(r.i)]} ${dmy(r.i)}</td><td>${esc(r.shift || "—")}</td>${p.kind === "metrics" ? `<td><b>${fN(r.sales)}</b></td><td>${fN(r.orders)}</td><td>${fN(r.items)}</td><td>${r.orders ? fN(r.sales / r.orders) : "—"}</td><td>${fN(r.oos)}</td><td>${fN(r.refunds)}</td><td>${fN(r.exch)}</td>` : ""}<td class="f" dir="auto">${esc(r.fb)}</td></tr>`).join("") || `<tr><td colspan="10" class="muted">Nothing logged in this period.</td></tr>`}</tbody></table></div>`;
+    void missSet;
+  } else {
+    const H = profileData(D, p, t);
+    if (!H) body = `<div class="empty">No reports or scheduled days yet.</div>`;
+    else {
+      const L = H.life, cp = H.comp, rate = cp.expected ? cp.done / cp.expected : null;
+      const cvTxt = H.cv == null ? "—" : H.cv < 0.45 ? "Steady" : H.cv < 0.8 ? "Moderate" : "Volatile";
+      const former = p.m && p.m.former;
+      const hl = [
+        ["Best day", H.life.best ? `EGP ${fN(H.life.best.sales)}` : "—", H.life.best ? `${DY[wdOf(H.life.best.i)]} ${dmy(H.life.best.i, 1)}` : ""],
+        ["Best week", H.bestWeek ? `EGP ${fN(H.bestWeek[1])}` : "—", H.bestWeek ? `Week of ${dmy(+H.bestWeek[0], 1)}` : ""],
+        ["Best month", H.bestMonth ? `EGP ${fN(H.bestMonth.ag.sales)}` : "—", H.bestMonth ? H.bestMonth.label : ""],
+        ["Weakest full month", H.worstMonth ? `EGP ${fN(H.worstMonth.ag.sales)}` : "—", H.worstMonth ? H.worstMonth.label : "Needs a full month"],
+        ["Reporting streak", `${H.streakCur} days`, `Current · best ${H.streakBest} days in a row`],
+        ["Consistency", cvTxt, H.cv == null ? "" : `Daily sales vary ±${Math.round(H.cv * 100)}% around her average`],
+        ["Team rank · total sales", H.rankSales ? `#${H.rankSales[0]} of ${H.rankSales[1]}` : "—", "All-time totals"],
+        ["Team rank · avg per day", H.rankAvg ? `#${H.rankAvg[0]} of ${H.rankAvg[1]}` : "—", H.life.avgDaily ? `EGP ${fN(H.life.avgDaily)} per selling day` : ""],
+      ];
+      const wdMax = Math.max(...H.wd.map((x) => (x.n ? x.s / x.n : 0)), 1);
+      const shiftRows = Object.entries(L.byShift).sort((x, y) => y[1].sales - x[1].sales);
+      body = `<div class="pf-h"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><div class="pf-n">${esc(p.name)}${former ? ` <span class="stale warn">Former</span>` : ""}</div><div class="muted">${p.code ? "ID " + esc(p.code) + " · " : ""}Since ${dmy(H.start, 1)} · ${tenure(H.start, t)} · ${H.schedDays} scheduled work days · ${H.offDays} days off</div></div>
+        <div class="pf-r"><span>Last report</span><b>${p.last == null ? "Never" : dmy(p.last, 1)}</b></div></div>
+      ${p.kind === "metrics" ? `<div class="mk">${[["Lifetime sales", `EGP ${fN(L.sales)}`, `${fN(L.orders)} orders · ${fN(L.items)} items`], ["Average order value", `EGP ${fN(L.aov)}`, `${L.ipo == null ? "—" : nf2.format(L.ipo)} items per order`], ["Avg daily sales", `EGP ${fN(L.avgDaily)}`, `${L.selling} selling days`], ["Refund rate", fPct(L.refundRate), `${fN(L.refunds)} refunds`], ["Exchange rate", fPct(L.exchRate), `${fN(L.exch)} exchanges · ${fN(L.oos)} OOS`], ["Report discipline", rate == null ? "—" : fPct(rate, 0), cp.expected ? `${cp.done}/${cp.expected} days · ${cp.missing.length} missing` : "No scheduled days"]].map(([l, v, s]) => `<div><span>${l}</span><b>${v}</b><small>${s}</small></div>`).join("")}</div>` : `<div class="mk"><div><span>Report discipline</span><b>${rate == null ? "—" : fPct(rate, 0)}</b><small>${cp.done}/${cp.expected} days</small></div><div><span>Feedback notes</span><b>${H.fbRows.length}</b><small>since ${dmy(H.start, 1)}</small></div></div>`}
+      ${p.kind === "metrics" ? `<div class="hls">${hl.map(([l, v, s]) => `<div><span>${l}</span><b>${v}</b><small>${esc(s)}</small></div>`).join("")}</div>` : ""}
+      ${p.kind === "metrics" ? `<div class="panel"><h4>Sales by month</h4>${monthChart(H.months)}</div>` : ""}
+      <div class="panel"><h4>Month by month</h4><div class="tw"><table><thead><tr><th>Month</th><th>Sales</th><th>vs prev. month</th><th>Orders</th><th>Items</th><th>AOV</th><th>Items / order</th><th>Avg / day</th><th>Refund %</th><th>Exch. %</th><th>OOS</th><th>Reports</th><th>Missing</th></tr></thead><tbody>
+        ${H.months.slice().reverse().map((m, k, arr) => { const prev = arr[k + 1], ch = prev ? pctChg(m.ag.sales, prev.ag.sales) : null, c = m.cp; return `<tr><td>${m.label}${m.partial ? ` <span class="muted">(so far)</span>` : ""}</td><td><b>${fN(m.ag.sales)}</b></td><td>${ch == null || !prev.ag.sales ? "—" : `<span class="dl ${ch >= 0 ? "good" : "bad"}" style="margin:0">${ch >= 0 ? "▲" : "▼"} ${Math.abs(ch * 100).toFixed(0)}%</span>`}</td><td>${fN(m.ag.orders)}</td><td>${fN(m.ag.items)}</td><td>${fN(m.ag.aov)}</td><td>${m.ag.ipo == null ? "—" : nf2.format(m.ag.ipo)}</td><td>${fN(m.ag.avgDaily)}</td><td>${fPct(m.ag.refundRate)}</td><td>${fPct(m.ag.exchRate)}</td><td>${fN(m.ag.oos)}</td><td>${c.expected ? `${c.done}/${c.expected}` : `<span class="muted">${c.schedDays ? "—" : "no schedule"}</span>`}</td><td>${c.missing.length ? `<b style="color:var(--bad)">${c.missing.length}</b>` : c.expected ? "0" : "—"}</td></tr>`; }).join("")}</tbody></table></div></div>
+      <div class="pf2">
+        ${p.kind === "metrics" ? `<div class="panel"><h4>By shift (from her reports)</h4><table class="stbl"><thead><tr><th>Shift</th><th>Days</th><th>Sales</th><th>Avg / day</th><th>AOV</th></tr></thead><tbody>${shiftRows.map(([k, s]) => `<tr><td>${esc(k)}</td><td>${s.days}</td><td><b>${fN(s.sales)}</b></td><td>${s.days ? fN(s.sales / s.days) : "—"}</td><td>${s.orders ? fN(s.sales / s.orders) : "—"}</td></tr>`).join("") || `<tr><td colspan="5" class="muted">—</td></tr>`}</tbody></table></div>
+        <div class="panel"><h4>Average sales by weekday</h4><div class="wdb">${H.wd.map((x, k) => { const v = x.n ? x.s / x.n : 0; return `<div><span>${DY[k]}</span><i style="width:${((v / wdMax) * 100).toFixed(1)}%"></i><b>${x.n ? fN(v) : "—"}</b></div>`; }).join("")}</div></div>` : ""}
+        <div class="panel"><h4>On the schedule</h4><table class="stbl"><tbody>${Object.entries(H.shiftsS).sort((x, y) => y[1] - x[1]).map(([k, n]) => `<tr><td>${esc(k)} shifts</td><td><b>${n}</b></td></tr>`).join("")}${Object.entries(H.desks).sort((x, y) => y[1] - x[1]).map(([k, n]) => `<tr><td>${esc(k)}</td><td><b>${n}</b> days</td></tr>`).join("") || ""}${!H.schedDays ? `<tr><td class="muted">No schedule weeks for her yet — import the schedule history.</td></tr>` : ""}</tbody></table></div>
+        <div class="panel"><h4>Records</h4><table class="stbl"><tbody><tr><td>Bonuses</td><td><b class="pos">${H.bonus.n ? "+ " + money(H.bonus.amount) : "—"}</b> ${H.bonus.n ? `<span class="muted">(${H.bonus.n})</span>` : ""}</td></tr><tr><td>Deductions</td><td><b class="neg">${H.ded.n ? "− " + esc(dedText(H.ded)) : "—"}</b> ${H.ded.n ? `<span class="muted">(${H.ded.n})</span>` : ""}</td></tr><tr><td>Excuses &amp; day-off changes</td><td><b>${H.excuses}</b></td></tr><tr><td>Late arrivals</td><td><b>${H.lates}</b></td></tr><tr><td>Shift swaps</td><td><b>${H.swaps}</b></td></tr></tbody></table></div>
+      </div>
+      ${cp.missing.length ? `<div class="panel"><h4>Missing reports · all time (${cp.missing.length})</h4>${Object.entries(byMonth(cp.missing)).reverse().map(([mn, Ls]) => `<div style="font-size:12.8px;padding:3px 0"><b>${mn}</b> · ${Ls.length}: ${daysTxt(Ls)}</div>`).join("")}</div>` : ""}
+      ${H.fbRows.length ? `<div class="panel"><h4>Latest feedback</h4>${H.fbRows.slice(0, 4).map((r) => `<div class="fbi" style="grid-template-columns:130px 1fr;padding:10px 0"><div class="muted" style="font-size:12px">${DY[wdOf(r.i)]}, ${dmy(r.i, 1)}${r.shift ? `<br>${esc(r.shift)}` : ""}</div><p class="fbt open" dir="auto">${esc(r.fb)}</p></div>`).join("")}</div>` : ""}`;
+    }
+  }
+  const tabs = `<div class="seg" style="margin-right:8px">${p.m || p.kind === "metrics" ? `<button class="${RS.dtab === "history" ? "active" : ""}" data-act="repDTab" data-k="${esc(p.key)}" data-v="history">Full history</button>` : ""}<button class="${RS.dtab === "period" ? "active" : ""}" data-act="repDTab" data-k="${esc(p.key)}" data-v="period">${esc(rngTxt(a, b))}</button></div>`;
+  const sc = $(".overlay .m-body")?.scrollTop;
+  $("#modalRoot").innerHTML = `<div class="overlay" data-act="repClose"><div class="modal"><div class="m-head"><h3>${esc(p.name)}${RS.dtab === "history" ? " · Profile" : ""}</h3><div class="row">${tabs}<a class="btn sm light" href="${esc(p.url)}" target="_blank" rel="noopener">Open sheet ↗</a><button class="btn ghost" data-act="repClose">✕</button></div></div>
+    <div class="m-body dtl">${body}</div></div></div>`;
+  void sc;
+}
+
 async function loadReports(force) {
   if (!S.me) return renderReports();
   RS.loading = true; renderReports();
@@ -1918,7 +2154,7 @@ function renderAdmin() {
     D.timeSlots.forEach((t, k) => {
       const r = tRange(t) || { s: 660, e: 1140 };
       body += `<div class="lrow" style="grid-template-columns:150px 150px 1fr auto auto"><label class="field">From<input type="time" step="900" data-slot="${k}" data-part="s" value="${toHM(r.s)}"></label><label class="field">To<input type="time" step="900" data-slot="${k}" data-part="e" value="${toHM(r.e)}"></label>
-        <div style="padding-bottom:9px;font-weight:700">${esc(tLabel(t))} <span class="muted" style="font-weight:500">· ${fmtDur(r.e - r.s)}</span></div>
+        <div style="padding-bottom:9px;font-weight:700">${esc(tLabel(t))} <span class="muted" style="font-weight:500">· ${fmtDur(r.dur)}</span></div>
         <div class="mv"><button class="btn sm ghost" data-act="moveSlot" data-i="${k}" data-d="-1" ${k ? "" : "disabled"}>↑</button><button class="btn sm ghost" data-act="moveSlot" data-i="${k}" data-d="1" ${k < D.timeSlots.length - 1 ? "" : "disabled"}>↓</button></div>
         <button class="btn sm danger" data-act="delSlot" data-i="${k}" style="margin-bottom:4px">Delete</button></div>`;
     });
@@ -1947,6 +2183,8 @@ function renderAdmin() {
       <label class="field">Schedule starts<input type="date" data-path="settings.startDate" value="${esc(D.settings.startDate || "")}"></label>
       <label class="field">The day switches at<input type="time" step="900" data-path="settings.dayStart" value="${esc(D.settings.dayStart || "03:00")}"></label></div>
       <p class="muted" style="font-size:12.5px">The daily view and “today” run from ${fmtT(dayStartMin(D))} to ${fmtT(dayStartMin(D))} the next day, so a night shift ending at 3 AM stays on its own day. Changing the week start after creating weeks hides those weeks.</p>
+      <div class="panel"><h4>Schedule history</h4><p class="muted" style="margin:0 0 10px;font-size:12.5px">Brings in the weekly schedules from the old Google Sheets (15 Feb – 28 Nov 2026) so Team Reports can check every report against the real schedule. Weeks already in the dashboard are kept as they are.</p>
+        <button class="btn sm primary" data-act="importHistory">${D.weeks["2026-02-15"] ? "Re-check history (adds missing weeks only)" : "Import schedule history"}</button></div>
       <div class="panel"><h4>Backup</h4><div class="row"><button class="btn sm" data-act="export">Download backup (JSON)</button><label class="btn sm">Restore from file<input type="file" accept="application/json" id="importFile" class="hidden"></label><button class="btn sm danger" data-act="logout" style="margin-left:auto">Sign out</button></div></div>`;
   }
   const sc = $(".overlay")?.scrollTop || 0;
@@ -2018,7 +2256,11 @@ document.addEventListener("input", (e) => {
   if (e.target.id === "repFq") { RS.fq = e.target.value; RS.feedAll = false; renderReports(); }
 });
 document.addEventListener("change", (e) => {
-  if (e.target.id === "repFrom" || e.target.id === "repTo") { RS.from = $("#repFrom").value; RS.to = $("#repTo").value; return renderReports(); }
+  if (e.target.id === "repFrom" || e.target.id === "repTo") { RS.from = $("#repFrom").value; RS.to = $("#repTo").value; RS.preset = "custom"; return renderReports(); }
+  if (e.target.id === "repPreset") { RS.preset = e.target.value; if (RS.preset === "custom") { const r = repRange(); RS.from = RS.from || iDate(r.a); RS.to = RS.to || iDate(r.b); } return renderReports(); }
+  if (e.target.id === "repCmp") { RS.cmp = e.target.value; return renderReports(); }
+  if (e.target.id === "repMem") { RS.mem = e.target.value; RS.fmem = ""; RS.feedAll = false; return renderReports(); }
+  if (e.target.id === "repShift") { RS.shift = e.target.value; return renderReports(); }
   const su = e.target.closest("[data-srcurl]");
   if (su && S.draft) { const id = sheetIdOf(su.value); if (!id) return toast("That isn't a Google Sheets link", true); S.draft.reportSources[+su.dataset.srcurl].sheetId = id; afterEdit(true); }
 });
@@ -2053,14 +2295,29 @@ document.addEventListener("click", async (e) => {
     case "overlay": if (e.target === el) closeAdmin(); return;
     case "view": if (el.dataset.v === "reports" && !S.me) return openLogin("__reports"); return showView(el.dataset.v);
     case "repLogin": return openLogin("__reports");
-    case "repPreset": RS.preset = el.dataset.v; return renderReports();
+    case "repReset": Object.assign(RS, { preset: "thisMonth", cmp: "prev", mem: "", shift: "", from: "", to: "", fmem: "", fq: "" }); return renderReports();
     case "repRefresh": return loadReports(true);
-    case "repDetail": return repDetail(el.dataset.k);
+    case "repDetail": return repDetail(el.dataset.k, "history");
+    case "repDTab": return repDetail(el.dataset.k, el.dataset.v);
+    case "repCompOpen": RS.compOpen[el.dataset.k] = !RS.compOpen[el.dataset.k]; return renderReports();
+    case "repFlagAll": RS.flagAll = !RS.flagAll; return renderReports();
     case "repClose": if (e.target === el || el.tagName === "BUTTON") $("#modalRoot").innerHTML = ""; return;
     case "repFbMem": RS.fmem = el.dataset.k; RS.feedAll = false; return renderReports();
     case "repFbOpen": RS.open[el.dataset.id] = true; return renderReports();
     case "repFbAll": RS.feedAll = !RS.feedAll; return renderReports();
     case "repSources": return openAdmin("reports");
+    case "importHistory": {
+      if (!S.me) return openLogin("settings");
+      if (!S.admin.open) openAdmin("settings");
+      const X = S.draft;
+      let H; try { H = await (await fetch("assets/schedule-history.json", { cache: "no-store" })).json(); } catch { return toast("Couldn't load the history file", true); }
+      for (const k of ["members", "shiftTypes", "responsibilities"]) for (const o of H[k]) if (!X[k].some((x) => x.id === o.id)) X[k].push(clone(o));
+      let added = 0;
+      for (const [key, w] of Object.entries(H.weeks)) if (!X.weeks[key]) { X.weeks[key] = clone(w); added++; }
+      if (!X.settings.startDate || X.settings.startDate > H.range[0]) X.settings.startDate = H.range[0];
+      toast(added ? `Imported ${added} weeks of schedule history — press Save changes` : "History is already in the dashboard");
+      return R();
+    }
     case "srcDel": if (confirm("Remove this sheet from Reports? The sheet itself isn't touched.")) D.reportSources.splice(i, 1); return R();
     case "srcAdd": {
       const id = sheetIdOf($("#srcNewUrl").value); if (!id) return toast("Paste a Google Sheets link", true);
