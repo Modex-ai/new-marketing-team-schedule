@@ -2979,6 +2979,8 @@ function listEditor(D, list, path, kind) {
 function requestsEditor(D) {
   const A = S.admin;
   const f = A.rq || (A.rq = { type: "swap", date: iDate(curIdx()), member: D.members[0]?.id, withMember: D.members[1]?.id, withDate: "", details: "", status: "approved", amount: "", days: "", reason: "", attachments: [], mode: "full", deskA: "auto", deskB: "auto", toShift: "", toTime: "", toDesk: "keep" });
+  const solo = f.type === "swap" && f.withMember === f.member; // same person picked twice = change her own desk / shift
+  if (solo && (f.toDesk == null || f.toDesk === "keep") && f.deskA && f.deskA !== "auto") f.toDesk = f.deskA;
   f.mode = f.mode || "full"; if (f.deskA == null) f.deskA = "auto"; if (f.deskB == null) f.deskB = "auto"; if (f.toDesk == null) f.toDesk = "keep";
   const mopts = (sel) => D.members.map((m) => `<option value="${esc(m.id)}" ${m.id === sel ? "selected" : ""}>${esc(m.name)}</option>`).join("");
   const adj = ADJ[f.type];
@@ -2991,23 +2993,23 @@ function requestsEditor(D) {
     <label class="field">Status<select id="rqStatus">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === f.status ? "selected" : ""}>${stLabel({ type: f.type, status: x })}</option>`).join("")}</select></label>
     ${f.type === "swap" ? `<label class="field">Swap with<select id="rqWith">${mopts(f.withMember)}</select></label>
     <label class="field">Their shift date (if different)<input type="date" id="rqWithDate" value="${esc(f.withDate)}"></label>` : ""}
-    ${f.type === "change" ? (() => { const work = D.shiftTypes.filter((x) => x.kind === "work"); return `<label class="field">New shift<select id="rqToShift"><option value="">Keep her shift</option>${D.shiftTypes.map((x) => `<option value="${esc(x.id)}" ${f.toShift === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
+    ${f.type === "change" || solo ? (() => { const work = D.shiftTypes.filter((x) => x.kind === "work"); return `<label class="field">New shift<select id="rqToShift"><option value="">Keep her shift</option>${D.shiftTypes.map((x) => `<option value="${esc(x.id)}" ${f.toShift === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
     <label class="field">New time<select id="rqToTime"><option value="">Keep her time</option><option value="default" ${f.toTime === "default" ? "selected" : ""}>The shift's usual time</option>${D.timeSlots.map((t) => `<option value="${esc(t)}" ${f.toTime === t ? "selected" : ""}>${esc(tLabel(t, true))}</option>`).join("")}</select></label>
-    <label class="field">New desk (Responsible Of)<select id="rqToDesk"><option value="keep" ${f.toDesk === "keep" ? "selected" : ""}>Keep her desk</option>${D.responsibilities.map((x) => `<option value="${esc(x.id)}" ${f.toDesk === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}<option value="" ${f.toDesk === "" ? "selected" : ""}>No desk</option></select></label>`; })() : ""}
+    ${solo ? `<div class="field wide" style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-2);font-size:12.8px">Same person on both sides — this <b>changes ${esc(memName(D, f.member))}'s own desk / shift</b> (saved as a Shift / desk change).</div>` : ""}<label class="field">New desk (Responsible Of)<select id="rqToDesk"><option value="keep" ${f.toDesk === "keep" ? "selected" : ""}>Keep her desk</option>${D.responsibilities.map((x) => `<option value="${esc(x.id)}" ${f.toDesk === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}<option value="" ${f.toDesk === "" ? "selected" : ""}>No desk</option></select></label>`; })() : ""}
     ${adj ? `<label class="field">Reason<select id="rqReason">${adj.reasons.map((x) => `<option ${x === f.reason ? "selected" : ""}>${x}</option>`).join("")}</select></label>
     <label class="field">Amount (EGP)<input type="number" min="0" step="5" id="rqAmount" value="${esc(f.amount)}" placeholder="0"></label>
     ${adj.days ? `<label class="field">Days deducted<input type="number" min="0" step="0.25" id="rqDays" value="${esc(f.days)}" placeholder="0"></label>` : ""}` : ""}
-    ${f.type === "swap" ? `<div class="field wide">What to swap<div class="swm">${Object.entries(SWAP_MODES).map(([k, [l, d]]) => `<label class="${f.mode === k ? "on" : ""}"><input type="radio" name="rqMode" value="${k}" ${f.mode === k ? "checked" : ""}><b>${l}</b><small>${d}</small></label>`).join("")}</div></div>
+    ${f.type === "swap" && !solo ? `<div class="field wide">What to swap<div class="swm">${Object.entries(SWAP_MODES).map(([k, [l, d]]) => `<label class="${f.mode === k ? "on" : ""}"><input type="radio" name="rqMode" value="${k}" ${f.mode === k ? "checked" : ""}><b>${l}</b><small>${d}</small></label>`).join("")}</div></div>
     ${(() => { const dk = (id, v) => `<select id="${id}"><option value="auto" ${v === "auto" ? "selected" : ""}>As swapped</option>${D.responsibilities.map((x) => `<option value="${esc(x.id)}" ${v === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}<option value="" ${v === "" ? "selected" : ""}>No desk</option></select>`;
       return `<label class="field">${esc(memName(D, f.member))}'s desk after<br>${dk("rqDeskA", f.deskA)}</label><label class="field">${esc(memName(D, f.withMember))}'s desk after<br>${dk("rqDeskB", f.deskB)}</label>`; })()}` : ""}
-    ${(f.type === "swap" || f.type === "change") && f.date ? (() => { const pv = recPreview(D, { ...f, deskA: f.deskA === "auto" ? null : f.deskA, deskB: f.deskB === "auto" ? null : f.deskB }); return `<div class="field wide">Preview on the schedule<div class="rqpv">${pv.ok ? pv.rows.map((x) => `<div><b>${esc(x.name)}</b><span>${DY[wdOf(x.i)]} ${dmy(x.i)}</span><span class="b4">${esc(x.before)}</span><i>→</i><span class="af ${x.before === x.after ? "same" : ""}">${esc(x.after)}</span></div>`).join("") : `<div class="muted">Nothing to change on that date — is the week created and is she on it?</div>`}</div></div>`; })() : ""}
+    ${(f.type === "swap" || f.type === "change") && f.date ? (() => { const pv = recPreview(D, { ...f, ...(solo ? { type: "change", withDate: "" } : {}), deskA: f.deskA === "auto" ? null : f.deskA, deskB: f.deskB === "auto" ? null : f.deskB }); return `<div class="field wide">Preview on the schedule<div class="rqpv">${pv.ok ? pv.rows.map((x) => `<div><b>${esc(x.name)}</b><span>${DY[wdOf(x.i)]} ${dmy(x.i)}</span><span class="b4">${esc(x.before)}</span><i>→</i><span class="af ${x.before === x.after ? "same" : ""}">${esc(x.after)}</span></div>`).join("") : `<div class="muted">Nothing to change on that date — is the week created and is she on it?</div>`}</div></div>`; })() : ""}
     <label class="field wide">Details<input type="text" id="rqDetails" value="${esc(f.details)}" placeholder="${ph}"></label>
   </div>
   <div class="row" style="margin-top:12px;align-items:flex-start">
     <div style="flex:1"><div class="field" style="margin-bottom:6px">Attachments (photos or videos)</div>
       <div class="row">${(f.attachments || []).map((x, j) => `<span class="attx"><span class="att" style="width:52px;height:52px">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="">`}</span><button class="rm" data-act="rqAttDel" data-j="${j}" title="Remove">✕</button></span>`).join("")}
       <label class="btn sm">📎 Attach photo / video<input type="file" id="rqFiles" accept="image/*,video/*" multiple class="hidden"></label></div></div>
-    <div class="row" style="justify-content:flex-end">${f.type === "swap" || f.type === "change" ? `<label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="rqApply" checked> Apply ${f.type === "swap" ? "the swap" : "the change"} to the schedule</label>` : ""}<button class="btn primary" data-act="reqCreate">Add record</button></div></div>
+    <div class="row" style="justify-content:flex-end">${f.type === "swap" || f.type === "change" ? `<label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="rqApply" checked> Apply ${f.type === "swap" && !solo ? "the swap" : "the change"} to the schedule</label>` : ""}<button class="btn primary" data-act="reqCreate">Add record</button></div></div>
   <div id="upStatus" class="upbar ${A.upMsg ? "" : "hidden"}" style="margin-top:10px">${esc(A.upMsg || "")}</div></div>`;
   const list = D.requests.map((r, k) => ({ r, k })).sort((a, b) => (b.r.date + (b.r.createdAt || "")).localeCompare(a.r.date + (a.r.createdAt || "")));
   body += `<div class="panel"><h4>All records (${list.length})</h4>` + (list.length ? list.map(({ r, k }) => {
@@ -3315,10 +3317,10 @@ document.addEventListener("click", async (e) => {
     case "reqCreate": {
       const f = S.admin.rq;
       if (!f.date) return toast("Pick a date", true);
-      if (f.type === "swap" && f.member === f.withMember) return toast("Pick two different people for a swap", true);
-      const r = { id: uid("r"), type: f.type, date: f.date, member: f.member, details: f.details.trim(), status: f.status, createdAt: new Date().toISOString(), createdBy: S.me ? S.me.name : "" };
-      if (f.type === "swap") { r.withMember = f.withMember; if (f.withDate && f.withDate !== f.date) r.withDate = f.withDate; if (f.mode && f.mode !== "full") r.mode = f.mode; if (f.deskA !== "auto") r.deskA = f.deskA; if (f.deskB !== "auto") r.deskB = f.deskB; }
-      if (f.type === "change") {
+      const solo = f.type === "swap" && f.member === f.withMember;
+      const r = { id: uid("r"), type: solo ? "change" : f.type, date: f.date, member: f.member, details: f.details.trim(), status: f.status, createdAt: new Date().toISOString(), createdBy: S.me ? S.me.name : "" };
+      if (f.type === "swap" && !solo) { r.withMember = f.withMember; if (f.withDate && f.withDate !== f.date) r.withDate = f.withDate; if (f.mode && f.mode !== "full") r.mode = f.mode; if (f.deskA !== "auto") r.deskA = f.deskA; if (f.deskB !== "auto") r.deskB = f.deskB; }
+      if (r.type === "change") {
         if (!f.toShift && !f.toTime && f.toDesk === "keep") return toast("Choose what changes — shift, time or desk", true);
         if (f.toShift) r.toShift = f.toShift; if (f.toTime) r.toTime = f.toTime; if (f.toDesk !== "keep") r.toDesk = f.toDesk;
         r.before = cellText(D, f.member, dIdx(f.date));
@@ -3332,8 +3334,8 @@ document.addEventListener("click", async (e) => {
       if (S.admin.upMsg) return toast("Wait for the upload to finish", true);
       if ((f.attachments || []).length) r.attachments = clone(f.attachments);
       D.requests.push(r);
-      if (f.type === "swap" && $("#rqApply")?.checked) { const ok = applySwap(D, r); toast(ok ? "Swap applied to the schedule" : "Record added — no shifts to swap on that date (is the week created?)", !ok); }
-      if (f.type === "change") { if ($("#rqApply")?.checked) { const ok = applyChange(D, r); toast(ok ? "Change applied to the schedule" : "Record added — she has no shift that day to change (is the week created?)", !ok); } else { const T = clone({ ...D, requests: [] }), x = clone(r); applyChange(T, x); r.after = x.after; } }
+      if (r.type === "swap" && $("#rqApply")?.checked) { const ok = applySwap(D, r); toast(ok ? "Swap applied to the schedule" : "Record added — no shifts to swap on that date (is the week created?)", !ok); }
+      if (r.type === "change") { if ($("#rqApply")?.checked) { const ok = applyChange(D, r); toast(ok ? "Change applied to the schedule" : "Record added — she has no shift that day to change (is the week created?)", !ok); } else { const T = clone({ ...D, requests: [] }), x = clone(r); applyChange(T, x); r.after = x.after; } }
       S.admin.rq = null; return R();
     }
     case "rqAttDel": S.admin.rq.attachments.splice(+el.dataset.j, 1); return R();
