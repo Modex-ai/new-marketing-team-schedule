@@ -224,7 +224,7 @@ table.wk td.editable:hover .slot,table.wk td.editable:hover .offc,table.wk td.ed
 .req .tt{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .req .dd{font-size:12.5px;color:var(--ink-2);margin-top:3px}
 .tp{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-radius:6px;padding:3px 8px}
-.tp.swap{background:var(--deep);color:#fff}.tp.excuse{background:#F7E1E6;color:#9A2D45}.tp.late,.tp.early{background:var(--warn-bg);color:var(--warn)}.tp.dayoff{background:#E3ECF8;color:#2F5A8A}.tp.other{background:var(--line-2);color:var(--muted)}.tp.deduction{background:#7A1F2A;color:#fff}.tp.bonus{background:#1F6B47;color:#fff}
+.tp.swap{background:var(--deep);color:#fff}.tp.change{background:#2F6E70;color:#fff}.tp.excuse{background:#F7E1E6;color:#9A2D45}.tp.late,.tp.early{background:var(--warn-bg);color:var(--warn)}.tp.dayoff{background:#E3ECF8;color:#2F5A8A}.tp.other{background:var(--line-2);color:var(--muted)}.tp.deduction{background:#7A1F2A;color:#fff}.tp.bonus{background:#1F6B47;color:#fff}
 .ss{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:4px 11px;white-space:nowrap}
 .ss.pending{background:var(--warn-bg);color:var(--warn)}.ss.approved{background:var(--ok-bg);color:var(--ok)}.ss.rejected{background:var(--bad-bg);color:var(--bad)}
 .ss.bon-approved{background:var(--ok-bg);color:var(--ok)}.ss.bon-rejected,.ss.ded-rejected{background:var(--line-2);color:var(--muted)}.ss.ded-approved{background:var(--bad-bg);color:#8A1D2A}
@@ -342,6 +342,8 @@ table.wgrid td.mc{background:none;border:none;vertical-align:middle;padding-left
 .opt span{font-size:12.5px;color:var(--muted)}
 .rqform{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end}
 .rqform .wide{grid-column:span 2}
+.rqform .swm,.rqform .rqpv{}
+.rqform .field.wide:has(.swm),.rqform .field.wide:has(.rqpv){grid-column:1/-1}
 .rqrow{display:grid;grid-template-columns:110px 1fr 150px auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
 .utbl{width:100%;border-collapse:collapse;font-size:13px}
 .utbl th{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
@@ -594,6 +596,15 @@ tr.cdays .offl{text-decoration:underline dotted var(--bad);text-underline-offset
 .wdb span{color:var(--muted);font-weight:700}
 .wdb i{display:block;height:9px;border-radius:9px;background:linear-gradient(90deg,var(--brand),var(--brand-2));min-width:2px}
 .wdb b{text-align:right;font-variant-numeric:tabular-nums}
+.swm{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.swm label{display:block;border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;background:#fff;text-transform:none;letter-spacing:0;transition:all .12s}
+.swm label.on,.swm label:has(input:checked){border-color:var(--brand);background:var(--pale-2);box-shadow:0 0 0 1px var(--brand)}
+.swm input{display:none}.swm b{display:block;font-size:13px;color:var(--deep)}.swm small{display:block;font-size:11.5px;color:var(--muted);font-weight:500;margin-top:2px}
+.rqpv{border:1px solid var(--line);border-radius:12px;background:var(--pale-3);padding:6px 12px;margin-top:6px;text-transform:none;letter-spacing:0;font-weight:500}
+.rqpv>div{display:grid;grid-template-columns:110px 90px 1fr 18px 1fr;gap:8px;align-items:center;font-size:12.8px;padding:6px 0;border-bottom:1px dashed var(--line-2);color:var(--ink)}
+.rqpv>div:last-child{border-bottom:none}.rqpv span{color:var(--muted)}.rqpv .b4{text-decoration:line-through;text-decoration-color:#C9B9A6}.rqpv i{font-style:normal;color:var(--gold);font-weight:800}
+.rqpv .af{color:var(--deep);font-weight:700}.rqpv .af.same{color:var(--muted);font-weight:500}
+@media (max-width:640px){.swm{grid-template-columns:1fr}.rqpv>div{grid-template-columns:1fr 1fr}.rqpv i{display:none}}
 /* ---------- team profiles ---------- */
 .pfctl select,.pfctl input{font-size:13px;padding:7px 10px}
 .pfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
@@ -1366,7 +1377,7 @@ function dayText(D, i) {
 }
 
 /* ============================ excuses, swaps, deductions & bonuses ============================ */
-const REQ_TYPES = { swap: "Shift swap", excuse: "Excuse / absence", late: "Late arrival", early: "Early leave", dayoff: "Day-off change", deduction: "Deduction", bonus: "Bonus", other: "Other" };
+const REQ_TYPES = { swap: "Shift swap", change: "Shift / desk change", excuse: "Excuse / absence", late: "Late arrival", early: "Early leave", dayoff: "Day-off change", deduction: "Deduction", bonus: "Bonus", other: "Other" };
 const ADJ = {
   deduction: { prefix: "DED", sign: "−", days: true, labels: { pending: "Pending review", approved: "Applied", rejected: "Waived" },
     reasons: ["Late arrival", "Absence without notice", "Early leave", "Unauthorized break", "Policy violation", "Performance / quality", "Other"] },
@@ -1401,13 +1412,15 @@ function reqTitle(D, r) {
   const d = dIdx(r.date);
   if (r.type === "swap") {
     const wd = r.withDate ? dIdx(r.withDate) : d;
-    return `${memName(D, r.member)} ↔ ${memName(D, r.withMember)}` + (wd !== d ? ` · ${DY[wdOf(d)]} ${dmy(d)} ↔ ${DY[wdOf(wd)]} ${dmy(wd)}` : ` · ${DY[wdOf(d)]} ${dmy(d)}`);
+    return `${memName(D, r.member)} ↔ ${memName(D, r.withMember)}` + (r.mode && r.mode !== "full" ? ` (${SWAP_MODES[r.mode][0].toLowerCase()})` : "") + (wd !== d ? ` · ${DY[wdOf(d)]} ${dmy(d)} ↔ ${DY[wdOf(wd)]} ${dmy(wd)}` : ` · ${DY[wdOf(d)]} ${dmy(d)}`);
   }
+  if (r.type === "change") return `${memName(D, r.member)} · ${DY[wdOf(d)]} ${dmy(d)}${r.before || r.after ? ` · ${r.before || "—"} → ${r.after || "—"}` : ""}`;
   return `${memName(D, r.member)} · ${DY[wdOf(d)]} ${dmy(d)}`;
 }
 function reqBadge(D, r, mid, long) {
   if (isAdj(r)) return long ? `${REQ_TYPES[r.type]} ${ADJ[r.type].sign} ${dedText(r)} · ${r.reason || "—"}` : `${ADJ[r.type].sign} ${dedText(r)}`;
-  if (r.type === "swap") { const other = r.member === mid ? r.withMember : r.member; return (long ? "Swapped with " : "↔ ") + memName(D, other); }
+  if (r.type === "swap") { const other = r.member === mid ? r.withMember : r.member; return (long ? (r.mode === "desk" ? "Swapped desks with " : "Swapped with ") : "↔ ") + memName(D, other); }
+  if (r.type === "change") return long ? `Changed: ${r.before || "—"} → ${r.after || "—"}` : "Changed";
   return REQ_TYPES[r.type] || r.type;
 }
 function reqsFor(D, mid, i) {
@@ -1415,20 +1428,69 @@ function reqsFor(D, mid, i) {
     (r.member === mid && dIdx(r.date) === i) ||
     (r.type === "swap" && r.withMember === mid && dIdx(r.withDate || r.date) === i)));
 }
-// Swap = the two people exchange their cells on the date(s) involved.
+// Swap modes: "full" = exchange the whole cell (shift, time and desk) · "shift" = exchange shift + time, each keeps
+// her own desk · "desk" = exchange only the desks (Responsible Of), shifts stay. After any mode the resulting desk of
+// each person can be overridden (r.deskA for r.member, r.deskB for r.withMember; "" = no desk).
+const SWAP_MODES = { full: ["Whole shift", "Shift, time and desk move together"], shift: ["Shift only", "They swap shift + time, each keeps her desk"], desk: ["Desk only", "Shifts stay — they swap Modex-Porto / WhatsApp / Task…"] };
 function applySwap(D, r) {
-  const at = (i) => { const ws = wkStart(D, i), w = D.weeks[iDate(ws)]; if (!w) return null; [r.member, r.withMember].forEach((id) => { if (!w.memberIds.includes(id)) w.memberIds.push(id); w.cells[id] = w.cells[id] || {}; }); return { w, k: i - ws }; };
-  const dates = [...new Set([dIdx(r.date), dIdx(r.withDate || r.date)])];
+  const at = (i) => { const ws = wkStart(D, i), w = D.weeks[iDate(ws)]; if (!w) return null; [r.member, r.withMember].forEach((id) => { if (!w.memberIds.includes(id)) w.memberIds.push(id); w.cells[id] = w.cells[id] || {}; }); return { w, k: i - ws, i }; };
+  const d1 = dIdx(r.date), d2 = dIdx(r.withDate || r.date);
+  const dates = [...new Set([d1, d2])];
   const spots = dates.map(at);
   if (spots.some((x) => !x)) return false;
   if (!spots.some(({ w, k }) => w.cells[r.member][k] || w.cells[r.withMember][k])) return false;
+  const mode = r.mode || "full", isWork = (c) => c && c.s && (typeById(D, c.s) || {}).kind === "work";
   for (const { w, k } of spots) {
-    const a = w.cells[r.member][k], b = w.cells[r.withMember][k];
-    if (b) w.cells[r.member][k] = clone(b); else delete w.cells[r.member][k];
-    if (a) w.cells[r.withMember][k] = clone(a); else delete w.cells[r.withMember][k];
+    const A = w.cells[r.member], B = w.cells[r.withMember], a = A[k] ? clone(A[k]) : null, b = B[k] ? clone(B[k]) : null;
+    if (mode === "desk") {
+      if (isWork(a)) { if (b && b.r) A[k].r = b.r; else delete A[k].r; }
+      if (isWork(b)) { if (a && a.r) B[k].r = a.r; else delete B[k].r; }
+    } else if (mode === "shift") {
+      const mv = (src, keep) => { if (!src) return null; const c = clone(src); delete c.n; if (keep && keep.r && isWork(c)) c.r = keep.r; else delete c.r; if (keep && keep.n) c.n = keep.n; return c; };
+      const na = mv(b, a), nb = mv(a, b);
+      if (na) A[k] = na; else delete A[k];
+      if (nb) B[k] = nb; else delete B[k];
+    } else {
+      if (b) A[k] = b; else delete A[k];
+      if (a) B[k] = a; else delete B[k];
+    }
   }
+  // desk overrides after the swap
+  const setDesk = (id, i, desk) => { const ws = wkStart(D, i), w = D.weeks[iDate(ws)], c = w && w.cells[id] && w.cells[id][i - ws]; if (!isWork(c)) return; if (desk) c.r = desk; else delete c.r; };
+  // with two dates they trade days: she ends up working his/her day (d2) and the other one works d1
+  if (r.deskA != null) setDesk(r.member, d2, r.deskA);
+  if (r.deskB != null) setDesk(r.withMember, d1, r.deskB);
   r.applied = true; if (r.status === "pending") r.status = "approved";
   return true;
+}
+// One person's shift / time / desk changed on one day (e.g. Roaa: Night · Modex-Porto → Night · WhatsApp-Styllano)
+const cellText = (D, mid, i) => { const c = cellAt(D, mid, i); if (!c) return "Not scheduled"; return c.off ? c.ty.name : `${c.ty.name}${c.t ? " " + tLabel(c.t, true) : ""}${c.resp ? " · " + c.resp.name : ""}`; };
+function applyChange(D, r) {
+  const i = dIdx(r.date), ws = wkStart(D, i), w = D.weeks[iDate(ws)];
+  if (!w) return false;
+  if (!w.memberIds.includes(r.member)) w.memberIds.push(r.member);
+  const row = (w.cells[r.member] = w.cells[r.member] || {}), k = i - ws;
+  const before = cellText(D, r.member, i), c = clone(row[k] || {});
+  if (r.toShift) { const ty = typeById(D, r.toShift); if (!ty) return false; if (c.s !== ty.id) { c.s = ty.id; c.t = ty.time || ""; } if (ty.kind !== "work") { delete c.r; delete c.t; } }
+  if (!c.s) return false;
+  const work = (typeById(D, c.s) || {}).kind === "work";
+  if (work && r.toTime != null && r.toTime !== "") c.t = r.toTime === "default" ? (typeById(D, c.s).time || "") : r.toTime;
+  if (work && r.toDesk != null && r.toDesk !== "keep") { if (r.toDesk) c.r = r.toDesk; else delete c.r; }
+  row[k] = c;
+  r.before = before; r.after = cellText(D, r.member, i);
+  r.applied = true; if (r.status === "pending") r.status = "approved";
+  return true;
+}
+// what a swap / change would do, without touching the schedule
+function recPreview(D, f) {
+  const T = clone({ ...D, requests: [] }), r = { ...clone(f), id: "preview", status: "approved" };
+  if (r.type === "swap") { if (!r.withDate || r.withDate === r.date) delete r.withDate; }
+  const d1 = dIdx(f.date), d2 = f.withDate ? dIdx(f.withDate) : d1;
+  const ppl = f.type === "swap" ? [[f.member, d1], [f.withMember, d2]] : [[f.member, d1]];
+  if (f.type === "swap" && d2 !== d1) ppl.push([f.member, d2], [f.withMember, d1]);
+  const before = ppl.map(([id, i]) => cellText(D, id, i));
+  const ok = f.type === "swap" ? applySwap(T, r) : applyChange(T, r);
+  return { ok, rows: ppl.map(([id, i], k) => ({ name: memName(D, id), i, before: before[k], after: ok ? cellText(T, id, i) : before[k] })) };
 }
 /* attachments (photos / videos, stored privately in Vercel Blob, served via /api/file) */
 const fileUrl = (a) => "/api/file?u=" + encodeURIComponent(a.url);
@@ -1577,14 +1639,14 @@ function diffData(A, B) {
   const rn = (r) => `${REQ_TYPES[r.type] || r.type}${r.ref ? " " + r.ref : ""} — ${reqTitle(B, r)}${isAdj(r) ? ` · ${ADJ[r.type].sign} ${dedText(r)} · ${r.reason || ""}` : ""}`;
   for (const r of B.requests || []) {
     const o = (A.requests || []).find((x) => x.id === r.id);
-    if (!o) { out.push(`Records: logged ${rn(r)} (${stLabel(r)})${r.details ? " — " + r.details : ""}${(r.attachments || []).length ? ` · 📎 ${r.attachments.length} attachment${r.attachments.length > 1 ? "s" : ""}` : ""}`); if (r.applied) out.push(`Records: applied swap to the schedule — ${reqTitle(B, r)}`); continue; }
+    if (!o) { out.push(`Records: logged ${rn(r)} (${stLabel(r)})${r.details ? " — " + r.details : ""}${(r.attachments || []).length ? ` · 📎 ${r.attachments.length} attachment${r.attachments.length > 1 ? "s" : ""}` : ""}`); if (r.applied) out.push(`Records: applied ${r.type === "change" ? "change" : "swap"} to the schedule — ${reqTitle(B, r)}`); continue; }
     if (o.status !== r.status) out.push(`Records: ${rn(r)} — status ${stLabel(o)} → ${stLabel(r)}`);
     if (isAdj(r) && (+o.amount !== +r.amount || +(o.days || 0) !== +(r.days || 0) || o.reason !== r.reason)) out.push(`Records: ${REQ_TYPES[r.type].toLowerCase()} ${r.ref || ""} changed ${dedText(o)} (${o.reason || "—"}) → ${dedText(r)} (${r.reason || "—"})`);
     const oa = (o.attachments || []).length, na = (r.attachments || []).length;
     if (na > oa) out.push(`Records: attached ${na - oa} file${na - oa > 1 ? "s" : ""} — ${rn(r)}`);
     if (na < oa) out.push(`Records: removed ${oa - na} attachment${oa - na > 1 ? "s" : ""} — ${rn(r)}`);
     if ((o.details || "") !== (r.details || "")) out.push(`Records: updated details — ${rn(r)}`);
-    if (!o.applied && r.applied) out.push(`Records: applied swap to the schedule — ${reqTitle(B, r)}`);
+    if (!o.applied && r.applied) out.push(`Records: applied ${r.type === "change" ? "change" : "swap"} to the schedule — ${reqTitle(B, r)}`);
   }
   for (const o of A.requests || []) if (!(B.requests || []).some((r) => r.id === o.id)) out.push(`Records: deleted ${rn(o)}`);
   if (+A.settings.weekStart !== +B.settings.weekStart) out.push(`Settings: week starts on ${DAYS[+B.settings.weekStart]}`);
@@ -2097,7 +2159,7 @@ function profileData(D, p, t) {
   // team rank on lifetime totals (sheets with sales)
   const peers = repModel().filter((q) => q.kind === "metrics" && q.loaded).map((q) => ({ q, ag: agg(q.rows, -1e9, t, "") }));
   const rankBy = (f) => { const L = peers.filter((x) => f(x.ag) != null).sort((x, y) => f(y.ag) - f(x.ag)); const k = L.findIndex((x) => x.q.key === p.key); return k < 0 ? null : [k + 1, L.length]; };
-  return { start, end: Math.max(data.length ? data[data.length - 1].i : -Infinity, sched.length ? sched[sched.length - 1] : -Infinity), life, comp, months, bestWeek, bestMonth, worstMonth, streakBest: best, streakCur: cur, cv, wd, desks, shiftsS, offDays: offDays.length, schedDays: sched.length, bonus: sumT("bonus"), ded: sumT("deduction"), excuses: recs.filter((r) => EXCUSED.has(r.type)).length, swaps: recs.filter((r) => r.type === "swap").length, lates: recs.filter((r) => r.type === "late").length, fbRows: data.filter((r) => r.fb).sort((x, y) => y.i - x.i), rankSales: rankBy((g) => g.sales || null), rankAvg: rankBy((g) => g.avgDaily) };
+  return { start, end: Math.max(data.length ? data[data.length - 1].i : -Infinity, sched.length ? sched[sched.length - 1] : -Infinity), life, comp, months, bestWeek, bestMonth, worstMonth, streakBest: best, streakCur: cur, cv, wd, desks, shiftsS, offDays: offDays.length, schedDays: sched.length, bonus: sumT("bonus"), ded: sumT("deduction"), excuses: recs.filter((r) => EXCUSED.has(r.type)).length, swaps: recs.filter((r) => r.type === "swap" || r.type === "change").length, lates: recs.filter((r) => r.type === "late").length, fbRows: data.filter((r) => r.fb).sort((x, y) => y.i - x.i), rankSales: rankBy((g) => g.sales || null), rankAvg: rankBy((g) => g.avgDaily) };
 }
 const tenure = (a, b) => { const d = b - a + 1; if (d < 60) return `${d} days`; const m = Math.round(d / 30.44); return m < 24 ? `${m} months` : `${(d / 365.25).toFixed(1)} years`; };
 function monthChart(months) {
@@ -2163,7 +2225,7 @@ function repDetail(key, tab) {
         ${p.kind === "metrics" ? `<div class="panel"><h4>By shift (from her reports)</h4><table class="stbl"><thead><tr><th>Shift</th><th>Days</th><th>Sales</th><th>Avg / day</th><th>AOV</th></tr></thead><tbody>${shiftRows.map(([k, s]) => `<tr><td>${esc(k)}</td><td>${s.days}</td><td><b>${fN(s.sales)}</b></td><td>${s.days ? fN(s.sales / s.days) : "—"}</td><td>${s.orders ? fN(s.sales / s.orders) : "—"}</td></tr>`).join("") || `<tr><td colspan="5" class="muted">—</td></tr>`}</tbody></table></div>
         <div class="panel"><h4>Average sales by weekday</h4><div class="wdb">${H.wd.map((x, k) => { const v = x.n ? x.s / x.n : 0; return `<div><span>${DY[k]}</span><i style="width:${((v / wdMax) * 100).toFixed(1)}%"></i><b>${x.n ? fN(v) : "—"}</b></div>`; }).join("")}</div></div>` : ""}
         <div class="panel"><h4>On the schedule</h4><table class="stbl"><tbody>${Object.entries(H.shiftsS).sort((x, y) => y[1] - x[1]).map(([k, n]) => `<tr><td>${esc(k)} shifts</td><td><b>${n}</b></td></tr>`).join("")}${Object.entries(H.desks).sort((x, y) => y[1] - x[1]).map(([k, n]) => `<tr><td>${esc(k)}</td><td><b>${n}</b> days</td></tr>`).join("") || ""}${!H.schedDays ? `<tr><td class="muted">No schedule weeks for her yet — import the schedule history.</td></tr>` : ""}</tbody></table></div>
-        <div class="panel"><h4>Records</h4><table class="stbl"><tbody><tr><td>Bonuses</td><td><b class="pos">${H.bonus.n ? "+ " + money(H.bonus.amount) : "—"}</b> ${H.bonus.n ? `<span class="muted">(${H.bonus.n})</span>` : ""}</td></tr><tr><td>Deductions</td><td><b class="neg">${H.ded.n ? "− " + esc(dedText(H.ded)) : "—"}</b> ${H.ded.n ? `<span class="muted">(${H.ded.n})</span>` : ""}</td></tr><tr><td>Excuses &amp; day-off changes</td><td><b>${H.excuses}</b></td></tr><tr><td>Late arrivals</td><td><b>${H.lates}</b></td></tr><tr><td>Shift swaps</td><td><b>${H.swaps}</b></td></tr></tbody></table></div>
+        <div class="panel"><h4>Records</h4><table class="stbl"><tbody><tr><td>Bonuses</td><td><b class="pos">${H.bonus.n ? "+ " + money(H.bonus.amount) : "—"}</b> ${H.bonus.n ? `<span class="muted">(${H.bonus.n})</span>` : ""}</td></tr><tr><td>Deductions</td><td><b class="neg">${H.ded.n ? "− " + esc(dedText(H.ded)) : "—"}</b> ${H.ded.n ? `<span class="muted">(${H.ded.n})</span>` : ""}</td></tr><tr><td>Excuses &amp; day-off changes</td><td><b>${H.excuses}</b></td></tr><tr><td>Late arrivals</td><td><b>${H.lates}</b></td></tr><tr><td>Shift swaps &amp; changes</td><td><b>${H.swaps}</b></td></tr></tbody></table></div>
         ${p.m && TK.list ? (() => { const L = TK.list.filter((x) => x.member === p.m.id), k = tkStats(L, cairoNow().abs), [g, c] = grade(k.score); return `<div class="panel"><h4>Tasks · all time</h4>${L.length ? `<table class="stbl"><tbody><tr><td>Task score</td><td><b class="sc ${c}" style="font-size:20px">${k.score ?? "—"}</b> <span class="muted">${g}</span></td></tr><tr><td>Tasks given</td><td><b>${k.n}</b> · ${k.closed} completed · ${k.open} open${k.overdue ? ` · <b style="color:var(--bad)">${k.overdue} overdue</b>` : ""}</td></tr><tr><td>On-time delivery</td><td><b>${fPct(k.onTime, 0)}</b></td></tr><tr><td>Quality rating</td><td>${k.quality == null ? "—" : `${stars(k.quality)} <b>${nf2.format(k.quality)}</b>`}</td></tr><tr><td>Right first time</td><td><b>${fPct(k.ftr, 0)}</b></td></tr></tbody></table>` : `<div class="muted" style="font-size:12.8px">No tasks given yet.</div>`}</div>`; })() : ""}
       </div>
       ${cp.missing.length ? `<div class="panel"><h4>Missing reports · all time (${cp.missing.length})</h4>${Object.entries(byMonth(cp.missing)).reverse().map(([mn, Ls]) => `<div style="font-size:12.8px;padding:3px 0"><b>${mn}</b> · ${Ls.length}: ${daysTxt(Ls)}</div>`).join("")}</div>` : ""}
@@ -2264,7 +2326,7 @@ function memberProfile(D, m, a, b, t) {
   P.recs = (D.requests || []).filter((r) => mine(r) && inR(r)).sort((x, y) => x.date.localeCompare(y.date));
   const live = P.recs.filter((r) => r.status !== "rejected");
   const cnt = (ty) => live.filter((r) => r.type === ty).length;
-  P.rc = { excuse: cnt("excuse"), late: cnt("late"), early: cnt("early"), dayoff: cnt("dayoff"), swap: cnt("swap"), other: cnt("other"), rejected: P.recs.length - live.length, pending: live.filter((r) => r.status === "pending").length };
+  P.rc = { excuse: cnt("excuse"), late: cnt("late"), early: cnt("early"), dayoff: cnt("dayoff"), swap: cnt("swap") + cnt("change"), other: cnt("other"), rejected: P.recs.length - live.length, pending: live.filter((r) => r.status === "pending").length };
   const tot = (ty) => live.filter((r) => r.type === ty && r.member === m.id).reduce((x, r) => ({ n: x.n + 1, amount: x.amount + (+r.amount || 0), days: x.days + (+r.days || 0) }), { n: 0, amount: 0, days: 0 });
   P.bonus = tot("bonus"); P.ded = tot("deduction");
   P.incidents = P.rc.excuse + P.rc.late + P.rc.early + P.ded.n;
@@ -2310,7 +2372,7 @@ function profileBody(D, m, a, b, t, img) {
   // conduct & records
   const net = P.bonus.amount - P.ded.amount;
   h += `<div class="panel"><h4>Conduct &amp; records</h4><div class="pfr">
-    <div><span>Excuses</span><b>${P.rc.excuse}</b></div><div><span>Late arrivals</span><b>${P.rc.late}</b></div><div><span>Early leave</span><b>${P.rc.early}</b></div><div><span>Day-off changes</span><b>${P.rc.dayoff}</b></div><div><span>Shift swaps</span><b>${P.rc.swap}</b></div>
+    <div><span>Excuses</span><b>${P.rc.excuse}</b></div><div><span>Late arrivals</span><b>${P.rc.late}</b></div><div><span>Early leave</span><b>${P.rc.early}</b></div><div><span>Day-off changes</span><b>${P.rc.dayoff}</b></div><div><span>Swaps &amp; changes</span><b>${P.rc.swap}</b></div>
     <div class="g"><span>Bonuses</span><b class="pos">${P.bonus.n ? "+ " + money(P.bonus.amount) : "—"}</b><small>${P.bonus.n} record${P.bonus.n === 1 ? "" : "s"}</small></div>
     <div class="r"><span>Deductions</span><b class="neg">${P.ded.n ? "− " + esc(dedText(P.ded)) : "—"}</b><small>${P.ded.n} record${P.ded.n === 1 ? "" : "s"}</small></div>
     <div><span>Net</span><b class="${net < 0 ? "neg" : net > 0 ? "pos" : ""}">${net < 0 ? "− " : net > 0 ? "+ " : ""}${money(Math.abs(net))}</b><small>${P.ded.days ? `and − ${dayStr(P.ded.days)}` : P.rc.pending ? `${P.rc.pending} pending` : "&nbsp;"}</small></div></div>
@@ -2365,12 +2427,12 @@ function recordsImageHTML(D, a, b, label) {
   const ids = [...new Set(L.flatMap((r) => (r.type === "swap" ? [r.member, r.withMember] : [r.member])))];
   const z = () => ({ excuse: 0, late: 0, early: 0, dayoff: 0, swap: 0, bonus: 0, ded: 0, dd: 0, n: 0 });
   const per = Object.fromEntries(ids.map((id) => [id, z()]));
-  for (const r of L) { if (r.status === "rejected") continue; const p = per[r.member]; p.n++; if (r.type === "bonus") p.bonus += +r.amount || 0; else if (r.type === "deduction") { p.ded += +r.amount || 0; p.dd += +r.days || 0; } else if (p[r.type] != null) p[r.type]++; if (r.type === "swap" && per[r.withMember]) per[r.withMember].swap++; }
+  for (const r of L) { if (r.status === "rejected") continue; const p = per[r.member]; p.n++; if (r.type === "bonus") p.bonus += +r.amount || 0; else if (r.type === "deduction") { p.ded += +r.amount || 0; p.dd += +r.days || 0; } else if (r.type === "change") p.swap++; else if (p[r.type] != null) p[r.type]++; if (r.type === "swap" && per[r.withMember]) per[r.withMember].swap++; }
   const T = ids.reduce((s, id) => { for (const k in s) s[k] += per[id][k]; return s; }, z());
   const netTxt = (p) => { const v = p.bonus - p.ded; return `<b class="${v < 0 ? "neg" : v > 0 ? "pos" : ""}">${v < 0 ? "− " : v > 0 ? "+ " : ""}${esc(money(Math.abs(v)))}</b>${p.dd ? ` <span class="ref">− ${dayStr(p.dd)}</span>` : ""}`; };
-  const sum = ids.length ? `<div class="xr"><h3>Summary by team member</h3><table><thead><tr><th>Team member</th><th>Excuses</th><th>Late</th><th>Early leave</th><th>Day-off changes</th><th>Swaps</th><th>Bonuses</th><th>Deductions</th><th>Net</th></tr></thead><tbody>
+  const sum = ids.length ? `<div class="xr"><h3>Summary by team member</h3><table><thead><tr><th>Team member</th><th>Excuses</th><th>Late</th><th>Early leave</th><th>Day-off changes</th><th>Swaps &amp; changes</th><th>Bonuses</th><th>Deductions</th><th>Net</th></tr></thead><tbody>
     ${ids.map((id) => { const p = per[id]; return `<tr><td><b>${esc(memName(D, id))}</b></td><td>${p.excuse || "–"}</td><td>${p.late || "–"}</td><td>${p.early || "–"}</td><td>${p.dayoff || "–"}</td><td>${p.swap || "–"}</td><td>${p.bonus ? `<b class="pos">+ ${esc(money(p.bonus))}</b>` : "–"}</td><td>${p.ded || p.dd ? `<b class="neg">− ${esc(dedText({ amount: p.ded, days: p.dd }))}</b>` : "–"}</td><td>${netTxt(p)}</td></tr>`; }).join("")}
-    <tr style="background:#EFECE4"><td><b>Total</b></td><td><b>${T.excuse || "–"}</b></td><td><b>${T.late || "–"}</b></td><td><b>${T.early || "–"}</b></td><td><b>${T.dayoff || "–"}</b></td><td><b>${L.filter((r) => r.type === "swap" && r.status !== "rejected").length || "–"}</b></td><td><b class="pos">${T.bonus ? "+ " + esc(money(T.bonus)) : "–"}</b></td><td><b class="neg">${T.ded || T.dd ? "− " + esc(dedText({ amount: T.ded, days: T.dd })) : "–"}</b></td><td>${netTxt(T)}</td></tr></tbody></table></div>` : "";
+    <tr style="background:#EFECE4"><td><b>Total</b></td><td><b>${T.excuse || "–"}</b></td><td><b>${T.late || "–"}</b></td><td><b>${T.early || "–"}</b></td><td><b>${T.dayoff || "–"}</b></td><td><b>${L.filter((r) => (r.type === "swap" || r.type === "change") && r.status !== "rejected").length || "–"}</b></td><td><b class="pos">${T.bonus ? "+ " + esc(money(T.bonus)) : "–"}</b></td><td><b class="neg">${T.ded || T.dd ? "− " + esc(dedText({ amount: T.ded, days: T.dd })) : "–"}</b></td><td>${netTxt(T)}</td></tr></tbody></table></div>` : "";
   const list = `<div class="xr"><h3>All records · ${L.length}</h3>${L.length ? `<table><thead><tr><th>Date</th><th>Type</th><th>Team member</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody>${L.map((r) => { const d = dIdx(r.date); return `<tr><td style="white-space:nowrap">${DY[wdOf(d)]} ${dmy(d)}</td><td><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span>${r.ref ? ` <span class="ref">${esc(r.ref)}</span>` : ""}</td><td><b>${esc(r.type === "swap" ? memName(D, r.member) + " ↔ " + memName(D, r.withMember) : memName(D, r.member))}</b></td><td>${esc(isAdj(r) ? (r.reason || "") + (r.details ? " — " + r.details : "") : r.details || "")}</td><td style="white-space:nowrap">${isAdj(r) ? `<b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b>` : "—"}</td><td><span class="ss ${stClass(r)}">${stLabel(r)}</span></td></tr>`; }).join("")}</tbody></table>` : `<p style="font-size:18px;color:var(--muted);margin:0">No excuses, shift changes, bonuses or deductions in this period.</p>`}</div>`;
   return `<div class="xw" style="width:1500px"><div class="xh"><div><div class="ey">Marketing Team · Operations Management</div><img src="assets/logo-white.png" alt=""></div>
     <div class="r">Excuses, Shifts, Bonuses &amp; Deductions<small>${label}</small></div></div>${sum}${list}
@@ -2916,11 +2978,12 @@ function listEditor(D, list, path, kind) {
 }
 function requestsEditor(D) {
   const A = S.admin;
-  const f = A.rq || (A.rq = { type: "swap", date: iDate(curIdx()), member: D.members[0]?.id, withMember: D.members[1]?.id, withDate: "", details: "", status: "approved", amount: "", days: "", reason: "", attachments: [] });
+  const f = A.rq || (A.rq = { type: "swap", date: iDate(curIdx()), member: D.members[0]?.id, withMember: D.members[1]?.id, withDate: "", details: "", status: "approved", amount: "", days: "", reason: "", attachments: [], mode: "full", deskA: "auto", deskB: "auto", toShift: "", toTime: "", toDesk: "keep" });
+  f.mode = f.mode || "full"; if (f.deskA == null) f.deskA = "auto"; if (f.deskB == null) f.deskB = "auto"; if (f.toDesk == null) f.toDesk = "keep";
   const mopts = (sel) => D.members.map((m) => `<option value="${esc(m.id)}" ${m.id === sel ? "selected" : ""}>${esc(m.name)}</option>`).join("");
   const adj = ADJ[f.type];
   if (adj && !adj.reasons.includes(f.reason)) f.reason = adj.reasons[0];
-  const ph = { swap: "e.g. Basant asked to swap her night shift with Habiba", deduction: "e.g. Arrived 45 min late without notice", bonus: "e.g. Covered Habiba's night shift on short notice" }[f.type] || "e.g. Family emergency — leaving at 3 PM";
+  const ph = { swap: "e.g. Basant asked to swap her night shift with Habiba", change: "e.g. Two on Modex-Porto Friday night — Roaa moved to WhatsApp-Styllano", deduction: "e.g. Arrived 45 min late without notice", bonus: "e.g. Covered Habiba's night shift on short notice" }[f.type] || "e.g. Family emergency — leaving at 3 PM";
   let body = `<div class="panel"><h4>New record</h4><div class="rqform">
     <label class="field">Type<select id="rqType">${Object.entries(REQ_TYPES).map(([k, v]) => `<option value="${k}" ${k === f.type ? "selected" : ""}>${v}</option>`).join("")}</select></label>
     <label class="field">Date<input type="date" id="rqDate" value="${esc(f.date)}"></label>
@@ -2928,16 +2991,23 @@ function requestsEditor(D) {
     <label class="field">Status<select id="rqStatus">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === f.status ? "selected" : ""}>${stLabel({ type: f.type, status: x })}</option>`).join("")}</select></label>
     ${f.type === "swap" ? `<label class="field">Swap with<select id="rqWith">${mopts(f.withMember)}</select></label>
     <label class="field">Their shift date (if different)<input type="date" id="rqWithDate" value="${esc(f.withDate)}"></label>` : ""}
+    ${f.type === "change" ? (() => { const work = D.shiftTypes.filter((x) => x.kind === "work"); return `<label class="field">New shift<select id="rqToShift"><option value="">Keep her shift</option>${D.shiftTypes.map((x) => `<option value="${esc(x.id)}" ${f.toShift === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
+    <label class="field">New time<select id="rqToTime"><option value="">Keep her time</option><option value="default" ${f.toTime === "default" ? "selected" : ""}>The shift's usual time</option>${D.timeSlots.map((t) => `<option value="${esc(t)}" ${f.toTime === t ? "selected" : ""}>${esc(tLabel(t, true))}</option>`).join("")}</select></label>
+    <label class="field">New desk (Responsible Of)<select id="rqToDesk"><option value="keep" ${f.toDesk === "keep" ? "selected" : ""}>Keep her desk</option>${D.responsibilities.map((x) => `<option value="${esc(x.id)}" ${f.toDesk === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}<option value="" ${f.toDesk === "" ? "selected" : ""}>No desk</option></select></label>`; })() : ""}
     ${adj ? `<label class="field">Reason<select id="rqReason">${adj.reasons.map((x) => `<option ${x === f.reason ? "selected" : ""}>${x}</option>`).join("")}</select></label>
     <label class="field">Amount (EGP)<input type="number" min="0" step="5" id="rqAmount" value="${esc(f.amount)}" placeholder="0"></label>
     ${adj.days ? `<label class="field">Days deducted<input type="number" min="0" step="0.25" id="rqDays" value="${esc(f.days)}" placeholder="0"></label>` : ""}` : ""}
+    ${f.type === "swap" ? `<div class="field wide">What to swap<div class="swm">${Object.entries(SWAP_MODES).map(([k, [l, d]]) => `<label class="${f.mode === k ? "on" : ""}"><input type="radio" name="rqMode" value="${k}" ${f.mode === k ? "checked" : ""}><b>${l}</b><small>${d}</small></label>`).join("")}</div></div>
+    ${(() => { const dk = (id, v) => `<select id="${id}"><option value="auto" ${v === "auto" ? "selected" : ""}>As swapped</option>${D.responsibilities.map((x) => `<option value="${esc(x.id)}" ${v === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}<option value="" ${v === "" ? "selected" : ""}>No desk</option></select>`;
+      return `<label class="field">${esc(memName(D, f.member))}'s desk after<br>${dk("rqDeskA", f.deskA)}</label><label class="field">${esc(memName(D, f.withMember))}'s desk after<br>${dk("rqDeskB", f.deskB)}</label>`; })()}` : ""}
+    ${(f.type === "swap" || f.type === "change") && f.date ? (() => { const pv = recPreview(D, { ...f, deskA: f.deskA === "auto" ? null : f.deskA, deskB: f.deskB === "auto" ? null : f.deskB }); return `<div class="field wide">Preview on the schedule<div class="rqpv">${pv.ok ? pv.rows.map((x) => `<div><b>${esc(x.name)}</b><span>${DY[wdOf(x.i)]} ${dmy(x.i)}</span><span class="b4">${esc(x.before)}</span><i>→</i><span class="af ${x.before === x.after ? "same" : ""}">${esc(x.after)}</span></div>`).join("") : `<div class="muted">Nothing to change on that date — is the week created and is she on it?</div>`}</div></div>`; })() : ""}
     <label class="field wide">Details<input type="text" id="rqDetails" value="${esc(f.details)}" placeholder="${ph}"></label>
   </div>
   <div class="row" style="margin-top:12px;align-items:flex-start">
     <div style="flex:1"><div class="field" style="margin-bottom:6px">Attachments (photos or videos)</div>
       <div class="row">${(f.attachments || []).map((x, j) => `<span class="attx"><span class="att" style="width:52px;height:52px">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="">`}</span><button class="rm" data-act="rqAttDel" data-j="${j}" title="Remove">✕</button></span>`).join("")}
       <label class="btn sm">📎 Attach photo / video<input type="file" id="rqFiles" accept="image/*,video/*" multiple class="hidden"></label></div></div>
-    <div class="row" style="justify-content:flex-end">${f.type === "swap" ? `<label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="rqApply" checked> Apply the swap to the schedule</label>` : ""}<button class="btn primary" data-act="reqCreate">Add record</button></div></div>
+    <div class="row" style="justify-content:flex-end">${f.type === "swap" || f.type === "change" ? `<label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="rqApply" checked> Apply ${f.type === "swap" ? "the swap" : "the change"} to the schedule</label>` : ""}<button class="btn primary" data-act="reqCreate">Add record</button></div></div>
   <div id="upStatus" class="upbar ${A.upMsg ? "" : "hidden"}" style="margin-top:10px">${esc(A.upMsg || "")}</div></div>`;
   const list = D.requests.map((r, k) => ({ r, k })).sort((a, b) => (b.r.date + (b.r.createdAt || "")).localeCompare(a.r.date + (a.r.createdAt || "")));
   body += `<div class="panel"><h4>All records (${list.length})</h4>` + (list.length ? list.map(({ r, k }) => {
@@ -2949,7 +3019,7 @@ function requestsEditor(D) {
       <input type="text" data-path="requests.${k}.details" value="${esc(r.details || "")}" placeholder="Details" style="width:100%;margin-top:4px">
       <div class="row" style="margin-top:6px">${(r.attachments || []).map((x, j) => `<span class="attx"><button class="att" style="width:46px;height:46px" data-act="viewAtt" data-r="${esc(r.id)}" data-j="${j}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="">`}</button><button class="rm" data-act="recAttDel" data-i="${k}" data-j="${j}" title="Remove">✕</button></span>`).join("")}<label class="btn sm ghost">📎 Attach<input type="file" class="hidden attIn" data-k="${k}" accept="image/*,video/*" multiple></label></div></div>
     <select data-path="requests.${k}.status">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === r.status ? "selected" : ""}>${stLabel({ type: r.type, status: x })}</option>`).join("")}</select>
-    <div class="row" style="justify-content:flex-end">${r.type === "swap" ? (r.applied ? `<span class="chip-s pub">✓ Applied</span>` : `<button class="btn sm" data-act="reqApply" data-i="${k}">Apply swap</button>`) : ""}<button class="btn sm danger" data-act="delItem" data-path="requests" data-i="${k}">Delete</button></div></div>`;
+    <div class="row" style="justify-content:flex-end">${r.type === "swap" || r.type === "change" ? (r.applied ? `<span class="chip-s pub">✓ Applied</span>` : `<button class="btn sm" data-act="reqApply" data-i="${k}">Apply ${r.type === "swap" ? "swap" : "change"}</button>`) : ""}<button class="btn sm danger" data-act="delItem" data-path="requests" data-i="${k}">Delete</button></div></div>`;
   }).join("") : `<div class="muted">No records yet.</div>`) + `</div>`;
   return body;
 }
@@ -3022,8 +3092,10 @@ function renderAdmin() {
   if (nd) { const upd = () => { if (!nd.value) return; const ws = wkStart(D, dIdx(nd.value)); $("#newDateInfo").innerHTML = `Week: <b>${dmy(ws)} – ${dmy(ws + 6, 1)}</b>${D.weeks[iDate(ws)] ? ' <span class="chip-s pub">already created — will open it</span>' : ""}`; A.newDate = nd.value; }; nd.oninput = upd; upd(); }
   document.querySelectorAll("input[name=src]").forEach((r) => (r.onchange = () => (A.newSrc = r.value)));
   if ($("#rqType")) {
-    const keep = () => { const f = A.rq; f.type = $("#rqType").value; f.date = $("#rqDate").value; f.member = $("#rqMember").value; f.status = $("#rqStatus").value; f.details = $("#rqDetails").value; if ($("#rqWith")) { f.withMember = $("#rqWith").value; f.withDate = $("#rqWithDate").value; } const v = (q) => $(q)?.value; if ($("#rqAmount")) { f.amount = v("#rqAmount"); f.days = v("#rqDays") ?? ""; f.reason = v("#rqReason"); } };
+    const keep = () => { const f = A.rq; f.type = $("#rqType").value; f.date = $("#rqDate").value; f.member = $("#rqMember").value; f.status = $("#rqStatus").value; f.details = $("#rqDetails").value; if ($("#rqWith")) { f.withMember = $("#rqWith").value; f.withDate = $("#rqWithDate").value; } const v = (q) => $(q)?.value; const md = document.querySelector("input[name=rqMode]:checked"); if (md) f.mode = md.value; if ($("#rqDeskA")) { f.deskA = v("#rqDeskA"); f.deskB = v("#rqDeskB"); } if ($("#rqToShift")) { f.toShift = v("#rqToShift"); f.toTime = v("#rqToTime"); f.toDesk = v("#rqToDesk"); } if ($("#rqAmount")) { f.amount = v("#rqAmount"); f.days = v("#rqDays") ?? ""; f.reason = v("#rqReason"); } };
     ["#rqDate", "#rqMember", "#rqStatus", "#rqDetails", "#rqWith", "#rqWithDate", "#rqAmount", "#rqDays", "#rqReason"].forEach((q) => { const el = $(q); if (el) el.addEventListener("input", keep); });
+    ["#rqDate", "#rqMember", "#rqWith", "#rqWithDate", "#rqDeskA", "#rqDeskB", "#rqToShift", "#rqToTime", "#rqToDesk"].forEach((q) => { const el = $(q); if (el) el.addEventListener("change", () => { keep(); renderAdmin(); }); });
+    document.querySelectorAll("input[name=rqMode]").forEach((x) => (x.onchange = () => { keep(); renderAdmin(); }));
     $("#rqType").onchange = () => { keep(); if (ADJ[A.rq.type] && A.rq.status === "approved") A.rq.status = "pending"; renderAdmin(); };
     $("#rqFiles").onchange = (e) => { keep(); const fs = [...e.target.files]; uploadFiles(fs, (att) => { (A.rq.attachments = A.rq.attachments || []).push(att); if (S.admin.open && A.tab === "requests") renderAdmin(); }); };
   }
@@ -3245,7 +3317,12 @@ document.addEventListener("click", async (e) => {
       if (!f.date) return toast("Pick a date", true);
       if (f.type === "swap" && f.member === f.withMember) return toast("Pick two different people for a swap", true);
       const r = { id: uid("r"), type: f.type, date: f.date, member: f.member, details: f.details.trim(), status: f.status, createdAt: new Date().toISOString(), createdBy: S.me ? S.me.name : "" };
-      if (f.type === "swap") { r.withMember = f.withMember; if (f.withDate && f.withDate !== f.date) r.withDate = f.withDate; }
+      if (f.type === "swap") { r.withMember = f.withMember; if (f.withDate && f.withDate !== f.date) r.withDate = f.withDate; if (f.mode && f.mode !== "full") r.mode = f.mode; if (f.deskA !== "auto") r.deskA = f.deskA; if (f.deskB !== "auto") r.deskB = f.deskB; }
+      if (f.type === "change") {
+        if (!f.toShift && !f.toTime && f.toDesk === "keep") return toast("Choose what changes — shift, time or desk", true);
+        if (f.toShift) r.toShift = f.toShift; if (f.toTime) r.toTime = f.toTime; if (f.toDesk !== "keep") r.toDesk = f.toDesk;
+        r.before = cellText(D, f.member, dIdx(f.date));
+      }
       if (ADJ[f.type]) {
         r.amount = Math.max(0, +f.amount || 0); r.reason = f.reason;
         if (ADJ[f.type].days) r.days = Math.max(0, +f.days || 0);
@@ -3256,11 +3333,12 @@ document.addEventListener("click", async (e) => {
       if ((f.attachments || []).length) r.attachments = clone(f.attachments);
       D.requests.push(r);
       if (f.type === "swap" && $("#rqApply")?.checked) { const ok = applySwap(D, r); toast(ok ? "Swap applied to the schedule" : "Record added — no shifts to swap on that date (is the week created?)", !ok); }
+      if (f.type === "change") { if ($("#rqApply")?.checked) { const ok = applyChange(D, r); toast(ok ? "Change applied to the schedule" : "Record added — she has no shift that day to change (is the week created?)", !ok); } else { const T = clone({ ...D, requests: [] }), x = clone(r); applyChange(T, x); r.after = x.after; } }
       S.admin.rq = null; return R();
     }
     case "rqAttDel": S.admin.rq.attachments.splice(+el.dataset.j, 1); return R();
     case "recAttDel": if (confirm("Remove this attachment from the record?")) D.requests[i].attachments.splice(+el.dataset.j, 1); return R();
-    case "reqApply": { const ok = applySwap(D, D.requests[i]); toast(ok ? "Swap applied to the schedule" : "No shifts to swap on that date", !ok); return R(); }
+    case "reqApply": { const r = D.requests[i], ok = r.type === "change" ? applyChange(D, r) : applySwap(D, r); toast(ok ? (r.type === "change" ? "Change applied to the schedule" : "Swap applied to the schedule") : "Nothing to change on that date", !ok); return R(); }
     case "logout": e.preventDefault(); if (dirty() && !confirm("Sign out and discard unsaved changes?")) return; S.draft = null; S.admin.open = false; $("#modalRoot").innerHTML = ""; signedOut(); toast("Signed out"); return renderAll();
     case "userCreate": {
       const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), role: $("#nuRole").value, password: $("#nuPass").value };
