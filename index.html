@@ -676,7 +676,7 @@ html{overflow-x:hidden}
 .kpi .dl,.kpi .s{white-space:normal;overflow-wrap:anywhere}
 @media (max-width:760px){
   .views button{padding:7px 11px;font-size:12.5px}
-  main section.card table:not(.pfw),.modal .m-body table:not(.pfw){display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  main section.card table:not(.pfw):not(.wk):not(.tblw table):not(.lbw table):not(.tw table),.modal .m-body table:not(.pfw):not(.tblw table):not(.lbw table):not(.tw table){display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
   main section.card,.modal .panel,.modal .m-body{min-width:0;max-width:100%}
   .xall span{display:none}
   .modal .m-head{flex-wrap:wrap;gap:8px}
@@ -1397,11 +1397,12 @@ function weekTableHTML(D, ws) {
 }
 // Weekly schedule approval: review → approved / rejected. Weeks from before approvals existed count as approved.
 const WK_ST = { review: ["In review", "rv"], approved: ["Approved", "ap"], rejected: ["Rejected", "rj"], draft: ["Draft", "dr"] };
-const wkStatus = (w) => (w && w.status) || "approved";
+// A week with no status yet: this week or later still needs its first approval; older weeks were published before approvals existed.
+const wkStatus = (w, key) => (w && w.status) || (key && dIdx(key) >= wkStart(V(), curIdx()) ? "review" : "approved");
 function weekStatusHTML(w, key) {
-  const st = wkStatus(w), [l, c] = WK_ST[st] || WK_ST.approved, d = w.decided || {}, rv = w.review || {};
+  const st = wkStatus(w, key), [l, c] = WK_ST[st] || WK_ST.approved, d = w.decided || {}, rv = w.review || {};
   const when = (x) => (x && x.at ? `${logFmt.format(new Date(x.at))} ${logTime.format(new Date(x.at))}` : "");
-  const info = st === "review" ? `submitted${rv.by ? " by " + esc(rv.by) : ""}${rv.at ? " · " + when(rv) : ""}${rv.note ? " · " + esc(rv.note) : ""}` : st === "approved" ? (d.by ? `by ${esc(d.by)} · ${when(d)}` : "published") : st === "rejected" ? `by ${esc(d.by || "—")}${d.note ? ` — “${esc(d.note)}”` : ""}` : "";
+  const info = st === "review" ? `${w.status ? "submitted" : "awaiting first approval"}${rv.by ? " by " + esc(rv.by) : ""}${rv.at ? " · " + when(rv) : ""}${rv.note ? " · " + esc(rv.note) : ""}` : st === "approved" ? (d.by ? `by ${esc(d.by)} · ${when(d)}` : "published before approvals") : st === "rejected" ? `by ${esc(d.by || "—")}${d.note ? ` — “${esc(d.note)}”` : ""}` : "";
   const btns = canApprove() ? (st === "review" ? `<button class="btn sm primary" data-act="wkDecide" data-k="${key}" data-v="approved">Approve week</button><button class="btn sm" data-act="wkDecide" data-k="${key}" data-v="rejected">Reject</button>` : st === "approved" ? `<button class="btn sm ghost" data-act="wkDecide" data-k="${key}" data-v="review">Back to review</button>` : `<button class="btn sm primary" data-act="wkDecide" data-k="${key}" data-v="approved">Approve week</button><button class="btn sm ghost" data-act="wkDecide" data-k="${key}" data-v="review">Back to review</button>`) : "";
   return `<span class="wkst ${c}"><b>● ${l}</b>${info ? `<small>${info}</small>` : ""}</span>${btns ? `<span class="wkbtns">${btns}</span>` : ""}`;
 }
@@ -1833,7 +1834,7 @@ function diffData(A, B) {
   }
   for (const r of B.requests || []) { const o = (A.requests || []).find((x) => x.id === r.id); if (o && isAdj(r) && !!o.settled !== !!r.settled) out.push(`Records: ${rn(r)} — marked ${r.settled ? ADJ[r.type].settled.toLowerCase() : ADJ[r.type].unsettled.toLowerCase()}`); }
   for (const o of A.requests || []) if (!(B.requests || []).some((r) => r.id === o.id)) out.push(`Records: deleted ${rn(o)}`);
-  for (const [k, w] of Object.entries(B.weeks || {})) { const o = (A.weeks || {})[k]; if (o && wkStatus(o) !== wkStatus(w)) out.push(`Approvals: week ${dmy(dIdx(k))} – ${dmy(dIdx(k) + 6, 1)} — ${WK_ST[wkStatus(o)][0]} → ${WK_ST[wkStatus(w)][0]}${w.decided && w.decided.note && wkStatus(w) === "rejected" ? ` (“${w.decided.note}”)` : ""}`); }
+  for (const [k, w] of Object.entries(B.weeks || {})) { const o = (A.weeks || {})[k]; if (o && wkStatus(o, k) !== wkStatus(w, k)) out.push(`Approvals: week ${dmy(dIdx(k))} – ${dmy(dIdx(k) + 6, 1)} — ${WK_ST[wkStatus(o, k)][0]} → ${WK_ST[wkStatus(w, k)][0]}${w.decided && w.decided.note && wkStatus(w, k) === "rejected" ? ` (“${w.decided.note}”)` : ""}`); }
   if (+A.settings.weekStart !== +B.settings.weekStart) out.push(`Settings: week starts on ${DAYS[+B.settings.weekStart]}`);
   if (A.settings.startDate !== B.settings.startDate) out.push(`Settings: schedule starts ${B.settings.startDate}`);
   if (A.settings.dayStart !== B.settings.dayStart) out.push(`Settings: the day switches at ${fmtT(hm(B.settings.dayStart))}`);
@@ -2827,7 +2828,7 @@ const AP_GROUPS = [["Shift swaps & desk changes", (r) => r.type === "swap" || r.
 function apCounts() {
   const D = V(), recs = canApprove() ? (D.requests || []).filter((r) => r.status === "pending") : [];
   const tasks = can("tasksReview") && TK.list ? TK.list.filter((t) => t.status === "done") : [];
-  const weeks = canApprove() ? Object.entries(D.weeks).filter(([, w]) => wkStatus(w) === "review").map(([k]) => k).sort() : [];
+  const weeks = canApprove() ? Object.entries(D.weeks).filter(([k, w]) => wkStatus(w, k) === "review").map(([k]) => k).sort() : [];
   const pay = canApprove() ? (D.requests || []).filter((r) => isAdj(r) && r.status === "approved" && !r.settled) : [];
   const resets = can("users") ? S.resetReqs || [] : [];
   return { recs, tasks, weeks, pay, resets, n: recs.length + tasks.length + weeks.length + resets.length };
