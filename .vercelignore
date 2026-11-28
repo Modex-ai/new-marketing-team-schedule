@@ -1,2 +1,6 @@
 apps-script/
 README.md
+server.js
+scripts/
+data/
+.env.example

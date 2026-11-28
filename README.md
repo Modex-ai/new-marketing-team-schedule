@@ -21,3 +21,14 @@ Live operations dashboard for the marketing team: who's on duty now, the daily d
 - `api/schedule.js` — reads/saves the schedule in Vercel Blob (keeps the last 15 versions).
 - `api/auth.js`, `api/users.js` — sign-in and user management.
 - `assets/` — Vendoor logos, bundled fonts, html-to-image.
+
+## Run it on another server (outside Vercel)
+
+1. Node.js 20+ → `npm install`
+2. Copy `.env.example` to `.env` and fill it in (`STORAGE=fs` keeps the data as files in `DATA_DIR`).
+3. Bring the data over: `BLOB_READ_WRITE_TOKEN=… npm run export-data` downloads everything from Vercel Blob into `./data`.
+4. `npm start` → the dashboard on `PORT` (put it behind HTTPS — Nginx / Caddy / your host's proxy).
+   With Telegram, the bot follows the address you open the dashboard from (My account → Connect Telegram once).
+
+Notes: `data/` is the whole database — back it up. Photo / video uploads use Vercel Blob's direct upload, so on another
+server new attachments need a storage swap (existing ones are exported and still open).

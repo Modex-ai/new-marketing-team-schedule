@@ -4,5 +4,12 @@
   "type": "module",
   "dependencies": {
     "@vercel/blob": "^2.9.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "export-data": "node scripts/export-data.mjs"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

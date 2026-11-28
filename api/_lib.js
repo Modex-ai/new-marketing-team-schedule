@@ -1,5 +1,5 @@
 // Shared server helpers (files starting with "_" are not exposed as routes on Vercel).
-import { put, list, del, get } from '@vercel/blob';
+import { put, list, del, get } from './_store.js';
 import crypto from 'node:crypto';
 
 export const ACCESS = process.env.BLOB_ACCESS === 'public' ? 'public' : 'private';

@@ -1,7 +1,7 @@
 // Serves attachments from the private Blob store (with Range support so videos stream and seek).
 // GET    /api/file?u=<blob url>                → the file
 // DELETE /api/file?u=<blob url>  (signed in) → deletes the file
-import { get, del } from '@vercel/blob';
+import { get, del } from './_store.js';
 import { Readable } from 'node:stream';
 import { userFromToken, bearer } from './_lib.js';
 
