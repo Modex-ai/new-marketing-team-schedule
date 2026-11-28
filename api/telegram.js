@@ -51,7 +51,11 @@ export default async function handler(req, res) {
     if (!me) return res.status(401).json({ error: 'Please sign in again' });
     const tg = (await readJSON(TELEGRAM)) || {}; tg.links = tg.links || {}; tg.codes = tg.codes || {};
     const mine = tg.links[me.username];
-    if (req.method === 'GET') return res.status(200).json({ configured: !!tgToken(), linked: !!mine, name: mine ? mine.name : '', bot: tg.bot || '' });
+    if (req.method === 'GET') {
+      // make sure Telegram knows where to deliver messages, so the bot answers even a plain /start
+      if (tgToken()) { const url = originOf(req) + '/api/telegram'; if (tg.hook !== url) { try { await botName(tg); await tgCall('setWebhook', { url, secret_token: tgSecret(), allowed_updates: ['message'] }); tg.hook = url; await writeJSON(TELEGRAM, tg, 5); } catch (e) { return res.status(200).json({ configured: true, linked: false, error: e.message }); } } }
+      return res.status(200).json({ configured: !!tgToken(), linked: !!mine, name: mine ? mine.name : '', bot: tg.bot || '' });
+    }
     if (req.method !== 'POST') { res.setHeader('Allow', 'GET, POST'); return res.status(405).json({ error: 'method not allowed' }); }
     if (!tgToken()) return res.status(400).json({ error: 'Telegram isn\'t set up yet — add TELEGRAM_BOT_TOKEN in Vercel' });
     const { action } = parseBody(req);
