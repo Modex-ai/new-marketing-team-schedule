@@ -11,7 +11,7 @@ const originOf = (req) => `https://${req.headers['x-forwarded-host'] || req.head
 
 async function botName(tg) {
   if (tg.bot && tg.botToken === tgToken().slice(0, 12)) return tg.bot;
-  const me = await tgCall('getMe', {});
+  const me = await tgCall('getMe', {}).catch((e) => { throw new Error(/unauthorized|not found/i.test(e.message) ? 'Telegram rejected the bot token — check TELEGRAM_BOT_TOKEN in Vercel (copy it again from @BotFather) and redeploy' : e.message); });
   tg.bot = me.username; tg.botToken = tgToken().slice(0, 12);
   return tg.bot;
 }
