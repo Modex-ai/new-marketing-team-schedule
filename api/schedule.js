@@ -29,7 +29,19 @@ function mergeRecords(me, inc, cur) {
   const hidden = (cur || []).filter((r) => !vis(r));
   inc = (inc || []).filter((r) => r && vis(r));
   cur = (cur || []).filter(vis);
-  if (can(me, 'approve')) return [...inc, ...hidden];
+  if (can(me, 'approve')) {
+    // segregation of duties: an approver never decides her own records, and never approves money she recorded herself
+    const byS = new Map(cur.map((s) => [s.id, s])), DEC = ['status', 'settled', 'settledBy', 'settledAt', 'decidedBy', 'decidedAt', 'decisionNote', 'applied'];
+    const out = inc.map((r) => {
+      const s = byS.get(r.id), own = !!me.member && (r.member === me.member || r.withMember === me.member);
+      const maker = moneyType(r.type) && (s ? s.createdByU : me.username) === me.username;
+      if (!own && !maker) return r;
+      if (s) { if (DEC.some((k) => JSON.stringify(r[k] ?? null) !== JSON.stringify(s[k] ?? null))) me._sod = (me._sod || 0) + 1; const x = { ...r }; for (const k of DEC) { if (s[k] === undefined) delete x[k]; else x[k] = s[k]; } return x; }
+      if (r.status !== 'pending') me._sod = (me._sod || 0) + 1;
+      const x = { ...r, status: 'pending' }; delete x.applied; delete x.settled; delete x.decidedBy; delete x.decidedAt; return x;
+    });
+    return [...out, ...hidden];
+  }
   const okType = (t) => can(me, moneyType(t) ? 'money' : 'records');
   const byId = new Map((inc || []).map((r) => [r && r.id, r]));
   const out = [];
@@ -189,7 +201,7 @@ export default async function handler(req, res) {
       const own = (weeks) => (me.self ? Object.fromEntries(Object.entries(weeks || {}).map(([k, w]) => [k, { ...w, memberIds: (w.memberIds || []).filter((x) => x === me.member), cells: { [me.member]: (w.cells || {})[me.member] || {} }, notes: {} }])) : weeks);
       if (String((req.query && req.query.history) || new URL(req.url, 'http://x').searchParams.get('history') || '') === '1') return res.status(200).json({ history: me.self ? { ...HISTORY, weeks: own(HISTORY.weeks) } : HISTORY });
       const data = await readJSON(SCHEDULE);
-      if (data && me.self) data.weeks = own(data.weeks);
+      if (data && me.self) { data.weeks = own(data.weeks); data.reportSources = (data.reportSources || []).filter((x) => x.memberId === me.member); }
       if (data && !can(me, 'log')) delete data.log;
       // excuses / bonuses / deductions and the report sheet list are for signed-in accounts only;
       // an account limited to some team members only gets theirs
@@ -234,7 +246,7 @@ export default async function handler(req, res) {
 
     await writeJSON(SCHEDULE, data);
     if (notices.length) await pushNotices(notices, me, `https://${req.headers['x-forwarded-host'] || req.headers.host}`).catch(() => {});
-    return res.status(200).json({ ok: true, updatedAt: data.updatedAt, entry });
+    return res.status(200).json({ ok: true, updatedAt: data.updatedAt, entry, ...(me._sod ? { sod: me._sod } : {}) });
   } catch (e) {
     return res.status(500).json({ error: String((e && e.message) || e) });
   }

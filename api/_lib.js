@@ -175,3 +175,37 @@ async function telegramNotices(list, origin) {
   }
   await Promise.all(sends);
 }
+
+/* ---------- security: sign-in attempts, lockouts and the security log (governance) ---------- */
+export const SECURITY = 'marketing-ops/security';
+const LOCK_AFTER = 5, LOCK_MIN = 15;
+export const clientOf = (req) => ({ ip: String((req.headers && req.headers['x-forwarded-for']) || '').split(',')[0].trim().slice(0, 60), ua: String((req.headers && req.headers['user-agent']) || '').slice(0, 140) });
+export async function secEvent(ev) {
+  const d = (await readJSON(SECURITY)) || { fails: {}, log: [] };
+  d.log = [{ at: new Date().toISOString(), ...ev }, ...(d.log || [])].slice(0, 400);
+  await writeJSON(SECURITY, d, 3);
+}
+// → minutes left when the username is locked, else 0
+export async function secLocked(uname) {
+  const d = (await readJSON(SECURITY)) || {}, f = (d.fails || {})[uname];
+  return f && f.until && f.until > Date.now() ? Math.ceil((f.until - Date.now()) / 60000) : 0;
+}
+export async function secResult(uname, ok, client, name) {
+  const d = (await readJSON(SECURITY)) || { fails: {}, log: [] };
+  d.fails = d.fails || {};
+  const at = new Date().toISOString();
+  let locked = false;
+  if (ok) { delete d.fails[uname]; d.log = [{ at, type: 'signin', username: uname, name, ...client }, ...(d.log || [])]; }
+  else {
+    let f = d.fails[uname] || { n: 0 };
+    if ((f.until && f.until < Date.now()) || (f.last && Date.now() - Date.parse(f.last) > LOCK_MIN * 60e3)) f = { n: 0 }; // an old streak starts over
+    d.fails[uname] = f;
+    f.n = (f.n || 0) + 1; f.last = at;
+    if (f.n >= LOCK_AFTER) { f.until = Date.now() + LOCK_MIN * 60e3; f.n = 0; locked = true; }
+    d.log = [{ at, type: locked ? 'lockout' : 'failed', username: uname, ...client }, ...(d.log || [])];
+  }
+  d.log = d.log.slice(0, 400);
+  await writeJSON(SECURITY, d, 3);
+  if (locked) await pushNotices([{ kind: 'security', to: 'users', status: 'rejected', icon: '🔒', title: `Sign-in locked for “${uname}” — ${LOCK_AFTER} wrong passwords`, lines: [`Locked for ${LOCK_MIN} minutes`, client.ip ? `IP ${client.ip}` : ''].filter(Boolean), link: '#governance', linkText: 'Open governance' }], { username: 'system', name: 'Security' }).catch(() => {});
+  return locked;
+}

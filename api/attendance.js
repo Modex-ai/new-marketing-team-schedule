@@ -56,6 +56,7 @@ export default async function handler(req, res) {
       if (!can(me, 'approve')) return res.status(403).json({ error: 'Only approvers can correct attendance' });
       const mid = String(b.member || ''), date = String(b.date || '');
       if (!mid || !isDate(date) || !inScope(me, mid)) return res.status(400).json({ error: 'Choose a team member and a date' });
+      if (!me.owner && me.member && mid === me.member) return res.status(403).json({ error: "You can't correct your own attendance — another approver has to" });
       const D = (await readJSON(SCHEDULE)) || {}, doc = (await readJSON(ATTEND)) || { days: {} };
       doc.days = doc.days || {};
       const i = dIdx(date), tin = hm(b.in), tout = hm(b.out), name = ((D.members || []).find((m) => m.id === mid) || {}).name || mid;

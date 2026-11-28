@@ -342,7 +342,9 @@ table.wgrid td.mc{background:none;border:none;vertical-align:middle;padding-left
 .opt span{font-size:12.5px;color:var(--muted)}
 .rqform{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end}
 .rqform>*{min-width:0}.rqform input,.rqform select{width:100%;min-width:0;box-sizing:border-box}
-@media (max-width:520px){.rqform{grid-template-columns:1fr!important}}
+@media (max-width:520px){.rqform,.tkgrid{grid-template-columns:minmax(0,1fr)!important}}
+@media (max-width:760px){.lrow{display:flex!important;flex-wrap:wrap;gap:8px;align-items:flex-end}.lrow>*{min-width:0}.lrow>.field{flex:1 1 140px}.lrow>.field input,.lrow>.field select{width:100%;min-width:0;box-sizing:border-box}}
+.tkgrid>*{min-width:0}.tkgrid input,.tkgrid select{width:100%;min-width:0;box-sizing:border-box}
 .rqform .wide{grid-column:span 2}
 .rqform .swm,.rqform .rqpv{}
 .rqform .field.wide:has(.swm),.rqform .field.wide:has(.rqpv){grid-column:1/-1}
@@ -498,6 +500,7 @@ table.xs tr.notes td{background:#FFF8EC!important;color:var(--warn);font-size:18
 .legend2 span{display:inline-flex;align-items:center;gap:6px}
 .legend2 i{width:10px;height:10px;border-radius:3px;background:var(--c)}
 .lbw{overflow-x:auto}
+.tw{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
 table.lbt{width:100%;border-collapse:collapse;font-size:13px;min-width:1040px}
 table.lbt th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 table.lbt th:nth-child(-n+2),table.lbt td:nth-child(-n+2){text-align:left}
@@ -778,6 +781,25 @@ table.attbl td,table.attbl th{white-space:nowrap}
   .sechead h2{font-size:22px}
 }
 body.selfview .teamonly,body.selfview #kpis,body.selfview #dayCov,body.selfview #saveAllCards,body.selfview #timeline .desks,body.selfview #wkEdit,body.selfview #wkFoot{display:none!important}
+.myrep{display:flex;flex-direction:column;gap:10px}
+.mri{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff}
+.mri.miss{background:#FFF8F9;border-color:#F1C9CE}
+.mrd{display:flex;flex-direction:column;gap:4px;align-items:flex-start}.mrd small{color:var(--muted);font-size:12px}
+.mrb{min-width:0}.mrt{font-size:12.5px;margin-bottom:6px}.mrn{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.mrn span{background:var(--pale-3,#F5F8F7);border-radius:9px;padding:5px 10px;display:flex;flex-direction:column}.mrn small{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.mrn b{font-size:14px}
+.mrb .fbt{margin:0;white-space:pre-wrap;line-height:1.6;font-size:13.5px}
+@media (max-width:620px){.mri{grid-template-columns:minmax(0,1fr)}.mrd{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px}}
+.gvrisks{display:flex;flex-direction:column;gap:8px}
+.gvr{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:10px 14px}
+.gvr.high{border-left-color:var(--bad);background:#FFF8F9}.gvr.med{border-left-color:#C98A1B}.gvr.low{border-left-color:#7C93A8}
+.gvr .lv{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.gvr.high .lv{color:var(--bad)}.gvr.med .lv{color:var(--warn)}.gvr.low .lv{color:#4F6A82}
+.gvr small{display:block;color:var(--muted);font-size:12.3px;margin-top:2px}
+table.gvm td,table.gvm th{white-space:nowrap}table.gvm .c{text-align:center}table.gvm td small{display:block;color:var(--muted);font-size:11px}table.gvm tr.off td{opacity:.55}
+.gvk{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:2px 9px}.gvk.own{background:#14494B;color:#E7B977}.gvk.manager{background:var(--warn-bg);color:var(--warn)}.gvk.personal{background:var(--ok-bg);color:var(--ok)}.gvk.viewer{background:var(--line-2);color:var(--muted)}
+.gvc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.gvg{border:1px solid var(--line);border-radius:14px;padding:14px}.gvg h4{margin:0 0 8px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--brand)}
+.gvi{padding:7px 0;border-bottom:1px dashed var(--line-2)}.gvi:last-child{border-bottom:none}.gvi b{font-size:13px;color:var(--ok)}.gvi small{display:block;color:var(--ink-2);font-size:12.3px;line-height:1.5;margin-top:2px}
+@media (max-width:620px){.gvr{grid-template-columns:minmax(0,1fr)}}
 .ntw{position:relative}
 .ntbtn{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;cursor:pointer}
 .ntbtn:hover{background:rgba(255,255,255,.14)}
@@ -908,12 +930,15 @@ table.tkp{min-width:1000px}
 .modal.tkm{max-width:1220px}
 .m-head .code{color:var(--amber);font-size:15px;margin-right:6px}
 .tkd{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+/* nothing inside a card or a dialog may push it wider than the screen (Android Chrome is strict about min-content) */
+.tkd>*,.tkmeta>*,.modal .m-body>*,main section.card>*,.grid2>*,.pfgrid>*,.people>*{min-width:0}
+.modal{max-width:min(100%,var(--mw,980px))}.modal h2,.modal h3,.tkh h2,main h2{overflow-wrap:anywhere}
 .tkd .panel{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;background:#fff}
 .tkd .panel h4{margin:0 0 10px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800}
 .tkd .panel.rvw{border-color:#E4D3F0;background:linear-gradient(180deg,#FDFAFF,#fff)}
 .tkh{margin-bottom:14px}
 .tkh h2{font-variant-numeric:lining-nums;font-family:var(--serif);font-size:30px;font-weight:600;color:var(--deep);margin:8px 0 0;line-height:1.15;unicode-bidi:plaintext;text-align:start}
-.tkmeta{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.tkmeta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
 .tkmeta>div{padding:10px 14px;border-bottom:1px solid var(--line-2);border-right:1px solid var(--line-2);background:var(--pale-3)}
 .tkmeta>div:nth-child(2n){border-right:none}
 .tkmeta>div:nth-last-child(-n+2){border-bottom:none}
@@ -970,7 +995,7 @@ table.tkp{min-width:1000px}
 @media (max-width:1100px){
   .tkr{grid-template-columns:110px 1fr 160px;row-gap:8px}
   .tkr .td,.tkr .ts,.tkr .tr2{grid-column:auto}
-  .tkd{grid-template-columns:1fr}
+  .tkd{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:640px){
   .tkr{grid-template-columns:1fr auto;padding:12px}
@@ -1019,7 +1044,7 @@ table.tkp{min-width:1000px}
       <button class="btn light" id="adminBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Manage</span></button>
     </div>
   </div>
-  <div class="wrap viewrow"><nav class="views"><button class="active" data-v="ops" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Operations</button><button data-v="reports" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg>Team Reports</button><button data-v="tasks" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Tasks</button><button data-v="approvals" data-act="view" id="apNav" class="hidden"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Approvals<span class="nb hidden" id="apBadge"></span></button><button data-v="attendance" data-act="view" id="atNav" class="hidden"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Attendance</button><button data-v="messages" data-act="view" id="msNav" class="hidden"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages<span class="nb hidden" id="msBadge"></span></button></nav><button class="btn light xall" data-act="xAll" title="Export the whole page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span>Export page</span></button></div>
+  <div class="wrap viewrow"><nav class="views"><button class="active" data-v="ops" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Operations</button><button data-v="reports" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg>Team Reports</button><button data-v="tasks" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Tasks</button><button data-v="approvals" data-act="view" id="apNav" class="hidden"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Approvals<span class="nb hidden" id="apBadge"></span></button><button data-v="attendance" data-act="view" id="atNav" class="hidden"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Attendance</button><button data-v="messages" data-act="view" id="msNav" class="hidden"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages<span class="nb hidden" id="msBadge"></span></button><button data-v="governance" data-act="view" id="gvNav" class="hidden"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/><path d="m12 3 9 5H3z"/></svg>Governance</button></nav><button class="btn light xall" data-act="xAll" title="Export the whole page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span>Export page</span></button></div>
 </header>
 
 <main class="wrap" id="opsView">
@@ -1111,6 +1136,7 @@ table.tkp{min-width:1000px}
 <main class="wrap hidden" id="apView"></main>
 <main class="wrap hidden" id="atView"></main>
 <main class="wrap hidden" id="msView"></main>
+<main class="wrap hidden" id="gvView"></main>
 
 <div id="exportStage"></div>
 <div id="modalRoot"></div>
@@ -1382,7 +1408,8 @@ async function save() {
     const srcChanged = JSON.stringify(S.data.reportSources) !== JSON.stringify(S.draft.reportSources);
     S.data = clone(S.draft); S.fresh = false; S.restored = false;
     if (srcChanged && S.me) { RS.raw = null; if (RS.view === "reports") loadReports(true); }
-    toast(canApprove() ? "Saved — the team sees it now" : "Saved — schedule changes go to review");
+    if (j.sod) { toast(`${j.sod} decision${j.sod > 1 ? "s" : ""} on your own records (or money you recorded) were kept for another approver — that's the segregation-of-duties rule`, true); setTimeout(() => load(true), 400); }
+    else toast(canApprove() ? "Saved — the team sees it now" : "Saved — schedule changes go to review");
     if (!canApprove() || changes.some((c) => /^Approvals: week/.test(c))) setTimeout(() => load(true), 400); // server adds the decision history / review state
   } catch (e) {
     if (e.status === 401) signedOut("Your session ended — sign in again, then save. Your changes are kept.");
@@ -2452,6 +2479,30 @@ function subCell(D, p, r) {
 }
 const byMonth = (list) => { const g = {}; for (const i of list) { const d = new Date(i * 864e5), k = MON[d.getUTCMonth()] + " " + d.getUTCFullYear(); (g[k] = g[k] || []).push(i); } return g; };
 const daysTxt = (list, max) => { const L = max ? list.slice(-max) : list; return L.map((i) => `${DY[wdOf(i)]} ${new Date(i * 864e5).getUTCDate()}`).join(", "); };
+// a team member's personal account: her own reports, day by day — what she wrote (numbers and / or feedback), when, and on time or not
+function myReportsHTML(D, all, a, b, t) {
+  const p = all.find((x) => x.m && x.m.id === S.me.member) || all[0];
+  if (!p) return `<section class="card"><div class="rsetup"><h3>Your report sheet isn't linked yet</h3><p class="muted">Ask your manager to link your Google Sheet to your name in <b>Manage → Reports</b>. Your reports will show here right after.</p></div></section>`;
+  const c = p.comp, cur = p.cur, metrics = p.kind === "metrics";
+  const miss = new Set(c.missing), lateSet = new Map(c.late.map((x) => [x.i, x.d]));
+  let h = `<div class="kpis">
+    <div class="kpi"><div class="l">Reports written</div><div class="v">${c.done}<small> of ${c.expected} due</small></div><div class="s">${rngTxt(a, b)}</div></div>
+    <div class="kpi"><div class="l">On time</div><div class="v">${c.rate == null ? "—" : Math.round(c.rate * 100) + "%"}</div><div class="s">within ${fmtDelay(graceOf(D))} after the shift</div></div>
+    <div class="kpi"><div class="l">Typical time after the shift</div><div class="v">${c.median == null ? "—" : fmtDelay(c.median)}</div><div class="s">${c.late.length} late · ${c.missing.length} missing</div></div>
+    ${metrics ? `<div class="kpi"><div class="l">My sales</div><div class="v"><span class="cur">EGP</span>${fN(cur.sales)}</div><div class="s">${fN(cur.orders)} orders · ${fN(cur.items)} items</div></div>` : `<div class="kpi"><div class="l">Feedback notes</div><div class="v">${cur.fb}</div><div class="s">written in this period</div></div>`}</div>`;
+  // every day in the period with a report, or one that was due and missing
+  const rows = [], byI = Object.fromEntries(p.rows.map((r) => [r.i, r]));
+  for (let i = Math.min(b, t); i >= a; i--) { const r = byI[i]; if ((r && (r.hasNums || r.fb)) || miss.has(i)) rows.push([i, r]); }
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">My reports</div><h2>${esc(p.name)}</h2><div class="sub">${rows.length} day${rows.length === 1 ? "" : "s"} · newest first · ${metrics ? "sales and feedback" : "feedback"} from your sheet</div></div></div>
+    <div class="myrep">${rows.map(([i, r]) => {
+      const cell = cellAt(D, p.m ? p.m.id : "", i), isMiss = miss.has(i), late = lateSet.get(i);
+      const st = isMiss ? `<span class="atc bad">Missing</span>` : late != null ? `<span class="atc bad">Late</span>` : r && r.st ? `<span class="atc ok">On time</span>` : `<span class="atc mut">Written</span>`;
+      const nums = r && r.hasNums ? `<div class="mrn">${[["Sales", r.sales != null ? "EGP " + fN(r.sales) : null], ["Orders", r.orders], ["Items", r.items], ["Refunds", r.refunds], ["Exchanges", r.exch], ["Out of stock", r.oos]].filter(([, v]) => v != null && v !== "" && v !== 0).map(([l, v]) => `<span><small>${l}</small><b>${typeof v === "number" ? fN(v) : esc(v)}</b></span>`).join("")}</div>` : "";
+      return `<div class="mri ${isMiss ? "miss" : ""}"><div class="mrd"><b>${DY[wdOf(i)]} ${dmy(i)}</b><small>${cell && cell.work ? `${esc(cell.ty.name)}${cell.e != null ? " · ends " + fmtT(cell.e) : ""}` : r && r.shift ? esc(r.shift) : ""}</small>${st}</div>
+        <div class="mrb">${isMiss ? `<span class="muted">No report for this shift.</span>` : `${r ? `<div class="mrt">${subCell(D, p, r)}</div>` : ""}${nums}${r && r.fb ? `<p class="fbt open" dir="auto">${esc(r.fb)}</p>` : r && !r.hasNums ? "" : ""}`}</div></div>`;
+    }).join("") || `<div class="muted" style="padding:16px">Nothing in this period yet.</div>`}</div></section>`;
+  return h;
+}
 function renderReports() {
   if (RS.view !== "reports") return;
   const D = V(), root = $("#repView");
@@ -2487,6 +2538,7 @@ function renderReports() {
     <div class="rmeta">${rngTxt(a, b)} · ${b - a + 1} day${b === a ? "" : "s"}${cmp ? ` · compared with ${rngTxt(pa, pb)}` : ""}${RS.mem ? ` · <b>${esc((all.find((p) => p.key === RS.mem) || {}).name || "")}</b> only` : ""}${RS.shift ? ` · <b>${esc(RS.shift)}</b> shifts only` : ""}${fresh == null ? "" : ` · sheets read <b>${fresh < 1 ? "just now" : fresh + " min ago"}</b>`}</div></section>`;
   if (RS.error) h += `<div class="banner warn">${raw && raw.stale ? "Showing the last saved copy — " : ""}${esc(RS.error)}</div>`;
   if (!HIST) h += `<div class="banner warn">Couldn't load the schedule history — report checks only cover weeks saved in the dashboard. Refresh the page to try again.</div>`;
+  if (S.me && S.me.self) { root.innerHTML = h + myReportsHTML(D, all, a, b, t); return; }
   h += `<div class="kpis">
     <div class="kpi"><div class="l">Team sales</div><div class="v"><span class="cur">EGP</span>${fN(T.sales)}</div>${X(T.sales, P.sales)}</div>
     <div class="kpi"><div class="l">Orders · items</div><div class="v">${fN(T.orders)}<small>· ${fN(T.items)} items</small></div>${X(T.orders, P.orders)}</div>
@@ -2861,7 +2913,7 @@ async function loadMessages(quiet) {
   renderMsBadge();
   if (!quiet || !$("#msView").classList.contains("hidden")) renderMessages();
 }
-function renderMsBadge() { const b = $("#msBadge"); if (!b) return; b.textContent = MS.unread > 9 ? "9+" : MS.unread; b.classList.toggle("hidden", !MS.unread); $("#msNav")?.classList.toggle("hidden", !S.me); $("#atNav")?.classList.toggle("hidden", !S.me); }
+function renderMsBadge() { $("#gvNav")?.classList.toggle("hidden", !(S.me && (isOwner() || can("users")))); const b = $("#msBadge"); if (!b) return; b.textContent = MS.unread > 9 ? "9+" : MS.unread; b.classList.toggle("hidden", !MS.unread); $("#msNav")?.classList.toggle("hidden", !S.me); $("#atNav")?.classList.toggle("hidden", !S.me); }
 const msWhen = (at) => { const d = new Date(at), t = logTime.format(d); return new Date().toDateString() === d.toDateString() ? t : `${logFmt.format(d)} · ${t}`; };
 function renderMessages() {
   const v = $("#msView"); if (!v || v.classList.contains("hidden")) return;
@@ -2900,6 +2952,88 @@ async function msSend() {
   MS.busy = false; renderMessages();
 }
 
+/* ================= Governance — who can do what, the controls in force, and the security trail ================= */
+const GV = { data: null, err: "", busy: false };
+async function loadGovernance() {
+  if (!(isOwner() || can("users"))) return;
+  try { GV.data = await call("/api/users?governance=1", "GET"); S.users = GV.data.users; S.ownerInfo = GV.data.owner; GV.err = ""; } catch (e) { GV.err = e.message; }
+  renderGovernance();
+}
+const PERM_SHORT = { schedule: "Schedule", setup: "Setup", settings: "Settings", records: "Records", money: "Money", approve: "Approve", reports: "Reports", sources: "Sheets", tasks: "Tasks", tasksManage: "Assign", tasksReview: "Review", log: "Log", users: "Users" };
+const agoD = (t) => (t ? Math.floor((Date.now() - new Date(t)) / 864e5) : null);
+function govRisks(G, D) {
+  const R = [], users = G.users || [], active = users.filter((u) => !u.disabled), tg = new Set(G.telegram || []), O = G.owner || {};
+  const add = (lvl, t, d, act) => R.push({ lvl, t, d, act });
+  if (!O.custom) add("high", "The owner still signs in with the PIN", "Set a personal owner password (Manage → Users → Change sign-in). The PIN is shared knowledge and can't be traced to one person.", `<button class="btn sm" data-act="gvUsers">Open Users</button>`);
+  if (O.custom && !O.recovery) add("high", "No owner recovery code", "Without it, a forgotten owner password locks the dashboard. Create one and keep it offline.", `<button class="btn sm" data-act="gvUsers">Open Users</button>`);
+  const admins = active.filter((u) => u.perms.includes("users"));
+  if (admins.length > 2) add("med", `${admins.length} accounts can manage users`, `Keep user administration to the fewest people possible: ${admins.map((u) => esc(u.name)).join(", ")}.`);
+  const approvers = active.filter((u) => u.perms.includes("approve"));
+  for (const u of approvers.filter((u) => !tg.has(u.username))) add("med", `${esc(u.name)} approves but isn't on Telegram`, "Late / away / rejection alerts won't reach this approver in time — ask them to connect Telegram (My account).");
+  if (!tg.has("owner")) add("med", "The owner isn't connected to Telegram", "Security and attendance alerts go to the bell only. Connect Telegram from My account.");
+  for (const u of active.filter((u) => u.member && !u.self)) add("med", `${esc(u.name)} is linked to a team member but isn't a personal account`, "She may see other people's data. Tick “Personal account” on her user.", `<button class="btn sm" data-act="gvUsers">Fix</button>`);
+  for (const u of active.filter((u) => { const d = agoD(u.lastLogin); return d == null ? agoD(u.createdAt) > 14 : d > 30; })) add("med", `${esc(u.name)} hasn't signed in for ${u.lastLogin ? agoD(u.lastLogin) + " days" : "ever"}`, "Unused active accounts are a risk — freeze it if the person no longer needs access.", `<button class="btn sm" data-act="gvFreeze" data-u="${esc(u.username)}">Freeze</button>`);
+  for (const u of active.filter((u) => u.mustChange)) add("low", `${esc(u.name)} still has a temporary password`, "They're asked to choose their own at the next sign-in.");
+  const linked = new Set(users.map((u) => u.member).filter(Boolean));
+  const noAcc = D.members.filter((m) => !m.former && !linked.has(m.id));
+  if (noAcc.length) add("low", `${noAcc.length} team member${noAcc.length > 1 ? "s have" : " has"} no personal account`, `${noAcc.map((m) => esc(m.name)).join(", ")} — without one they can't check in / out or see their own decisions.`, `<button class="btn sm" data-act="gvUsers">Add users</button>`);
+  if ((G.resetRequests || []).length) add("low", `${G.resetRequests.length} password reset request${G.resetRequests.length > 1 ? "s" : ""} waiting`, "Give a temporary password from Manage → Users.", `<button class="btn sm" data-act="gvUsers">Open Users</button>`);
+  for (const l of G.locks || []) add("high", `Sign-in locked: “${esc(l.username)}”`, `Too many wrong passwords — unlocks ${logTime.format(new Date(l.until))}. If it wasn't them, change their password.`);
+  const rank = { high: 0, med: 1, low: 2 };
+  return R.sort((x, y) => rank[x.lvl] - rank[y.lvl]);
+}
+const GOV_CONTROLS = [
+  ["Access", [
+    ["Private by default", "Nothing is visible without signing in — no schedule, names, reports or files. Signing out wipes the data from the screen."],
+    ["Least privilege", "Each account gets only the permissions ticked for it. Team members get personal accounts capped to their own data — management permissions can't be given to them, even by mistake."],
+    ["Data boundaries", "Accounts can be limited to chosen team members; personal accounts only ever receive their own row, records, tasks, reports and attendance from the server."],
+    ["No self-escalation", "Nobody can change their own permissions, give a permission they don't have, or touch the owner account."],
+  ]],
+  ["Segregation of duties", [
+    ["Maker ≠ checker", "Bonuses and deductions recorded by an approver need a different approver (or the owner) to approve or settle them."],
+    ["No self-approval", "An approver can't decide records about herself, review or rate her own task, or correct her own attendance."],
+    ["Schedule four-eyes", "Schedule changes by editors go to In review day by day; only approvers publish them, and every decision is kept in the week's history."],
+  ]],
+  ["Authentication", [
+    ["Lockout", "5 wrong passwords lock that sign-in for 15 minutes and alert the user managers."],
+    ["Sessions", "Sessions expire after 24 hours. A password change, a reset or “End sessions” signs the account out everywhere; frozen accounts are blocked immediately."],
+    ["Owner recovery", "The owner password is personal and has an offline recovery code; the PIN stops working once a password is set."],
+  ]],
+  ["Audit & alerts", [
+    ["Activity log", "Every change is stamped by the server with who and when — the client can't write or edit history."],
+    ["Security log", "Every sign-in, failed attempt and lockout, with IP and device."],
+    ["Decision trail", "Approvals, rejections and reasons reach the person concerned (dashboard + Telegram) and stay on the record."],
+    ["Attendance integrity", "Check-ins are graded against the schedule and the office location; corrections are marked with who made them and why."],
+  ]],
+];
+function renderGovernance() {
+  const v = $("#gvView"); if (!v || v.classList.contains("hidden")) return;
+  if (!(isOwner() || can("users"))) { v.innerHTML = `<section class="card"><div class="rsetup"><h3>Governance is for the owner and user managers</h3></div></section>`; return; }
+  const G = GV.data, D = V();
+  if (!G) { v.innerHTML = `<section class="card"><div class="muted" style="padding:20px">${GV.err ? esc(GV.err) : "Loading governance…"}</div></section>`; return; }
+  const users = G.users || [], active = users.filter((u) => !u.disabled), tg = new Set(G.telegram || []), risks = govRisks(G, D);
+  const nHigh = risks.filter((r) => r.lvl === "high").length, nMed = risks.filter((r) => r.lvl === "med").length;
+  const kind = (u) => (u.self ? "Personal" : u.perms.some((p) => ["approve", "users", "setup", "settings", "schedule", "money"].includes(p)) ? "Manager" : "Viewer");
+  let h = `<section class="card"><div class="sh"><div><div class="eyebrow">Access · Controls · Audit</div><h2>Governance</h2><div class="sub">Who can do what, the rules the system enforces, and the security trail.</div></div><button class="btn sm" data-act="gvRefresh">↻ Refresh</button></div>
+    <div class="kpis" style="margin:0">
+      <div class="kpi"><div class="l">Control status</div><div class="v ${nHigh ? "bdc" : nMed ? "wnc" : "okc"}">${nHigh ? "Action needed" : nMed ? "Review" : "Healthy"}</div><div class="s">${nHigh} high · ${nMed} medium · ${risks.length - nHigh - nMed} low</div></div>
+      <div class="kpi"><div class="l">Active accounts</div><div class="v">${active.length + 1}</div><div class="s">${active.filter((u) => kind(u) === "Manager").length} managers · ${active.filter((u) => u.self).length} personal · ${users.length - active.length} frozen</div></div>
+      <div class="kpi"><div class="l">Approvers</div><div class="v">${active.filter((u) => u.perms.includes("approve")).length + 1}</div><div class="s">owner included</div></div>
+      <div class="kpi"><div class="l">On Telegram</div><div class="v">${tg.size}</div><div class="s">of ${active.length + 1} accounts</div></div></div></section>`;
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Risk review</div><h2>Findings</h2><div class="sub">Checked automatically against the access rules.</div></div></div>${risks.length ? `<div class="gvrisks">${risks.map((r) => `<div class="gvr ${r.lvl}"><span class="lv">${r.lvl === "high" ? "High" : r.lvl === "med" ? "Medium" : "Low"}</span><div><b>${r.t}</b><small>${r.d}</small></div><div>${r.act || ""}</div></div>`).join("")}</div>` : `<div class="banner" style="background:var(--ok-bg);color:var(--ok)">✓ No findings — access follows the rules.</div>`}</section>`;
+  // access matrix
+  const cols = PERM_INFO.map((x) => x[0]);
+  const row = (u, own) => `<tr class="${u.disabled ? "off" : ""}"><td><b>${esc(u.name)}</b><small>@${esc(u.login || u.username)}</small></td><td><span class="gvk ${own ? "own" : kind(u).toLowerCase()}">${own ? "Owner" : kind(u)}</span></td>${cols.map((p) => `<td class="c">${own || u.perms.includes(p) ? "<b class='okc'>✓</b>" : "<span class='muted'>·</span>"}</td>`).join("")}<td>${own ? "Everyone" : u.self ? "Own data" : (u.scope || []).length ? u.scope.map((id) => esc(first(memName(D, id)))).join(", ") : "Everyone"}</td><td>${u.member ? esc(memName(D, u.member)) : "—"}</td><td class="c">${tg.has(own ? "owner" : u.username) ? "✓" : "—"}</td><td>${own ? (G.ownerLastLogin ? logFmt.format(new Date(G.ownerLastLogin)) : "—") : u.lastLogin ? logFmt.format(new Date(u.lastLogin)) : "Never"}</td><td>${u.disabled ? `<span class="atc bad">Frozen</span>` : `<span class="atc ok">Active</span>`}</td><td>${own || u.username === S.me.username ? "" : `<button class="btn sm ghost" data-act="gvEnd" data-u="${esc(u.username)}" title="Sign this account out of every device">End sessions</button>`}</td></tr>`;
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Role-based access</div><h2>Access Matrix</h2><div class="sub">Every account and exactly what it can do. Change access from Manage → Users.</div></div><button class="btn sm" data-act="gvUsers">Manage users</button></div>
+    <div class="tw"><table class="stbl gvm"><thead><tr><th>Account</th><th>Type</th>${cols.map((p) => `<th class="c" title="${esc((PERM_INFO.find((x) => x[0] === p) || [])[1] || p)}">${PERM_SHORT[p] || p}</th>`).join("")}<th>Sees</th><th>Team member</th><th class="c">Telegram</th><th>Last sign-in</th><th>Status</th><th></th></tr></thead><tbody>${row({ name: (G.owner || {}).name || "Owner", login: (G.owner || {}).login || "owner", username: "owner", perms: cols }, true)}${users.map((u) => row(u, false)).join("")}</tbody></table></div></section>`;
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Policy</div><h2>Controls in Force</h2><div class="sub">Rules the server enforces on every request — they can't be bypassed from the screen.</div></div></div><div class="gvc">${GOV_CONTROLS.map(([g, L]) => `<div class="gvg"><h4>${g}</h4>${L.map(([t, d]) => `<div class="gvi"><b>✓ ${t}</b><small>${d}</small></div>`).join("")}</div>`).join("")}</div></section>`;
+  const EV = { signin: ["Signed in", "ok"], failed: ["Wrong password", "rv"], lockout: ["Locked out", "bad"] };
+  const sec = G.security || [];
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Audit</div><h2>Security Log</h2><div class="sub">Sign-ins, wrong passwords and lockouts — newest first. Every other change is in the Activity log.</div></div></div>${sec.length ? `<div class="tw"><table class="stbl"><thead><tr><th>When</th><th>Event</th><th>Account</th><th>IP</th><th>Device</th></tr></thead><tbody>${sec.slice(0, 120).map((x) => { const [l, c] = EV[x.type] || [x.type, "mut"]; return `<tr><td>${logFmt.format(new Date(x.at))} · ${logTime.format(new Date(x.at))}</td><td><span class="atc ${c}">${l}</span></td><td>${esc(x.name || x.username || "—")}</td><td><small>${esc(x.ip || "—")}</small></td><td><small class="muted">${esc(devOf(x.ua))}</small></td></tr>`; }).join("")}</tbody></table></div>` : `<div class="muted" style="padding:14px">No sign-ins recorded yet — the log starts now.</div>`}</section>`;
+  v.innerHTML = h;
+}
+const devOf = (ua) => { ua = String(ua || ""); const os = /Android/.test(ua) ? "Android" : /iPhone|iPad/.test(ua) ? "iPhone" : /Mac OS/.test(ua) ? "Mac" : /Windows/.test(ua) ? "Windows" : ua ? "Other" : "—"; const br = /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : /Firefox\//.test(ua) ? "Firefox" : ""; return br ? `${os} · ${br}` : os; };
+
 function showView(v) {
   RS.view = v;
   $("#opsView").classList.toggle("hidden", v !== "ops");
@@ -2908,10 +3042,12 @@ function showView(v) {
   $("#apView").classList.toggle("hidden", v !== "approvals");
   $("#atView").classList.toggle("hidden", v !== "attendance");
   $("#msView").classList.toggle("hidden", v !== "messages");
+  $("#gvView").classList.toggle("hidden", v !== "governance");
   document.querySelectorAll(".views button").forEach((b) => b.classList.toggle("active", b.dataset.v === v));
-  history.replaceState(null, "", ["reports", "tasks", "approvals", "attendance", "messages"].includes(v) ? "#" + v : location.pathname + location.search);
+  history.replaceState(null, "", ["reports", "tasks", "approvals", "attendance", "messages", "governance"].includes(v) ? "#" + v : location.pathname + location.search);
   if (v === "attendance") { renderAttendance(); loadAttendance(!!AT.data); }
   if (v === "messages") { renderMessages(); loadMessages(); }
+  if (v === "governance") { renderGovernance(); loadGovernance(); }
   if (v === "approvals") { renderApprovals(); if (!TK.list && can("tasksReview")) loadTasks(true); }
   if (v === "reports") { renderReports(); if (!RS.raw && !RS.loading && can("reports")) loadReports(); if (!TK.list && can("tasks")) loadTasks(true); }
   if (v === "tasks") { renderTasks(); if (can("tasks") || can("tasksManage")) loadTasks(!!TK.list); }
@@ -3911,6 +4047,7 @@ function openHash() {
   if (h === "#approvals") showView("approvals");
   if (h === "#attendance") showView("attendance");
   if (h === "#messages") showView("messages");
+  if (h === "#governance") showView("governance");
   const m = /^#week=(\d{4}-\d{2}-\d{2})$/.exec(h);
   if (m && S.me) {
     const goWeek = () => { if (!S.data.weeks[m[1]]) return; S.weekOffset = (dIdx(m[1]) - wkStart(V(), curIdx())) / 7; showView("ops"); renderAll(); setTimeout(() => $("#wkTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); history.replaceState(null, "", location.pathname); };
@@ -4496,6 +4633,10 @@ document.addEventListener("click", async (e) => {
     case "msToAll": { const t = $("#msText")?.value; MS.to = MS.contacts.map((c) => c.username); renderMessages(); if (t) $("#msText").value = t; return; }
     case "msToNone": { const t = $("#msText")?.value; MS.to = []; renderMessages(); if (t) $("#msText").value = t; return; }
     case "msSend": return msSend();
+    case "gvRefresh": return loadGovernance();
+    case "gvUsers": return openAdmin("users");
+    case "gvEnd": { const u = (S.users || []).find((x) => x.username === el.dataset.u); if (!u || !confirm(`Sign ${u.name} out of every device now? They'll need to sign in again.`)) return; try { await call("/api/users", "PATCH", { username: u.username, endSessions: true }); toast(`${u.name} was signed out everywhere`); loadGovernance(); } catch (err) { toast(err.message, true); } return; }
+    case "gvFreeze": { const u = (S.users || []).find((x) => x.username === el.dataset.u); if (!u || !confirm(`Freeze ${u.name}'s account? They can't sign in until it's activated again.`)) return; try { await call("/api/users", "PATCH", { username: u.username, disabled: true }); toast(`${u.name} frozen`); loadGovernance(); } catch (err) { toast(err.message, true); } return; }
     case "tgTest": try { await call("/api/telegram", "POST", { action: "test" }); toast("Test sent — check Telegram"); } catch (err) { toast(err.message, true); } return;
     case "tgUnlink": if (!confirm("Stop Telegram notifications for this account?")) return; try { await call("/api/telegram", "POST", { action: "unlink" }); toast("Telegram disconnected"); loadTg(); } catch (err) { toast(err.message, true); } return;
     case "wkReview": if (!canApprove()) return; if (dirty()) return toast("You have unsaved changes in Manage — save or discard them first", true); return openReview(el.dataset.k, el.dataset.d != null ? +el.dataset.d : null);
@@ -4506,7 +4647,7 @@ document.addEventListener("click", async (e) => {
     case "ntToggle": e.preventDefault(); NT.open = !NT.open; renderNotices(); if (NT.open) loadNotices(); return;
     case "ntAll": e.preventDefault(); return markNotices(null);
     case "ntOpen": { const n = NT.list.find((x) => x.id === el.dataset.id); if (!n) return; NT.open = false; markNotices([n.id]);
-      if (!n.week) { const v = { "#tasks": "tasks", "#approvals": "approvals", "#attendance": "attendance", "#messages": "messages" }[n.link]; if (v && (v !== "approvals" || can("approve") || can("tasksReview"))) showView(v); renderNotices(); return; } S.weekOffset = (dIdx(n.week) - wkStart(V(), curIdx())) / 7; showView("ops"); renderAll(); setTimeout(() => $("#wkTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); if (n.kind === "submitted" && canApprove() && S.data.weeks[n.week] && !dirty()) openReview(n.week); return; }
+      if (!n.week) { const v = { "#tasks": "tasks", "#approvals": "approvals", "#attendance": "attendance", "#messages": "messages", "#governance": "governance" }[n.link]; if (v && (v !== "approvals" || can("approve") || can("tasksReview"))) showView(v); renderNotices(); return; } S.weekOffset = (dIdx(n.week) - wkStart(V(), curIdx())) / 7; showView("ops"); renderAll(); setTimeout(() => $("#wkTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); if (n.kind === "submitted" && canApprove() && S.data.weeks[n.week] && !dirty()) openReview(n.week); return; }
     case "apSettle": return settleRecords(el.dataset.id ? [el.dataset.id] : null, el.dataset.v !== "0", el.dataset.t);
     case "apWeekOpen": S.weekOffset = (dIdx(el.dataset.k) - wkStart(V(), curIdx())) / 7; showView("ops"); renderAll(); setTimeout(() => $("#wkTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); return;
     case "apLogin": return openLogin("__approvals");

@@ -4,7 +4,7 @@
 // POST /api/auth {action:'recover', username, code, password} → { token, user }   owner: new password with the recovery code
 // GET  /api/auth  (Authorization: Bearer …)                    → { user }          who am I
 // The owner signs in with their own password once set (until then the ADMIN_PIN).
-import { readJSON, writeJSON, USERS, hashPassword, checkPassword, signToken, userFromToken, bearer, sleep, parseBody, ownerUser, sessionUser, appendLog, newRecoveryCode } from './_lib.js';
+import { readJSON, writeJSON, USERS, hashPassword, checkPassword, signToken, userFromToken, bearer, sleep, parseBody, ownerUser, sessionUser, appendLog, newRecoveryCode, clientOf, secLocked, secResult } from './_lib.js';
 
 const ownerOk = (o, pw) => (o.hash ? checkPassword(pw, o.salt, o.hash) : !!process.env.ADMIN_PIN && String(pw) === String(process.env.ADMIN_PIN));
 
@@ -80,20 +80,29 @@ export default async function handler(req, res) {
     }
 
     // sign in
-    const uname = String(b.username || '').trim().toLowerCase(), password = b.password || '';
+    // 5 wrong passwords lock the username for 15 minutes; every sign-in is written to the security log
+    const uname = String(b.username || '').trim().toLowerCase(), password = b.password || '', client = clientOf(req);
+    const wait = uname ? await secLocked(uname) : 0;
+    if (wait) { await sleep(600); return res.status(429).json({ error: `Too many wrong passwords — try again in ${wait} minute${wait === 1 ? '' : 's'}` }); }
     if (uname === ownerLogin) {
-      if (ownerOk(o, password)) return res.status(200).json({ token: signToken({ u: 'owner', iat: now }), user: ownerUser(o) });
+      if (ownerOk(o, password)) {
+        o.lastLogin = new Date(now).toISOString(); doc.owner = o; await writeJSON(USERS, doc, 10);
+        await secResult(uname, true, client, o.name || 'Owner').catch(() => {});
+        return res.status(200).json({ token: signToken({ u: 'owner', iat: now }), user: ownerUser(o) });
+      }
     } else {
       const u = doc.users.find((x) => x.username === uname);
       if (u && checkPassword(password, u.salt, u.hash)) {
         if (u.disabled) { await sleep(400); return res.status(403).json({ error: 'This account is frozen — ask an admin to activate it' }); }
         u.lastLogin = new Date(now).toISOString();
         await writeJSON(USERS, doc, 10);
+        await secResult(uname, true, client, u.name).catch(() => {});
         return res.status(200).json({ token: signToken({ u: u.username, iat: now }), user: sessionUser(u) });
       }
     }
+    const locked = uname ? await secResult(uname, false, client).catch(() => false) : false;
     await sleep(800); // slow down guessing
-    return res.status(401).json({ error: 'Wrong username or password' });
+    return res.status(locked ? 429 : 401).json({ error: locked ? 'Too many wrong passwords — this sign-in is locked for 15 minutes' : 'Wrong username or password' });
   } catch (e) {
     return res.status(500).json({ error: String((e && e.message) || e) });
   }

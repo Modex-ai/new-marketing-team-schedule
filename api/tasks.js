@@ -54,6 +54,7 @@ export default async function handler(req, res) {
     const own = me.self && can(me, 'tasks') && (b.op === 'addProof' && b.list !== 'files' || b.op === 'update' && b.patch && Object.keys(b.patch).every((k) => ['status', 'doneNote', 'doneAt', 'checklist'].includes(k)) && (!b.patch.status || ['progress', 'done'].includes(b.patch.status)));
     if (own) { const t = doc.tasks.find((x) => x.id === b.id); if (!t || t.member !== me.member) return res.status(403).json({ error: 'This task is not yours' }); }
     else {
+      if (review && !me.owner && me.member && (doc.tasks.find((x) => x.id === b.id) || {}).member === me.member) return res.status(403).json({ error: "You can't review or rate your own task — another reviewer has to" });
       if (review && !can(me, 'tasksReview')) return res.status(403).json({ error: "Your account can't review or rate tasks" });
       if (!review && b.op !== 'delete' && !can(me, 'tasksManage')) return res.status(403).json({ error: "Your account can't assign or change tasks" });
     }

@@ -4,7 +4,7 @@
 // PATCH  /api/users {username, name?, perms?, role?, password?, disabled?}
 // DELETE /api/users {username}
 // Nobody can give permissions they don't have themselves, change their own permissions, or touch the owner account.
-import { readJSON, writeJSON, USERS, PERMS, PRESETS, permsOf, scopeOf, can, hashPassword, checkPassword, signToken, userFromToken, bearer, parseBody, appendLog, sleep, newRecoveryCode } from './_lib.js';
+import { readJSON, writeJSON, USERS, PERMS, PRESETS, permsOf, scopeOf, can, hashPassword, checkPassword, signToken, userFromToken, bearer, parseBody, appendLog, sleep, newRecoveryCode, SECURITY, TELEGRAM } from './_lib.js';
 
 const LABEL = { schedule: 'Edit schedule', setup: 'Team & setup', settings: 'Settings', records: 'Excuses & shift changes', money: 'Bonuses & deductions', approve: 'Approve / reject', log: 'Activity log', reports: 'View reports', sources: 'Report sheets', tasks: 'View tasks', tasksManage: 'Assign & manage tasks', tasksReview: 'Review & rate tasks', users: 'Manage users' };
 const presetOf = (perms) => Object.keys(PRESETS).find((k) => PRESETS[k].length === perms.length && PRESETS[k].every((p) => perms.includes(p))) || 'custom';
@@ -39,7 +39,14 @@ export default async function handler(req, res) {
 
     const doc = (await readJSON(USERS)) || { users: [] };
     doc.users = doc.users || [];
-    if (req.method === 'GET') return res.status(200).json(reply(doc));
+    if (req.method === 'GET') {
+      const q = req.query || Object.fromEntries(new URL(req.url, 'http://x').searchParams);
+      if (q.governance !== '1') return res.status(200).json(reply(doc));
+      // governance view: the security log, live lockouts and who gets alerts on Telegram
+      const sec = (await readJSON(SECURITY).catch(() => null)) || {}, tg = (await readJSON(TELEGRAM).catch(() => null)) || {};
+      const locks = Object.entries(sec.fails || {}).filter(([, f]) => f.until && f.until > Date.now()).map(([u, f]) => ({ username: u, until: new Date(f.until).toISOString() }));
+      return res.status(200).json({ ...reply(doc), security: (sec.log || []).slice(0, 200), locks, telegram: Object.keys(tg.links || {}), ownerLastLogin: (doc.owner || {}).lastLogin || null });
+    }
 
     const b = parseBody(req);
     const ownerLogin = (doc.owner || {}).username || 'owner';
@@ -96,6 +103,8 @@ export default async function handler(req, res) {
 
     if (req.method === 'PATCH') {
       const changes = [];
+      // end every session of this account (lost phone, shared device, someone leaving)
+      if (b.endSessions) { u.pwChangedAt = Date.now(); await writeJSON(USERS, doc, 10); await appendLog([`Users: signed ${u.name} (@${uname}) out of every device`], by); return res.status(200).json(reply(doc)); }
       if (b.name !== undefined && String(b.name).trim() && String(b.name).trim() !== u.name) { changes.push(`Users: renamed @${uname} ${u.name} → ${String(b.name).trim()}`); u.name = String(b.name).trim().slice(0, 60); }
       if (b.perms !== undefined || b.role !== undefined) {
         if (uname === me.username) return res.status(400).json({ error: "You can't change your own permissions" });
