@@ -227,7 +227,7 @@ table.wk td.editable:hover .slot,table.wk td.editable:hover .offc,table.wk td.ed
 .tp.swap{background:var(--deep);color:#fff}.tp.change{background:#2F6E70;color:#fff}.tp.excuse{background:#F7E1E6;color:#9A2D45}.tp.late,.tp.early{background:var(--warn-bg);color:var(--warn)}.tp.dayoff{background:#E3ECF8;color:#2F5A8A}.tp.other{background:var(--line-2);color:var(--muted)}.tp.deduction{background:#7A1F2A;color:#fff}.tp.bonus{background:#1F6B47;color:#fff}
 .ss{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:4px 11px;white-space:nowrap}
 .ss.pending{background:var(--warn-bg);color:var(--warn)}.ss.approved{background:var(--ok-bg);color:var(--ok)}.ss.rejected{background:var(--bad-bg);color:var(--bad)}
-.ss.bon-approved{background:var(--ok-bg);color:var(--ok)}.ss.bon-rejected,.ss.ded-rejected{background:var(--line-2);color:var(--muted)}.ss.ded-approved{background:var(--bad-bg);color:#8A1D2A}
+.ss.bon-approved{background:#EAF2FB;color:#2F5A8A}.ss.bon-settled{background:var(--ok-bg);color:var(--ok)}.ss.ded-settled{background:#7A1F2A;color:#fff}.ss.bon-rejected,.ss.ded-rejected{background:var(--line-2);color:var(--muted)}.ss.ded-approved{background:#FBEFD9;color:#8A5A12}
 .amt{font-family:var(--serif);font-weight:600;font-size:22px;color:#7A1F2A;white-space:nowrap}
 .amt.bonus{color:var(--ok)}
 .neg{color:#8A1D2A;font-weight:700}.pos{color:var(--ok);font-weight:700}
@@ -683,6 +683,13 @@ html{overflow-x:hidden}
   .modal .m-head .row{flex-wrap:wrap}
   .pf-h{flex-wrap:wrap}.pf-r{margin-left:0;text-align:left}
 }
+.wkst{display:inline-flex;flex-direction:column;vertical-align:middle;border-radius:10px;padding:5px 11px;margin-right:6px;line-height:1.3}
+.wkst b{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.wkst small{font-size:11px;opacity:.85}
+.wkst.ap{background:var(--ok-bg);color:var(--ok)}.wkst.rv{background:var(--warn-bg);color:var(--warn)}.wkst.rj{background:var(--bad-bg);color:var(--bad)}.wkst.dr{background:var(--line-2);color:var(--muted)}
+.wkbtns{display:inline-flex;gap:6px;vertical-align:middle;margin:4px 6px 4px 0}
+.aph h3 em{font-style:normal;color:var(--muted);font-weight:700;margin-left:6px;letter-spacing:0;text-transform:none}
+.rb.act{background:var(--ok-bg);color:var(--ok)}
+.rcode{font-family:ui-monospace,Menlo,monospace;font-size:19px;font-weight:700;letter-spacing:.06em;text-align:center;background:var(--pale-3);border:1px dashed var(--brand-3);border-radius:12px;padding:16px;color:var(--deep);user-select:all}
 /* ---------- team profiles ---------- */
 .pfctl select,.pfctl input{font-size:13px;padding:7px 10px}
 .pfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
@@ -1271,7 +1278,8 @@ async function save() {
     const srcChanged = JSON.stringify(S.data.reportSources) !== JSON.stringify(S.draft.reportSources);
     S.data = clone(S.draft); S.fresh = false; S.restored = false;
     if (srcChanged && S.me) { RS.raw = null; if (RS.view === "reports") loadReports(true); }
-    toast("Saved — the team sees it now");
+    toast(canApprove() ? "Saved — the team sees it now" : "Saved — schedule changes go to review");
+    if (!canApprove()) setTimeout(() => load(true), 400);
   } catch (e) {
     if (e.status === 401) signedOut("Your session ended — sign in again, then save. Your changes are kept.");
     else toast(e.status === 409 ? "Someone else saved changes first. Refresh the page, then edit again." : e.message, true);
@@ -1290,7 +1298,7 @@ function renderHeader() {
   $("#clockDate").textContent = `${DAYS[wdOf(n.idx)]}, ${dmy(n.idx, 1)} · Cairo`;
   const uc = $("#userChip");
   uc.classList.toggle("hidden", !S.me);
-  if (S.me) uc.innerHTML = `<div class="uav">${esc(initials(S.me.name))}</div><div><b>${esc(S.me.name)}</b><small>${roleLabel(S.me)} · <a href="#" data-act="logout" style="color:inherit">Sign out</a></small></div>`;
+  if (S.me) uc.innerHTML = `<div class="uav">${esc(initials(S.me.name))}</div><div><b>${esc(S.me.name)}</b><small>${roleLabel(S.me)} · <a href="#" data-act="myAccount" style="color:inherit">Account</a> · <a href="#" data-act="logout" style="color:inherit">Sign out</a></small></div>`;
 }
 function renderKpis() {
   const D = V(), n = cairoNow(), ci = opIdx(D, n), st = weekStats(D, wkStart(D, ci)), mem = st.mem;
@@ -1387,11 +1395,34 @@ function weekTableHTML(D, ws) {
   if (notes.some(Boolean)) h += `<tr class="notes"><td class="mem"><div class="nm">Notes</div></td>${notes.map((x) => `<td>${esc(x)}</td>`).join("")}<td></td></tr>`;
   return h + `</tbody>`;
 }
+// Weekly schedule approval: review → approved / rejected. Weeks from before approvals existed count as approved.
+const WK_ST = { review: ["In review", "rv"], approved: ["Approved", "ap"], rejected: ["Rejected", "rj"], draft: ["Draft", "dr"] };
+const wkStatus = (w) => (w && w.status) || "approved";
+function weekStatusHTML(w, key) {
+  const st = wkStatus(w), [l, c] = WK_ST[st] || WK_ST.approved, d = w.decided || {}, rv = w.review || {};
+  const when = (x) => (x && x.at ? `${logFmt.format(new Date(x.at))} ${logTime.format(new Date(x.at))}` : "");
+  const info = st === "review" ? `submitted${rv.by ? " by " + esc(rv.by) : ""}${rv.at ? " · " + when(rv) : ""}${rv.note ? " · " + esc(rv.note) : ""}` : st === "approved" ? (d.by ? `by ${esc(d.by)} · ${when(d)}` : "published") : st === "rejected" ? `by ${esc(d.by || "—")}${d.note ? ` — “${esc(d.note)}”` : ""}` : "";
+  const btns = canApprove() ? (st === "review" ? `<button class="btn sm primary" data-act="wkDecide" data-k="${key}" data-v="approved">Approve week</button><button class="btn sm" data-act="wkDecide" data-k="${key}" data-v="rejected">Reject</button>` : st === "approved" ? `<button class="btn sm ghost" data-act="wkDecide" data-k="${key}" data-v="review">Back to review</button>` : `<button class="btn sm primary" data-act="wkDecide" data-k="${key}" data-v="approved">Approve week</button><button class="btn sm ghost" data-act="wkDecide" data-k="${key}" data-v="review">Back to review</button>`) : "";
+  return `<span class="wkst ${c}"><b>● ${l}</b>${info ? `<small>${info}</small>` : ""}</span>${btns ? `<span class="wkbtns">${btns}</span>` : ""}`;
+}
+async function decideWeek(key, v) {
+  if (!canApprove()) return;
+  if (dirty()) return toast("You have unsaved changes in Manage — save or discard them first", true);
+  let note = "";
+  if (v === "rejected") { const x = prompt("Why is this week rejected? (shown to the team leader)"); if (x === null) return; note = x.trim(); }
+  const keepOpen = S.admin.open;
+  S.draft = clone(S.data);
+  const w = S.draft.weeks[key]; if (!w) return;
+  w.status = v; if (v === "review") w.review = { by: S.me.name, at: new Date().toISOString(), note: "Sent back to review" }; else w.decided = { by: S.me.name, at: new Date().toISOString(), note };
+  await save();
+  if (!keepOpen && !dirty()) S.draft = null;
+  renderAll();
+}
 function renderWeek() {
   const D = V(), ws = viewWS(), created = !!weekAt(D, ws);
   $("#wkTitle").textContent = `${dmy(ws)} – ${dmy(ws + 6, 1)}`;
   $("#wkSub").innerHTML = (S.weekOffset === 0 ? "This week · " : S.weekOffset === 1 ? "Next week · " : S.weekOffset === -1 ? "Last week · " : "") +
-    (created ? `<span class="chip-s pub">● Published week</span>${can("schedule") ? ` <span class="muted" style="font-size:12px">· click any cell to edit</span>` : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
+    (created ? `${weekStatusHTML(weekAt(D, ws), iDate(ws))}${can("schedule") ? ` <span class="muted" style="font-size:12px">· click any cell to edit${canApprove() ? "" : " — your changes go to review"}</span>` : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
   $("#wkBody").innerHTML = created ? `<div class="tblw"><table class="wk">${weekTableHTML(D, ws)}</table></div>` : `<div class="empty">This week hasn't been created yet.<br><button class="btn sm primary" style="margin-top:10px" data-act="openCreate">Create this week</button></div>`;
   $("#wkPrev").disabled = S.weekOffset <= minOffset();
   $("#wkToday").classList.toggle("hidden", S.weekOffset === 0);
@@ -1492,9 +1523,9 @@ const canRecType = (t) => can(t === "bonus" || t === "deduction" ? "money" : "re
 /* ============================ excuses, swaps, deductions & bonuses ============================ */
 const REQ_TYPES = { swap: "Shift swap", change: "Shift / desk change", excuse: "Excuse / absence", late: "Late arrival", early: "Early leave", dayoff: "Day-off change", deduction: "Deduction", bonus: "Bonus", other: "Other" };
 const ADJ = {
-  deduction: { prefix: "DED", sign: "−", days: true, labels: { pending: "Pending review", approved: "Applied", rejected: "Waived" },
+  deduction: { prefix: "DED", sign: "−", days: true, labels: { pending: "In review", approved: "Approved", rejected: "Rejected" }, settled: "Deducted", unsettled: "Not deducted yet", settle: "Mark as deducted",
     reasons: ["Late arrival", "Absence without notice", "Early leave", "Unauthorized break", "Policy violation", "Performance / quality", "Other"] },
-  bonus: { prefix: "BON", sign: "+", days: false, labels: { pending: "Pending review", approved: "Granted", rejected: "Cancelled" },
+  bonus: { prefix: "BON", sign: "+", days: false, labels: { pending: "In review", approved: "Approved", rejected: "Rejected" }, settled: "Paid", unsettled: "Not paid yet", settle: "Mark as paid",
     reasons: ["Outstanding performance", "Covered a shift", "Extra hours", "Target achieved", "Customer praise", "Other"] },
 };
 const isAdj = (r) => !!ADJ[r.type];
@@ -1502,10 +1533,10 @@ const money = (n) => "EGP " + new Intl.NumberFormat("en-US", { maximumFractionDi
 const dayStr = (d) => { d = +d || 0; return `${d} day${d === 1 ? "" : "s"}`; };
 function dedText(r) { const p = []; if (+r.amount) p.push(money(r.amount)); if (+r.days) p.push(dayStr(r.days)); return p.join(" + ") || "—"; }
 function stLabel(r) {
-  if (ADJ[r.type]) return ADJ[r.type].labels[r.status] || r.status;
-  return { pending: "Pending", approved: "Approved", rejected: "Rejected" }[r.status] || r.status;
+  if (ADJ[r.type]) { const A = ADJ[r.type]; return r.status === "approved" && r.settled ? A.settled : r.status === "approved" && r.date ? `${A.labels.approved} · ${A.unsettled}` : A.labels[r.status] || r.status; }
+  return { pending: "In review", approved: "Approved", rejected: "Rejected" }[r.status] || r.status;
 }
-const stClass = (r) => (isAdj(r) && r.status !== "pending" ? (r.type === "bonus" ? "bon-" : "ded-") + r.status : r.status);
+const stClass = (r) => (isAdj(r) && r.status !== "pending" ? (r.type === "bonus" ? "bon-" : "ded-") + (r.status === "approved" && r.settled ? "settled" : r.status) : r.status);
 function nextRef(D, type) {
   const n = (D.requests || []).filter((r) => r.type === type && r.ref).map((r) => +String(r.ref).replace(/\D/g, "") || 0);
   return ADJ[type].prefix + "-" + String((n.length ? Math.max(...n) : 0) + 1).padStart(4, "0");
@@ -1800,7 +1831,9 @@ function diffData(A, B) {
     if ((o.details || "") !== (r.details || "")) out.push(`Records: updated details — ${rn(r)}`);
     if (!o.applied && r.applied) out.push(`Records: applied ${r.type === "change" ? "change" : "swap"} to the schedule — ${reqTitle(B, r)}`);
   }
+  for (const r of B.requests || []) { const o = (A.requests || []).find((x) => x.id === r.id); if (o && isAdj(r) && !!o.settled !== !!r.settled) out.push(`Records: ${rn(r)} — marked ${r.settled ? ADJ[r.type].settled.toLowerCase() : ADJ[r.type].unsettled.toLowerCase()}`); }
   for (const o of A.requests || []) if (!(B.requests || []).some((r) => r.id === o.id)) out.push(`Records: deleted ${rn(o)}`);
+  for (const [k, w] of Object.entries(B.weeks || {})) { const o = (A.weeks || {})[k]; if (o && wkStatus(o) !== wkStatus(w)) out.push(`Approvals: week ${dmy(dIdx(k))} – ${dmy(dIdx(k) + 6, 1)} — ${WK_ST[wkStatus(o)][0]} → ${WK_ST[wkStatus(w)][0]}${w.decided && w.decided.note && wkStatus(w) === "rejected" ? ` (“${w.decided.note}”)` : ""}`); }
   if (+A.settings.weekStart !== +B.settings.weekStart) out.push(`Settings: week starts on ${DAYS[+B.settings.weekStart]}`);
   if (A.settings.startDate !== B.settings.startDate) out.push(`Settings: schedule starts ${B.settings.startDate}`);
   if (A.settings.dayStart !== B.settings.dayStart) out.push(`Settings: the day switches at ${fmtT(hm(B.settings.dayStart))}`);
@@ -2792,9 +2825,12 @@ async function xGo(kind) {
 const AP = { tab: "pending", busy: false };
 const AP_GROUPS = [["Shift swaps & desk changes", (r) => r.type === "swap" || r.type === "change"], ["Excuses & attendance", (r) => ["excuse", "late", "early", "dayoff", "other"].includes(r.type)], ["Bonuses & deductions", (r) => r.type === "bonus" || r.type === "deduction"]];
 function apCounts() {
-  const D = V(), recs = (D.requests || []).filter((r) => r.status === "pending");
+  const D = V(), recs = canApprove() ? (D.requests || []).filter((r) => r.status === "pending") : [];
   const tasks = can("tasksReview") && TK.list ? TK.list.filter((t) => t.status === "done") : [];
-  return { recs, tasks, n: recs.length + tasks.length };
+  const weeks = canApprove() ? Object.entries(D.weeks).filter(([, w]) => wkStatus(w) === "review").map(([k]) => k).sort() : [];
+  const pay = canApprove() ? (D.requests || []).filter((r) => isAdj(r) && r.status === "approved" && !r.settled) : [];
+  const resets = can("users") ? S.resetReqs || [] : [];
+  return { recs, tasks, weeks, pay, resets, n: recs.length + tasks.length + weeks.length + resets.length };
 }
 // show / hide parts of the page this account isn't allowed to see
 function renderAccess() {
@@ -2813,26 +2849,36 @@ function apRow(D, r) {
     <div style="min-width:0"><div class="tt"><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span>${esc(reqTitle(D, r))}${r.ref ? `<span class="ref">${esc(r.ref)}</span>` : ""}</div>
       ${adj ? `<div class="dd"><b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "—")}${r.details ? " — " + esc(r.details) : ""}</div>` : r.details ? `<div class="dd" dir="auto">${esc(r.details)}</div>` : ""}
       ${what ? `<div class="dd apw">${what}</div>` : ""}${attThumbs(r, true)}
-      <div class="ref" style="margin-top:4px">Added by ${esc(r.createdBy || "—")}${r.createdAt ? " · " + logFmt.format(new Date(r.createdAt)) + " " + logTime.format(new Date(r.createdAt)) : ""}${r.decidedBy ? ` · ${r.status === "approved" ? "approved" : "rejected"} by ${esc(r.decidedBy)}${r.decidedAt ? " · " + logFmt.format(new Date(r.decidedAt)) : ""}` : ""}</div></div>
-    <div class="apb">${r.status === "pending" ? `<button class="btn sm" data-act="apDecide" data-id="${esc(r.id)}" data-v="rejected">Reject</button><button class="btn sm primary" data-act="apDecide" data-id="${esc(r.id)}" data-v="approved">Approve</button>` : `<span class="ss ${stClass(r)}">${stLabel(r)}</span>${canApprove() ? `<button class="btn sm ghost" data-act="apDecide" data-id="${esc(r.id)}" data-v="pending">Back to review</button>` : ""}`}</div></div>`;
+      <div class="ref" style="margin-top:4px">Added by ${esc(r.createdBy || "—")}${r.createdAt ? " · " + logFmt.format(new Date(r.createdAt)) + " " + logTime.format(new Date(r.createdAt)) : ""}${r.decidedBy && r.status !== "pending" ? ` · ${r.status === "approved" ? "approved" : "rejected"} by ${esc(r.decidedBy)}${r.decidedAt ? " · " + logFmt.format(new Date(r.decidedAt)) : ""}` : ""}${r.decisionNote ? ` · “${esc(r.decisionNote)}”` : ""}${r.settled ? ` · ${ADJ[r.type].settled.toLowerCase()} by ${esc(r.settledBy || "—")}${r.settledAt ? " · " + logFmt.format(new Date(r.settledAt)) : ""}` : ""}</div></div>
+    <div class="apb">${r.status === "pending" ? `<span class="ss pending">In review</span><button class="btn sm" data-act="apDecide" data-id="${esc(r.id)}" data-v="rejected">Reject</button><button class="btn sm primary" data-act="apDecide" data-id="${esc(r.id)}" data-v="approved">Approve</button>` : `<span class="ss ${stClass(r)}">${stLabel(r)}</span>${canApprove() && isAdj(r) && r.status === "approved" ? (r.settled ? `<button class="btn sm ghost" data-act="apSettle" data-id="${esc(r.id)}" data-v="0">Undo</button>` : `<button class="btn sm primary" data-act="apSettle" data-id="${esc(r.id)}" data-v="1">${ADJ[r.type].settle}</button>`) : ""}${canApprove() && !r.settled ? `<button class="btn sm ghost" data-act="apDecide" data-id="${esc(r.id)}" data-v="pending">Back to review</button>` : ""}`}</div></div>`;
 }
 function renderApprovals() {
   if (RS.view !== "approvals") return;
   const root = $("#apView"), D = V();
   if (!S.me) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>Sign in to see approvals</h3><button class="btn primary" data-act="apLogin">Sign in</button></div></section>`; return; }
   if (!(can("approve") || can("tasksReview"))) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>No access to approvals</h3><p class="muted">Ask the owner to give you <b>Approve / reject</b> in Manage → Users.</p></div></section>`; return; }
-  const { recs, tasks } = apCounts();
+  const { recs, tasks, weeks, pay, resets } = apCounts();
   const sum = (t) => recs.filter((r) => r.type === t).reduce((x, r) => x + (+r.amount || 0), 0);
   const decided = (D.requests || []).filter((r) => r.status !== "pending").sort((a, b) => (b.decidedAt || b.createdAt || "").localeCompare(a.decidedAt || a.createdAt || "")).slice(0, 40);
   let h = `<div class="kpis">
-    <div class="kpi"><div class="l">Waiting for a decision</div><div class="v ${recs.length + tasks.length ? "warn" : "ok"}">${recs.length + tasks.length}</div><div class="s">${recs.length} record${recs.length === 1 ? "" : "s"} · ${tasks.length} task${tasks.length === 1 ? "" : "s"}</div></div>
-    <div class="kpi"><div class="l">Swaps &amp; desk changes</div><div class="v">${recs.filter(AP_GROUPS[0][1]).length}</div><div class="s">Reach the schedule once approved</div></div>
+    <div class="kpi"><div class="l">Waiting for a decision</div><div class="v ${recs.length + tasks.length + weeks.length ? "warn" : "ok"}">${recs.length + tasks.length + weeks.length}</div><div class="s">${weeks.length} week${weeks.length === 1 ? "" : "s"} · ${recs.length} record${recs.length === 1 ? "" : "s"} · ${tasks.length} task${tasks.length === 1 ? "" : "s"}</div></div>
+    <div class="kpi"><div class="l">Awaiting payroll</div><div class="v ${pay.length ? "warn" : ""}">${pay.length}</div><div class="s">Approved — ${fN(pay.filter((r) => r.type === "deduction").reduce((x, r) => x + (+r.amount || 0), 0))} to deduct · ${fN(pay.filter((r) => r.type === "bonus").reduce((x, r) => x + (+r.amount || 0), 0))} to pay</div></div>
     <div class="kpi"><div class="l">Bonuses pending</div><div class="v"><span class="cur">EGP</span>${fN(sum("bonus"))}</div><div class="s">${recs.filter((r) => r.type === "bonus").length} record(s)</div></div>
     <div class="kpi"><div class="l">Deductions pending</div><div class="v"><span class="cur">EGP</span>${fN(sum("deduction"))}</div><div class="s">${recs.filter((r) => r.type === "deduction").length} record(s)</div></div></div>`;
   h += `<section class="card"><div class="sh"><div><div class="eyebrow">Decisions</div><h2>Approvals</h2><div class="sub">Approving a swap or desk change puts it on the schedule right away. Every decision is saved and logged.</div></div>
-    <div class="seg"><button class="${AP.tab === "pending" ? "active" : ""}" data-act="apTab" data-v="pending">Waiting · ${recs.length + tasks.length}</button><button class="${AP.tab === "done" ? "active" : ""}" data-act="apTab" data-v="done">Decided</button></div></div>`;
-  if (AP.tab === "pending") {
-    if (!canApprove()) h += `<div class="banner info">Your account reviews tasks only — records need <b>Approve / reject</b>.</div>`;
+    <div class="seg"><button class="${AP.tab === "pending" ? "active" : ""}" data-act="apTab" data-v="pending">Waiting · ${recs.length + tasks.length + weeks.length + resets.length}</button><button class="${AP.tab === "payroll" ? "active" : ""}" data-act="apTab" data-v="payroll">Payroll · ${pay.length}</button><button class="${AP.tab === "done" ? "active" : ""}" data-act="apTab" data-v="done">Decided</button></div></div>`;
+  if (AP.tab === "payroll") {
+    h += `<p class="muted" style="margin:0 0 10px;font-size:12.8px">Approved bonuses and deductions. Mark each one when it has actually been paid or taken off the salary — the record then shows <b>Paid</b> / <b>Deducted</b>.</p>`;
+    for (const [t, title] of [["deduction", "Deductions to take off the salary"], ["bonus", "Bonuses to pay"]]) {
+      const L = pay.filter((r) => r.type === t).sort((a, b) => a.date.localeCompare(b.date)), sum = L.reduce((x, r) => x + (+r.amount || 0), 0);
+      h += `<div class="apg"><div class="aph"><h3>${title} <span>${L.length}</span>${sum ? ` <em>${money(sum)}</em>` : ""}</h3>${L.length > 1 ? `<button class="btn sm ghost" data-act="apSettle" data-t="${t}" data-v="1">${ADJ[t].settle} — all ${L.length}</button>` : ""}</div>${L.map((r) => apRow(D, r)).join("") || `<div class="muted" style="font-size:12.8px;padding:6px 0 10px">Nothing waiting.</div>`}</div>`;
+    }
+    const done = (D.requests || []).filter((r) => isAdj(r) && r.settled).sort((a, b) => (b.settledAt || "").localeCompare(a.settledAt || "")).slice(0, 20);
+    if (done.length) h += `<div class="apg"><div class="aph"><h3>Recently settled <span>${done.length}</span></h3></div>${done.map((r) => apRow(D, r)).join("")}</div>`;
+  } else if (AP.tab === "pending") {
+    if (can("users") && resets.length) h += `<div class="apg"><div class="aph"><h3>Password reset requests <span>${resets.length}</span></h3></div>${resets.map((x) => `<div class="apr2"><div class="dt"><b>🔑</b><span>Reset</span></div><div><div class="tt">${esc(x.name)} <span class="ref">@${esc(x.username)}</span></div><div class="dd">Asked ${logFmt.format(new Date(x.at))} ${logTime.format(new Date(x.at))}</div></div><div class="apb"><button class="btn sm primary" data-act="userPass" data-u="${esc(x.username)}">Set temporary password</button></div></div>`).join("")}</div>`;
+    if (canApprove()) h += `<div class="apg"><div class="aph"><h3>Weekly schedules <span>${weeks.length}</span></h3></div>${weeks.map((k) => { const w = D.weeks[k], i = dIdx(k), rv = w.review || {}; return `<div class="apr2"><div class="dt"><b>${new Date(i * 864e5).getUTCDate()}</b><span>${MON[new Date(i * 864e5).getUTCMonth()]}</span></div><div style="min-width:0"><div class="tt">Week ${dmy(i)} – ${dmy(i + 6, 1)} <span class="ss pending">In review</span></div><div class="dd">${rv.by ? "Changed by " + esc(rv.by) : ""}${rv.at ? " · " + logFmt.format(new Date(rv.at)) + " " + logTime.format(new Date(rv.at)) : ""}${rv.note ? " · " + esc(rv.note) : ""} · ${w.memberIds.length} people</div></div><div class="apb"><button class="btn sm ghost" data-act="apWeekOpen" data-k="${k}">Open week</button><button class="btn sm" data-act="wkDecide" data-k="${k}" data-v="rejected">Reject</button><button class="btn sm primary" data-act="wkDecide" data-k="${k}" data-v="approved">Approve week</button></div></div>`; }).join("") || `<div class="muted" style="font-size:12.8px;padding:6px 0 10px">No schedule changes waiting.</div>`}</div>`;
+    if (!canApprove()) h += `<div class="banner info">Your account reviews tasks only — records and schedules need <b>Approve / reject</b>.</div>`;
     else for (const [title, f] of AP_GROUPS) {
       const L = recs.filter(f).sort((a, b) => a.date.localeCompare(b.date));
       h += `<div class="apg"><div class="aph"><h3>${title} <span>${L.length}</span></h3>${L.length > 1 ? `<button class="btn sm ghost" data-act="apAll" data-g="${AP_GROUPS.findIndex((g) => g[0] === title)}">Approve all ${L.length}</button>` : ""}</div>${L.map((r) => apRow(D, r)).join("") || `<div class="muted" style="font-size:12.8px;padding:6px 0 10px">Nothing waiting.</div>`}</div>`;
@@ -2844,13 +2890,15 @@ function renderApprovals() {
 async function decideRecords(ids, v) {
   if (!canApprove() || AP.busy) return;
   if (dirty()) return toast("You have unsaved changes in Manage — save or discard them first", true);
+  let note = "";
+  if (v === "rejected") { const x = prompt(ids.length > 1 ? "Reason for rejecting (optional):" : "Why is it rejected? (optional)"); if (x === null) return; note = x.trim(); }
   AP.busy = true;
   const keepOpen = S.admin.open;
   S.draft = clone(S.data);
   let applied = 0, missed = 0;
   for (const id of ids) {
     const r = S.draft.requests.find((x) => x.id === id); if (!r) continue;
-    r.status = v; r.decidedBy = S.me.name; r.decidedAt = new Date().toISOString();
+    r.status = v; r.decidedBy = S.me.name; r.decidedAt = new Date().toISOString(); r.decisionNote = note || undefined; if (v !== "approved") r.settled = false;
     if (v === "approved" && !r.applied && (r.type === "swap" || r.type === "change")) { (r.type === "change" ? applyChange(S.draft, r) : applySwap(S.draft, r)) ? applied++ : missed++; }
   }
   await save();
@@ -2860,6 +2908,22 @@ async function decideRecords(ids, v) {
   renderAll();
 }
 
+// mark approved bonuses as paid / deductions as taken off the salary (or undo)
+async function settleRecords(ids, on, type) {
+  if (!canApprove() || AP.busy) return;
+  if (dirty()) return toast("You have unsaved changes in Manage — save or discard them first", true);
+  const D0 = V(), list = ids || (D0.requests || []).filter((r) => r.type === type && r.status === "approved" && !r.settled).map((r) => r.id);
+  if (!list.length) return;
+  if (!ids && !confirm(`${ADJ[type].settle} — all ${list.length}?`)) return;
+  AP.busy = true;
+  const keepOpen = S.admin.open;
+  S.draft = clone(S.data);
+  for (const id of list) { const r = S.draft.requests.find((x) => x.id === id); if (!r || !isAdj(r)) continue; r.settled = !!on; if (on) { r.settledBy = S.me.name; r.settledAt = new Date().toISOString(); } else { delete r.settledBy; delete r.settledAt; } }
+  await save();
+  if (!keepOpen && !dirty()) S.draft = null;
+  AP.busy = false;
+  renderAll();
+}
 /* ============================ tasks (assign → send as image → proof → review & rating) ============================ */
 const TK = { list: null, loading: false, error: "", period: "thisMonth", mem: "", tab: "open", q: "", form: null, sel: null, rate: 0, busy: false };
 const TST = { assigned: ["Assigned", "as"], progress: ["In progress", "pr"], done: ["Awaiting review", "rv"], approved: ["Approved", "ap"], returned: ["Returned for rework", "rt"], cancelled: ["Cancelled", "cx"] };
@@ -3270,7 +3334,7 @@ function openLogin(tab, msg) {
     <form class="m-body" id="loginForm">${msg ? `<div class="banner warn" style="margin-bottom:12px">${esc(msg)}</div>` : ""}
     <label class="field">Username<input type="text" id="liUser" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
     <label class="field" style="margin-top:10px">Password<input type="password" id="liPass" autocomplete="current-password"></label>
-    <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn primary" type="submit">Sign in</button></div></form></div></div>`;
+    <div class="row" style="margin-top:16px;justify-content:space-between"><a href="#" data-act="forgot" style="font-size:12.5px;color:var(--brand)">Forgot password?</a><button class="btn primary" type="submit">Sign in</button></div></form></div></div>`;
   $("#liUser").focus();
   $("#loginForm").onsubmit = async (e) => {
     e.preventDefault();
@@ -3279,9 +3343,41 @@ function openLogin(tab, msg) {
       S.token = j.token; S.me = j.user; localStorage.setItem("vmo_token", S.token);
       toast(`Welcome, ${S.me.name}`); renderHeader();
       if (!dirty()) { S.draft = null; await load(true); } // records, report sheets and the activity log come with sign-in
+      if (can("users")) loadUsers();
+      if (S.me.mustChange) return openAccount(true);
       if (tab === "__reports") { $("#modalRoot").innerHTML = ""; RS.raw = null; showView("reports"); } else if (tab === "__tasks") { $("#modalRoot").innerHTML = ""; TK.list = null; showView("tasks"); } else if (tab === "__approvals") { $("#modalRoot").innerHTML = ""; showView("approvals"); } else openAdmin(tab);
     } catch (err) { toast(err.status === 401 ? "Wrong username or password" : err.message, true); }
   };
+}
+// Forgot password: a team user asks an admin; the owner uses the recovery code
+function openForgot(mode) {
+  $("#modalRoot").innerHTML = `<div class="overlay"><div class="modal small"><div class="m-head"><h3>Forgot password</h3><button class="btn ghost" data-act="closeModal">✕</button></div>
+    <div class="m-body"><div class="seg" style="margin-bottom:14px"><button class="${mode !== "owner" ? "active" : ""}" data-act="forgot" data-v="user">Team account</button><button class="${mode === "owner" ? "active" : ""}" data-act="forgot" data-v="owner">Owner</button></div>
+    ${mode === "owner" ? `<p class="muted" style="margin:0 0 10px;font-size:12.8px">Use the recovery code you saved when you set your password. You'll get a new code after the reset.</p>
+      <label class="field">Owner username<input type="text" id="fgUser" autocapitalize="none" spellcheck="false"></label>
+      <label class="field" style="margin-top:10px">Recovery code<input type="text" id="fgCode" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX"></label>
+      <label class="field" style="margin-top:10px">New password<input type="password" id="fgPass" autocomplete="new-password" placeholder="At least 8 characters"></label>
+      <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn primary" data-act="forgotGo" data-v="owner">Reset &amp; sign in</button></div>`
+    : `<p class="muted" style="margin:0 0 10px;font-size:12.8px">Your request goes to the dashboard admins. They'll give you a temporary password, and you choose your own when you sign in.</p>
+      <label class="field">Your username<input type="text" id="fgUser" autocapitalize="none" spellcheck="false"></label>
+      <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn primary" data-act="forgotGo" data-v="user">Send request</button></div>`}</div></div></div>`;
+  $("#fgUser").focus();
+}
+// My account: change my own password (the current one is required). forced = after a temporary password.
+function openAccount(forced) {
+  $("#modalRoot").innerHTML = `<div class="overlay"><div class="modal small"><div class="m-head"><h3>${forced ? "Choose your password" : "My account"}</h3>${forced ? "" : `<button class="btn ghost" data-act="closeModal">✕</button>`}</div>
+    <div class="m-body">${forced ? `<div class="banner warn" style="margin-bottom:12px">You signed in with a temporary password. Choose your own to continue.</div>` : `<div class="muted" style="font-size:12.8px;margin-bottom:12px"><b>${esc(S.me.name)}</b> · ${esc(roleLabel(S.me))}${S.me.owner ? "" : ` · @${esc(S.me.username)}`}</div>`}
+    <label class="field">Current password<input type="password" id="acCur" autocomplete="current-password" placeholder="${forced ? "The temporary password" : ""}"></label>
+    <label class="field" style="margin-top:10px">New password<input type="password" id="acNew" autocomplete="new-password" placeholder="At least ${S.me.owner ? 8 : 6} characters"></label>
+    <label class="field" style="margin-top:10px">Repeat new password<input type="password" id="acNew2" autocomplete="new-password"></label>
+    <div class="row" style="margin-top:16px;justify-content:flex-end">${forced ? `<button class="btn ghost" data-act="logout">Sign out</button>` : ""}<button class="btn primary" data-act="accSave">Change password</button></div></div></div></div>`;
+  $("#acCur").focus();
+}
+function showRecoveryCode(code) {
+  $("#modalRoot").innerHTML = `<div class="overlay"><div class="modal small"><div class="m-head"><h3>Your owner recovery code</h3></div><div class="m-body">
+    <p style="margin:0 0 10px;font-size:13px">If you ever forget the owner password, this code lets you set a new one (Sign in → Forgot password → Owner). <b>It's shown only once</b> — save it somewhere safe, away from this phone.</p>
+    <div class="rcode">${esc(code)}</div>
+    <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-act="copyCode" data-v="${esc(code)}">Copy</button><button class="btn primary" data-act="closeModal">I saved it</button></div></div></div></div>`;
 }
 function signedOut(msg) {
   S.token = ""; S.me = null; S.users = null; localStorage.removeItem("vmo_token"); S.recAuth = false;
@@ -3293,18 +3389,18 @@ function signedOut(msg) {
 }
 async function checkSession() {
   if (!S.token) return;
-  try { const j = await call("/api/auth", "GET"); S.me = j.user; } catch (e) { if (e.status === 401) { S.token = ""; localStorage.removeItem("vmo_token"); } }
+  try { const j = await call("/api/auth", "GET"); S.me = j.user; if (S.me.mustChange) setTimeout(() => openAccount(true), 300); if (can("users")) loadUsers(); } catch (e) { if (e.status === 401) { S.token = ""; localStorage.removeItem("vmo_token"); } }
   renderAll();
   if (location.hash === "#reports") showView("reports");
   if (location.hash === "#tasks") showView("tasks");
   if (location.hash === "#approvals") showView("approvals");
 }
 async function loadUsers() {
-  try { const j = await call("/api/users", "GET"); S.users = j.users; S.ownerInfo = j.owner; } catch (e) { S.users = []; if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
+  try { const j = await call("/api/users", "GET"); S.users = j.users; S.ownerInfo = j.owner; S.resetReqs = j.resetRequests || []; renderAccess(); renderApprovals(); } catch (e) { S.users = []; if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
   if (S.admin.open && S.admin.tab === "users") renderAdmin();
 }
 async function userAction(method, body, okMsg) {
-  try { const j = await call("/api/users", method, body); S.users = j.users; S.ownerInfo = j.owner; toast(okMsg); load(true); }
+  try { const j = await call("/api/users", method, body); S.users = j.users; S.ownerInfo = j.owner; S.resetReqs = j.resetRequests || []; toast(okMsg); load(true); renderApprovals(); }
   catch (e) { if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
   if (S.admin.open) renderAdmin();
 }
@@ -3485,6 +3581,7 @@ function renderAdmin() {
       const mems = S.draft.members.filter((m) => !m.former && inScope(m.id));
       const scopeBox = (scope, attr) => `<div class="field" style="margin-top:14px">Team members they can see <span style="text-transform:none;letter-spacing:0;font-weight:500">— in Reports, Tasks, Profiles and Records. Leave all off = the whole team.</span></div><div class="tkmem">${mems.map((m) => `<label class="${scope.includes(m.id) ? "on" : ""}"><input type="checkbox" ${attr}="${esc(m.id)}" ${scope.includes(m.id) ? "checked" : ""}><span class="av" style="--c:${esc(m.color)}">${esc(initials(m.name))}</span>${esc(m.name)}</label>`).join("")}</div>`;
       const presetBtns = (attr) => `<div class="row" style="gap:6px;margin:8px 0 4px"><span class="muted" style="font-size:12px">Quick set:</span>${Object.keys(PERM_PRESETS).map((k) => `<button class="btn sm ghost" data-act="permPreset" data-v="${k}" ${attr}>${roleLabel({ role: k })}</button>`).join("")}<button class="btn sm ghost" data-act="permPreset" data-v="none" ${attr}>None</button></div>`;
+      if ((S.resetReqs || []).length) body += `<div class="panel apq"><h4>Password reset requests · ${S.resetReqs.length}</h4>${S.resetReqs.map((x) => `<div class="apr"><span class="rb viewer">Reset</span><div><b>${esc(x.name)}</b> <span class="ref">@${esc(x.username)}</span><small>asked ${esc(ago(x.at))}</small></div><div class="row"><button class="btn sm primary" data-act="userPass" data-u="${esc(x.username)}">Set temporary password</button></div></div>`).join("")}</div>`;
       body += `<div class="panel"><h4>Add user</h4><div class="rqform">
         <label class="field">Full name<input type="text" id="nuName" placeholder="e.g. Mai Ahmed" value="${esc(nu.name || "")}"></label>
         <label class="field">Username<input type="text" id="nuUser" placeholder="e.g. mai" autocapitalize="none" spellcheck="false" value="${esc(nu.user || "")}"></label>
@@ -3497,13 +3594,13 @@ function renderAdmin() {
       <div class="panel"><h4>Users (${S.users.length + 1})</h4>
         <div class="urow"><div class="uh"><div><b>${esc(S.ownerInfo ? S.ownerInfo.name : "Owner")}</b> <span class="rb admin">Owner</span><small>@${esc(S.ownerInfo ? S.ownerInfo.login : "owner")} · built-in account · ${S.ownerInfo && S.ownerInfo.custom ? "own password" : "password is the PIN"} · everything</small></div>
           ${isOwner() ? `<div class="row" style="justify-content:flex-end"><button class="btn sm ${A.ownEdit ? "primary" : ""}" data-act="ownerEdit">${A.ownEdit ? "Close" : "Change sign-in"}</button></div>` : ""}</div>
-          ${isOwner() && A.ownEdit ? `<div class="uperm"><div class="rqform" style="margin-top:8px"><label class="field">Display name<input type="text" id="owName" value="${esc(S.ownerInfo ? S.ownerInfo.name : S.me.name)}"></label><label class="field">Username<input type="text" id="owLogin" autocapitalize="none" spellcheck="false" value="${esc(S.ownerInfo ? S.ownerInfo.login : "owner")}"></label><label class="field">New password<input type="password" id="owPass" placeholder="Leave empty to keep it" autocomplete="new-password"></label><label class="field">Repeat password<input type="password" id="owPass2" autocomplete="new-password"></label></div>
-            <div class="pnote">Once you set your own password the old PIN stops working, and every other device signed in as owner is signed out. Keep it somewhere safe.</div>
-            <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm primary" data-act="ownerSave">Save owner sign-in</button></div></div>` : ""}</div>
-        ${S.users.map((u) => { const me = u.username === S.me.username, open = A.uOpen === u.username; return `<div class="urow" style="${u.disabled ? "opacity:.6" : ""}"><div class="uh"><div><b>${esc(u.name)}</b> <span class="rb ${u.role}">${roleLabel(u)}</span>${u.disabled ? ` <span class="rb off">Disabled</span>` : ""}
+          ${isOwner() && A.ownEdit ? `<div class="uperm"><div class="rqform" style="margin-top:8px"><label class="field">Display name<input type="text" id="owName" value="${esc(S.ownerInfo ? S.ownerInfo.name : S.me.name)}"></label><label class="field">Username<input type="text" id="owLogin" autocapitalize="none" spellcheck="false" value="${esc(S.ownerInfo ? S.ownerInfo.login : "owner")}"></label><label class="field">Current password<input type="password" id="owCur" autocomplete="current-password" placeholder="${S.ownerInfo && S.ownerInfo.custom ? "" : "The PIN"}"></label><label class="field">New password<input type="password" id="owPass" placeholder="Leave empty to keep it" autocomplete="new-password"></label><label class="field">Repeat new password<input type="password" id="owPass2" autocomplete="new-password"></label></div>
+            <div class="pnote">The current password is needed to change the username or password. Once you set your own password the PIN stops working and every other device signed in as owner is signed out. You'll get a <b>recovery code</b> for a forgotten password — save it.</div>
+            <div class="row" style="justify-content:space-between;margin-top:10px">${S.ownerInfo && S.ownerInfo.custom ? `<button class="btn sm ghost" data-act="ownerRecovery">New recovery code</button>` : "<span></span>"}<button class="btn sm primary" data-act="ownerSave">Save owner sign-in</button></div></div>` : ""}</div>
+        ${S.users.map((u) => { const me = u.username === S.me.username, open = A.uOpen === u.username; return `<div class="urow" style="${u.disabled ? "opacity:.6" : ""}"><div class="uh"><div><b>${esc(u.name)}</b> <span class="rb ${u.role}">${roleLabel(u)}</span>${u.disabled ? ` <span class="rb off">Frozen</span>` : ` <span class="rb act">Active</span>`}${u.mustChange ? ` <span class="rb viewer">Temporary password</span>` : ""}
             <small>@${esc(u.username)} · ${u.perms.length} permission${u.perms.length === 1 ? "" : "s"} · last sign-in ${esc(ago(u.lastLogin))} · added ${esc(ago(u.createdAt))}${u.createdBy ? " by " + esc(u.createdBy) : ""}</small>
             <div class="ptags">${PERM_INFO.filter(([k]) => u.perms.includes(k)).map(([, l]) => `<span>${l}</span>`).join("") || `<span class="none">No access — can only see the public dashboard</span>`}${(u.scope || []).length ? `<span class="sc2">Sees: ${u.scope.map((id) => esc(memName(S.draft, id))).join(", ")}</span>` : ""}</div></div>
-          <div class="row" style="justify-content:flex-end;gap:6px">${me ? `<span class="muted" style="font-size:12px">You</span>` : `<button class="btn sm ${open ? "primary" : ""}" data-act="userPerms" data-u="${esc(u.username)}">${open ? "Close" : "Permissions"}</button><button class="btn sm" data-act="userPass" data-u="${esc(u.username)}">Reset password</button><button class="btn sm" data-act="userToggle" data-u="${esc(u.username)}">${u.disabled ? "Enable" : "Disable"}</button><button class="btn sm danger" data-act="userDelete" data-u="${esc(u.username)}">Delete</button>`}</div></div>
+          <div class="row" style="justify-content:flex-end;gap:6px">${me ? `<span class="muted" style="font-size:12px">You</span>` : `<button class="btn sm ${open ? "primary" : ""}" data-act="userPerms" data-u="${esc(u.username)}">${open ? "Close" : "Permissions"}</button><button class="btn sm" data-act="userPass" data-u="${esc(u.username)}">Temporary password</button><button class="btn sm ${u.disabled ? "primary" : ""}" data-act="userToggle" data-u="${esc(u.username)}">${u.disabled ? "Activate" : "Freeze"}</button><button class="btn sm danger" data-act="userDelete" data-u="${esc(u.username)}">Delete</button>`}</div></div>
           ${open && !me ? `<div class="uperm">${presetBtns(`data-u="${esc(u.username)}"`)}${grid(A.uPerms || u.perms, "data-uperm")}${scopeBox(A.uScope || u.scope || [], "data-uscope")}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm ghost" data-act="userPerms" data-u="${esc(u.username)}">Cancel</button><button class="btn sm primary" data-act="userPermSave" data-u="${esc(u.username)}">Save permissions</button></div></div>` : ""}</div>`; }).join("")}
       </div>`;
     }
@@ -3792,6 +3889,35 @@ document.addEventListener("click", async (e) => {
     case "rqAttDel": S.admin.rq.attachments.splice(+el.dataset.j, 1); return R();
     case "recAttDel": if (confirm("Remove this attachment from the record?")) D.requests[i].attachments.splice(+el.dataset.j, 1); return R();
     case "openApprovals": return showView("approvals");
+    case "myAccount": e.preventDefault(); return openAccount(false);
+    case "forgot": e.preventDefault(); return openForgot(el.dataset.v);
+    case "copyCode": try { await navigator.clipboard.writeText(el.dataset.v); toast("Copied"); } catch { toast("Select the code and copy it", true); } return;
+    case "forgotGo": {
+      const user = $("#fgUser").value.trim().toLowerCase(); if (!user) return toast("Enter the username", true);
+      if (el.dataset.v === "user") { try { await call("/api/auth", "POST", { action: "forgot", username: user }); $("#modalRoot").innerHTML = ""; toast("Request sent — an admin will give you a temporary password"); } catch (err) { toast(err.message, true); } return; }
+      try {
+        const j = await call("/api/auth", "POST", { action: "recover", username: user, code: $("#fgCode").value, password: $("#fgPass").value });
+        S.token = j.token; S.me = j.user; localStorage.setItem("vmo_token", S.token); renderHeader(); await load(true);
+        return showRecoveryCode(j.recoveryCode);
+      } catch (err) { return toast(err.message, true); }
+    }
+    case "accSave": {
+      const cur = $("#acCur").value, nw = $("#acNew").value;
+      if (!cur) return toast("Enter your current password", true);
+      if (nw.length < (S.me.owner ? 8 : 6)) return toast(`The new password must be at least ${S.me.owner ? 8 : 6} characters`, true);
+      if (nw !== $("#acNew2").value) return toast("The two new passwords don't match", true);
+      try {
+        const j = await call("/api/auth", "POST", { action: "change", current: cur, password: nw });
+        S.token = j.token; localStorage.setItem("vmo_token", S.token); if (j.user) S.me = j.user; else S.me.mustChange = false;
+        toast("Password changed — other devices were signed out");
+        if (j.recoveryCode) return showRecoveryCode(j.recoveryCode);
+        $("#modalRoot").innerHTML = ""; renderAll();
+      } catch (err) { toast(err.message, true); }
+      return;
+    }
+    case "wkDecide": return decideWeek(el.dataset.k, el.dataset.v);
+    case "apSettle": return settleRecords(el.dataset.id ? [el.dataset.id] : null, el.dataset.v !== "0", el.dataset.t);
+    case "apWeekOpen": S.weekOffset = (dIdx(el.dataset.k) - wkStart(V(), curIdx())) / 7; showView("ops"); renderAll(); setTimeout(() => $("#wkTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); return;
     case "apLogin": return openLogin("__approvals");
     case "apTab": AP.tab = el.dataset.v; return renderApprovals();
     case "apDecide": return decideRecords([el.dataset.id], el.dataset.v);
@@ -3817,10 +3943,15 @@ document.addEventListener("click", async (e) => {
     case "userPerms": { const u = el.dataset.u; S.admin.uOpen = S.admin.uOpen === u ? null : u; S.admin.uPerms = null; S.admin.uScope = null; return renderAdmin(); }
     case "userPermSave": { const u = S.users.find((x) => x.username === el.dataset.u); const perms = S.admin.uPerms || u.perms, scope = S.admin.uScope || u.scope || []; S.admin.uOpen = null; S.admin.uPerms = null; S.admin.uScope = null; return userAction("PATCH", { username: u.username, perms, scope }, `Access saved for ${u.name}`); }
     case "ownerEdit": S.admin.ownEdit = !S.admin.ownEdit; return renderAdmin();
+    case "ownerRecovery": {
+      const cur = $("#owCur").value; if (!cur) return toast("Enter your current password first", true);
+      if (!confirm("Make a new recovery code? The old one stops working.")) return;
+      try { const j = await call("/api/users", "PATCH", { owner: true, newRecovery: true, current: cur }); S.ownerInfo = j.owner; return showRecoveryCode(j.recoveryCode); } catch (err) { return toast(err.message, true); }
+    }
     case "ownerSave": {
-      const body = { owner: true, name: $("#owName").value.trim(), login: $("#owLogin").value.trim().toLowerCase() }, pw = $("#owPass").value;
+      const body = { owner: true, name: $("#owName").value.trim(), login: $("#owLogin").value.trim().toLowerCase(), current: $("#owCur").value }, pw = $("#owPass").value;
       if (pw || $("#owPass2").value) { if (pw.length < 8) return toast("The owner password must be at least 8 characters", true); if (pw !== $("#owPass2").value) return toast("The two passwords don't match", true); body.password = pw; }
-      try { const j = await call("/api/users", "PATCH", body); S.users = j.users; S.ownerInfo = j.owner; if (j.token) { S.token = j.token; localStorage.setItem("vmo_token", S.token); } S.me.name = j.owner.name; S.admin.ownEdit = false; toast(body.password ? "Owner sign-in saved — use the new password from now on" : "Owner sign-in saved"); load(true); }
+      try { const j = await call("/api/users", "PATCH", body); S.users = j.users; S.ownerInfo = j.owner; if (j.token) { S.token = j.token; localStorage.setItem("vmo_token", S.token); } S.me.name = j.owner.name; S.admin.ownEdit = false; toast(body.password ? "Owner sign-in saved — use the new password from now on" : "Owner sign-in saved"); load(true); if (j.recoveryCode) return showRecoveryCode(j.recoveryCode); }
       catch (e) { toast(e.message, true); }
       return renderAdmin();
     }
@@ -3829,8 +3960,8 @@ document.addEventListener("click", async (e) => {
       if (el.dataset.u) S.admin.uPerms = list; else { keepNu(); S.admin.nu.perms = list; }
       return renderAdmin();
     }
-    case "userPass": { const pw = prompt(`New password for @${el.dataset.u} (at least 6 characters):`); if (pw) userAction("PATCH", { username: el.dataset.u, password: pw }, "Password reset — share it with them"); return; }
-    case "userToggle": { const u = S.users.find((x) => x.username === el.dataset.u); return userAction("PATCH", { username: u.username, disabled: !u.disabled }, u.disabled ? "User enabled" : "User disabled — signed out everywhere"); }
+    case "userPass": { const pw = prompt(`Temporary password for @${el.dataset.u} (at least 6 characters). They'll be asked to choose their own when they sign in:`); if (pw) userAction("PATCH", { username: el.dataset.u, password: pw }, "Temporary password set — share it with them"); return; }
+    case "userToggle": { const u = S.users.find((x) => x.username === el.dataset.u); if (!u.disabled && !confirm(`Freeze ${u.name}'s account? They're signed out everywhere and can't sign in until you activate it again.`)) return; return userAction("PATCH", { username: u.username, disabled: !u.disabled }, u.disabled ? "Account activated" : "Account frozen — signed out everywhere"); }
     case "userDelete": if (confirm(`Delete @${el.dataset.u}? Their past changes stay in the Activity Log.`)) userAction("DELETE", { username: el.dataset.u }, "User deleted"); return;
   }
 });

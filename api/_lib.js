@@ -21,7 +21,9 @@ export const can = (me, p) => !!me && (me.owner || (me.perms || []).includes(p))
 // scope = the team members this account may see in Reports, Tasks and Profiles (empty = everyone)
 export const scopeOf = (u) => (Array.isArray(u.scope) ? u.scope.filter((x) => typeof x === 'string' && x).slice(0, 100) : []);
 export const inScope = (me, memberId) => !me || me.owner || !(me.scope || []).length || me.scope.includes(memberId);
-export const sessionUser = (u) => ({ username: u.username, name: u.name, role: u.role, perms: permsOf(u), scope: scopeOf(u), owner: false });
+export const sessionUser = (u) => ({ username: u.username, name: u.name, role: u.role, perms: permsOf(u), scope: scopeOf(u), owner: false, mustChange: !!u.mustChange });
+// the owner's one-time recovery code (shown once, stored hashed) — used when the owner password is lost
+export const newRecoveryCode = () => crypto.randomBytes(12).toString('hex').toUpperCase().match(/.{1,4}/g).slice(0, 5).join('-');
 const SESSION_HOURS = 24;
 
 /* ---------- JSON documents in Blob (each save is a new version; old versions are trimmed) ---------- */

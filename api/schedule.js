@@ -38,15 +38,31 @@ function mergeRecords(me, inc, cur) {
     if (!i) { if (s.status === 'pending' && okType(s.type)) continue; out.push(s); continue; } // deleted
     if (!okType(s.type)) { out.push(s); continue; }
     if (s.status !== 'pending') { out.push({ ...s, details: i.details, attachments: i.attachments }); continue; }
-    out.push({ ...i, type: s.type, status: 'pending', applied: !!s.applied, ref: s.ref });
+    out.push({ ...i, type: s.type, status: 'pending', applied: !!s.applied, ref: s.ref, settled: false, decidedBy: s.decidedBy, decidedAt: s.decidedAt });
   }
-  for (const i of byId.values()) if (i && i.id && okType(i.type)) { const r = { ...i, status: 'pending' }; delete r.applied; out.push(r); }
+  for (const i of byId.values()) if (i && i.id && okType(i.type)) { const r = { ...i, status: 'pending' }; delete r.applied; delete r.settled; delete r.decidedBy; delete r.decidedAt; out.push(r); }
   return [...out, ...hidden];
+}
+// Weekly schedules: someone without "approve" can edit a week, but it then goes to "review" until it's approved;
+// they can never mark a week approved or rejected themselves.
+function reviewWeeks(me, data, current) {
+  const cur = (current && current.weeks) || {}, now = new Date().toISOString(), by = me.name;
+  const body = (w) => JSON.stringify([w.memberIds, w.cells, w.notes || null]);
+  for (const [k, w] of Object.entries(data.weeks || {})) {
+    const c = cur[k];
+    const decided = (x) => x && (x.status === 'approved' || x.status === 'rejected' || !x.status);
+    if (!c && /^imported/.test(String(w.src || '')) && !w.status) continue; // schedule history from the old sheets
+    if (!c) { w.status = 'review'; w.review = { by, at: now, note: 'New week' }; delete w.decided; continue; }
+    const changed = body(w) !== body(c);
+    if (changed) { w.status = 'review'; w.review = { by, at: now, note: c.status === 'review' ? (c.review || {}).note || 'Changed' : 'Changed after ' + (c.status || 'approval') }; w.decided = c.decided; }
+    else { w.status = c.status; w.review = c.review; w.decided = c.decided; if (!c.status) delete w.status; }
+    if (!changed && decided(c) && w.status !== c.status) w.status = c.status;
+  }
 }
 function enforcePerms(me, data, current) {
   if (me.owner) return '';
   let allowed = 0;
-  if (can(me, 'schedule')) allowed++; else keep(data, current, 'weeks');
+  if (can(me, 'schedule')) { allowed++; if (!can(me, 'approve')) reviewWeeks(me, data, current); } else keep(data, current, 'weeks');
   if (can(me, 'setup')) allowed++; else ['members', 'shiftTypes', 'responsibilities', 'timeSlots'].forEach((k) => keep(data, current, k));
   if (can(me, 'settings')) allowed++; else keep(data, current, 'settings');
   if (can(me, 'sources')) allowed++; else keep(data, current, 'reportSources');
@@ -98,7 +114,7 @@ export default async function handler(req, res) {
       ? body.changes.filter((x) => typeof x === 'string' && x.trim()).slice(0, 200).map((x) => x.slice(0, 400))
       : [];
     // approvals are the owner's: a status / apply line from anyone else never reaches the log (the server kept the old value)
-    if (!can(me, 'approve')) for (let k = changes.length - 1; k >= 0; k--) if (/^Records: .* — status |^Records: applied /.test(changes[k])) changes.splice(k, 1);
+    if (!can(me, 'approve')) for (let k = changes.length - 1; k >= 0; k--) if (/^Records: .* — status |^Records: applied |^Records: .* marked |^Approvals: /.test(changes[k])) changes.splice(k, 1);
     const prevLog = current && Array.isArray(current.log) ? current.log : [];
     const entry = changes.length ? { at: data.updatedAt, by: { username: me.username, name: me.name }, changes } : null;
     data.log = entry ? [entry, ...prevLog].slice(0, 500) : prevLog;

@@ -4,7 +4,7 @@
 // PATCH  /api/users {username, name?, perms?, role?, password?, disabled?}
 // DELETE /api/users {username}
 // Nobody can give permissions they don't have themselves, change their own permissions, or touch the owner account.
-import { readJSON, writeJSON, USERS, PERMS, PRESETS, permsOf, scopeOf, can, hashPassword, signToken, userFromToken, bearer, parseBody, appendLog } from './_lib.js';
+import { readJSON, writeJSON, USERS, PERMS, PRESETS, permsOf, scopeOf, can, hashPassword, checkPassword, signToken, userFromToken, bearer, parseBody, appendLog, sleep, newRecoveryCode } from './_lib.js';
 
 const LABEL = { schedule: 'Edit schedule', setup: 'Team & setup', settings: 'Settings', records: 'Excuses & shift changes', money: 'Bonuses & deductions', approve: 'Approve / reject', log: 'Activity log', reports: 'View reports', sources: 'Report sheets', tasks: 'View tasks', tasksManage: 'Assign & manage tasks', tasksReview: 'Review & rate tasks', users: 'Manage users' };
 const presetOf = (perms) => Object.keys(PRESETS).find((k) => PRESETS[k].length === perms.length && PRESETS[k].every((p) => perms.includes(p))) || 'custom';
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     if (!me) return res.status(401).json({ error: 'Please sign in again' });
     if (!can(me, 'users')) return res.status(403).json({ error: "Your account can't manage users" });
     const by = { username: me.username, name: me.name };
-    const reply = (doc, extra) => ({ ok: true, users: doc.users.map(publicUser), owner: { login: (doc.owner || {}).username || 'owner', name: (doc.owner || {}).name || me.name, custom: !!(doc.owner || {}).hash }, perms: PERMS, presets: PRESETS, ...extra });
+    const reply = (doc, extra) => ({ ok: true, users: doc.users.map(publicUser), resetRequests: (doc.resetRequests || []).filter((r) => doc.users.some((u) => u.username === r.username)), owner: { login: (doc.owner || {}).username || 'owner', name: (doc.owner || {}).name || me.name, custom: !!(doc.owner || {}).hash, recovery: !!(doc.owner || {}).recovery }, perms: PERMS, presets: PRESETS, ...extra });
     // which team members the account sees (empty = everyone); a limited manager can only hand out part of their own list
     const wantScope = (b) => {
       if (!Array.isArray(b.scope)) return null;
@@ -48,6 +48,12 @@ export default async function handler(req, res) {
     if (req.method === 'PATCH' && b.owner) {
       if (!me.owner) return res.status(403).json({ error: 'Only the owner can change the owner account' });
       const o = (doc.owner = doc.owner || {}), changes = [];
+      // changing the sign-in name or password needs the current password (or the PIN until a password is set)
+      const curOk = o.hash ? checkPassword(b.current || '', o.salt, o.hash) : !!process.env.ADMIN_PIN && String(b.current || '') === String(process.env.ADMIN_PIN);
+      const sensitive = b.password || b.newRecovery || (b.login !== undefined && String(b.login).trim().toLowerCase() !== ownerLogin);
+      if (sensitive && !curOk) { await sleep(700); return res.status(400).json({ error: 'Your current password is wrong' }); }
+      let recoveryCode = null;
+      if (b.newRecovery) { recoveryCode = newRecoveryCode(); o.recovery = hashPassword(recoveryCode); changes.push('Users: owner generated a new recovery code'); }
       if (b.login !== undefined) {
         const l = String(b.login).trim().toLowerCase();
         if (!/^[a-z0-9._-]{3,32}$/.test(l)) return res.status(400).json({ error: 'Username: 3–32 letters, numbers, dot, dash or underscore' });
@@ -60,13 +66,14 @@ export default async function handler(req, res) {
         if (String(b.password).length < 8) return res.status(400).json({ error: 'The owner password must be at least 8 characters' });
         const now = Date.now();
         Object.assign(o, hashPassword(b.password), { pwChangedAt: now });
+        if (!o.recovery) { recoveryCode = newRecoveryCode(); o.recovery = hashPassword(recoveryCode); }
         token = signToken({ u: 'owner', iat: now + 1 }); // this session stays signed in; every other owner session ends
         changes.push('Users: owner password changed — other owner sessions signed out');
       }
       if (!changes.length) return res.status(200).json(reply(doc));
       await writeJSON(USERS, doc, 10);
       await appendLog(changes, by);
-      return res.status(200).json(reply(doc, token ? { token } : {}));
+      return res.status(200).json(reply(doc, { ...(token ? { token } : {}), ...(recoveryCode ? { recoveryCode } : {}) }));
     }
     const uname = String(b.username || '').trim().toLowerCase();
     const u = doc.users.find((x) => x.username === uname);
@@ -108,12 +115,14 @@ export default async function handler(req, res) {
       }
       if (b.disabled !== undefined && !!b.disabled !== !!u.disabled) {
         if (uname === me.username) return res.status(400).json({ error: "You can't disable your own account" });
-        u.disabled = !!b.disabled; changes.push(`Users: ${u.disabled ? 'disabled' : 're-enabled'} ${u.name} (@${uname})`);
+        u.disabled = !!b.disabled; changes.push(`Users: ${u.disabled ? 'froze' : 'activated'} ${u.name} (@${uname})`);
       }
       if (b.password) {
         if (String(b.password).length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
-        Object.assign(u, hashPassword(b.password), { pwChangedAt: Date.now() });
-        changes.push(`Users: reset password for ${u.name} (@${uname})`);
+        // a password set by someone else is temporary — the person must choose their own at the next sign-in
+        Object.assign(u, hashPassword(b.password), { pwChangedAt: Date.now(), mustChange: true });
+        doc.resetRequests = (doc.resetRequests || []).filter((r) => r.username !== uname);
+        changes.push(`Users: set a temporary password for ${u.name} (@${uname})`);
       }
       if (!changes.length) return res.status(200).json(reply(doc));
       await writeJSON(USERS, doc, 10);
