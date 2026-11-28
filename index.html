@@ -440,9 +440,10 @@ table.xs tr.notes td{background:#FFF8EC!important;color:var(--warn);font-size:18
   .brand img{height:28px}
   .brand .divider{height:40px}
   .brand h1{font-size:27px}
-  .hero-right{width:100%;justify-content:space-between}
-  .clock{text-align:left}
-  .clock .t{font-size:24px}
+  .hero-right{width:100%;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  .clock{text-align:left;flex:1 1 100%;display:flex;align-items:baseline;gap:10px}
+  .clock .t{font-size:24px;white-space:nowrap}.clock .d{margin-top:0}
+  .userchip{flex:1;min-width:0}.userchip>div:last-child{min-width:0}
   section.card{padding:16px}
   .sh h2{font-size:23px}
   .kpi .v{font-size:29px}
@@ -568,6 +569,7 @@ table.lbt tr.tot td{font-weight:700;background:var(--pale-3);border-bottom:none}
 .rctl .rbtns{margin-left:auto;display:flex;gap:8px}
 .rfilter .rmeta{margin-top:10px}
 table.ctb{min-width:900px}
+table.ctb th,table.ctb td{padding-left:6px;padding-right:6px}table.ctb .spd{width:90px}
 .cpc2{font-family:var(--serif);font-size:19px;font-weight:600;min-width:44px;text-align:right}
 .cpc2.ok{color:var(--ok)} .cpc2.warn{color:var(--warn)} .cpc2.bad{color:var(--bad)}
 tr.cdays td{background:var(--pale-3);white-space:normal!important;text-align:left!important;font-size:12.8px;line-height:1.8;color:var(--ink-2);padding:10px 14px!important}
@@ -687,6 +689,67 @@ html{overflow-x:hidden}
 .wkst b{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.wkst small{font-size:11px;opacity:.85}
 .wkst.ap{background:var(--ok-bg);color:var(--ok)}.wkst.rv{background:var(--warn-bg);color:var(--warn)}.wkst.rj{background:var(--bad-bg);color:var(--bad)}.wkst.dr{background:var(--line-2);color:var(--muted)}
 .wkbtns{display:inline-flex;gap:6px;vertical-align:middle;margin:4px 6px 4px 0}
+.wkbtns{flex-wrap:wrap;align-items:center}
+.apdays{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}.apdays .dst{font-size:10.5px;font-weight:800;border:none;border-radius:999px;padding:3px 9px;font-family:inherit}
+.wkdec{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.wkdec button{border:none;background:none;padding:7px 12px;font:inherit;font-size:12.3px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-right:1px solid var(--line-2)}
+.wkdec button:last-child{border-right:none}
+.wkdec button:hover{background:var(--line-2);color:var(--ink)}
+.wkdec button.approved.on{background:var(--ok);color:#fff}.wkdec button.review.on{background:#C98A1B;color:#fff}.wkdec button.rejected.on{background:var(--bad);color:#fff}
+table.wk thead th .dst{display:inline-flex;align-items:center;gap:3px;margin-top:5px;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:2px 8px;border:none;font-family:inherit;line-height:1.5}
+.dst.approved{background:#D6EEDF;color:var(--ok)}.dst.review{background:#F8E6C6;color:#8A520A}.dst.rejected{background:#F6D5D9;color:var(--bad)}
+button.dst{cursor:pointer}button.dst:hover{filter:brightness(.95)}
+table.wk td.drj{background:#FDF4F5}table.wk thead th.drj{box-shadow:inset 0 -3px 0 var(--bad)}
+.wkmsg{border-radius:12px;padding:11px 15px;margin:4px 0 14px;font-size:13px;line-height:1.55}
+.wkmsg b{display:block;font-size:12px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+.wkmsg .dn{display:inline-block;font-weight:700;min-width:88px;margin-right:8px}
+.wkmsg small{display:block;margin-top:6px;opacity:.85}.wkmsg .gn{margin-top:6px;font-style:italic}
+.wkmsg.rj{background:var(--bad-bg);color:#6E1720;border:1px solid #F1C9CE}.wkmsg.rj b{color:var(--bad)}
+.wkmsg.rv{background:var(--warn-bg);color:#6B420A;border:1px solid #F0DDBC}.wkmsg.rv b{color:var(--warn)}.wkmsg.rv .dn{min-width:0;margin-right:4px}
+.m-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--line-2);background:#fff;position:sticky;bottom:0}
+.modal.rvm{max-width:1060px}
+.rvtop{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
+.rvkpi{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12.5px;font-weight:700}
+.rvkpi span{border-radius:999px;padding:4px 11px}.rvkpi .ap{background:var(--ok-bg);color:var(--ok)}.rvkpi .rv{background:var(--warn-bg);color:var(--warn)}.rvkpi .rj{background:var(--bad-bg);color:var(--bad)}.rvkpi .muted{font-weight:500;padding-left:2px}
+.rvall{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
+.rvlist{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.rvrow{display:grid;grid-template-columns:120px 1fr minmax(300px,360px);gap:14px;padding:12px 14px;border-bottom:1px solid var(--line-2);border-left:4px solid transparent;align-items:center}
+.rvrow:last-child{border-bottom:none}
+.rvrow.approved{border-left-color:var(--ok)}.rvrow.review{border-left-color:#C98A1B}.rvrow.rejected{border-left-color:var(--bad);background:#FFF8F9}
+.rvrow.focus{box-shadow:inset 0 0 0 2px var(--brand-3)}
+.rvd b{display:block;font-size:14px}.rvd span{font-size:12px;color:var(--muted)}.rvd small{display:block;font-size:11px;color:var(--soft);margin-top:3px}
+.rvsum{font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:5px}
+.rvck{display:flex;flex-wrap:wrap;gap:5px}
+.ck{font-size:11.3px;border-radius:7px;padding:2px 8px;font-weight:600}
+.ck.ok{background:var(--ok-bg);color:var(--ok)}.ck.warn{background:var(--warn-bg);color:var(--warn)}.ck.bad{background:var(--bad-bg);color:var(--bad)}
+.rva{display:flex;flex-direction:column;gap:6px}.rva .wkdec{align-self:stretch}.rva .wkdec button{flex:1;padding:7px 6px}
+.rvnote{border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;font-size:12.8px;width:100%}
+.rvrow.rejected .rvnote{border-color:#E8AEB6}
+.rvhist{margin-top:16px;border-top:1px solid var(--line-2);padding-top:12px;font-size:12.5px;color:var(--ink-2)}
+.rvhist h4{margin:0 0 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rvhist div{padding:4px 0}
+.ntw{position:relative}
+.ntbtn{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;cursor:pointer}
+.ntbtn:hover{background:rgba(255,255,255,.14)}
+.ntbtn i{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;border-radius:10px;background:#D9472F;color:#fff;font-style:normal;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;border:2px solid var(--deep)}
+.ntp{position:absolute;right:0;top:48px;width:380px;max-width:calc(100vw - 24px);background:#fff;color:var(--ink);border-radius:16px;box-shadow:0 22px 60px rgba(5,22,23,.3);z-index:40;overflow:hidden}
+.ntp .nth{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line-2)}
+.ntp .nth b{font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+.ntp .nth a{font-size:12px;color:var(--brand);font-weight:600}
+.ntl{max-height:420px;overflow-y:auto}
+.nti{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line-2);cursor:pointer;font-size:12.8px;line-height:1.45}
+.nti:hover{background:var(--line-2)}.nti.unread{background:#F6FAF9}
+.nti .ic{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:13px}
+.nti .ic.approved{background:var(--ok-bg);color:var(--ok)}.nti .ic.review{background:var(--warn-bg);color:var(--warn)}.nti .ic.rejected{background:var(--bad-bg);color:var(--bad)}
+.nti small{display:block;color:var(--muted);font-size:11.3px;margin-top:2px}
+.nti .why{display:block;color:var(--bad);margin-top:2px}
+.nti .dot{flex:none;width:8px;height:8px;border-radius:50%;background:#D9472F;margin-top:6px}
+@media (max-width:760px){
+  .rvrow{grid-template-columns:1fr;gap:8px}
+  .rvd{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .wkdec button{padding:7px 9px;font-size:11.8px}
+  .ntp{position:fixed;left:12px;right:12px;top:70px;width:auto}
+}
 .aph h3 em{font-style:normal;color:var(--muted);font-weight:700;margin-left:6px;letter-spacing:0;text-transform:none}
 .rb.act{background:var(--ok-bg);color:var(--ok)}
 .rcode{font-family:ui-monospace,Menlo,monospace;font-size:19px;font-weight:700;letter-spacing:.06em;text-align:center;background:var(--pale-3);border:1px dashed var(--brand-3);border-radius:12px;padding:16px;color:var(--deep);user-select:all}
@@ -901,6 +964,7 @@ table.tkp{min-width:1000px}
     </div>
     <div class="hero-right">
       <div class="clock"><div class="t" id="clockTime">--:--</div><div class="d" id="clockDate"></div></div>
+      <div class="ntw hidden" id="ntWrap"><button class="ntbtn" data-act="ntToggle" title="Notifications" aria-label="Notifications"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="19" height="19"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i id="ntCount" class="hidden"></i></button><div class="ntp hidden" id="ntPanel"></div></div>
       <div class="userchip hidden" id="userChip"></div>
       <button class="btn light" id="adminBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Manage</span></button>
     </div>
@@ -1259,6 +1323,7 @@ async function load(silent) {
   } catch (e) { if (!silent) S.serverOK = false; }
   if (!S.histApplied && !dirty()) { withHistory(S.data); if (S.draft) S.draft = clone(S.data); S.histApplied = true; }
   renderAll();
+  if (S.me) loadNotices(); else if (NT.list.length) { NT.list = []; NT.unread = 0; renderNotices(); }
 }
 async function call(url, method, body) {
   const r = await fetch(url, { method, headers: { "content-type": "application/json", ...(S.token ? { authorization: "Bearer " + S.token } : {}) }, body: body ? JSON.stringify(body) : undefined });
@@ -1279,7 +1344,7 @@ async function save() {
     S.data = clone(S.draft); S.fresh = false; S.restored = false;
     if (srcChanged && S.me) { RS.raw = null; if (RS.view === "reports") loadReports(true); }
     toast(canApprove() ? "Saved — the team sees it now" : "Saved — schedule changes go to review");
-    if (!canApprove()) setTimeout(() => load(true), 400);
+    if (!canApprove() || changes.some((c) => /^Approvals: week/.test(c))) setTimeout(() => load(true), 400); // server adds the decision history / review state
   } catch (e) {
     if (e.status === 401) signedOut("Your session ended — sign in again, then save. Your changes are kept.");
     else toast(e.status === 409 ? "Someone else saved changes first. Refresh the page, then edit again." : e.message, true);
@@ -1289,7 +1354,7 @@ async function save() {
 
 /* ============================ render ============================ */
 function renderAll() {
-  renderHeader(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderProfiles(); renderRequests(); renderLog(); renderSaveBar(); renderReports(); renderApprovals(); renderAccess();
+  renderHeader(); renderNotices(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderProfiles(); renderRequests(); renderLog(); renderSaveBar(); renderReports(); renderApprovals(); renderAccess();
   if (S.admin.open) renderAdmin();
 }
 function renderHeader() {
@@ -1316,6 +1381,10 @@ function renderBanners() {
   let h = "";
   if (!S.serverOK) h += `<div class="banner warn">Not connected to the server — showing the starting schedule. Changes can't be saved here.</div>`;
   else if (S.fresh) h += `<div class="banner info">Showing the starting schedule. Your first save from <b>Manage</b> stores it on the server.</div>`;
+  const nrj = NT.list.filter((n) => !n.read && n.kind === "decision" && (n.status === "rejected" || (n.days || []).some((d) => d.status === "rejected"))).length;
+  const nsub = NT.list.filter((n) => !n.read && n.kind === "submitted").length;
+  if (nrj) h += `<div class="banner warn" style="background:var(--bad-bg);color:var(--bad)">✕ ${nrj} schedule decision${nrj > 1 ? "s" : ""} with rejected days need${nrj > 1 ? "" : "s"} your attention — <a href="#" data-act="ntToggle" style="color:inherit;font-weight:700">View reasons</a></div>`;
+  else if (nsub && canApprove()) h += `<div class="banner info">● ${nsub} schedule submission${nsub > 1 ? "s" : ""} waiting for your decision — <a href="#" data-act="ntToggle" style="color:inherit;font-weight:700">View</a></div>`;
   $("#banners").innerHTML = h;
 }
 const relDay = (i, n) => { const t = opIdx(V(), n); return i === t ? "Today" : i === t + 1 ? "Tomorrow" : DY[wdOf(i)]; };
@@ -1373,9 +1442,16 @@ function renderDay() {
   $("#timeline").innerHTML = h;
 }
 function weekTableHTML(D, ws) {
-  const st = weekStats(D, ws), ci = curIdx(), edit = can("schedule");
+  const st = weekStats(D, ws), ci = curIdx(), edit = can("schedule"), key = iDate(ws), w = weekAt(D, ws);
+  // day-by-day decision pills (signed-in accounts only; older weeks published before approvals show none)
+  const showDec = !!w && !!S.me && !wkLegacy(w, key), dec = showDec ? daysOfWeek(w, key) : {};
+  const rjDay = (k) => showDec && dec[k].status === "rejected";
   let h = `<thead><tr><th>Team member</th>`;
-  for (let k = 0; k < 7; k++) { const i = ws + k; h += `<th class="${i === ci ? "today" : ""}">${DY[wdOf(i)]}<span class="dd">${dmy(i)}</span></th>`; }
+  for (let k = 0; k < 7; k++) {
+    const i = ws + k, x = dec[k];
+    const pill = showDec ? (canApprove() ? `<button class="dst ${x.status}" data-act="wkReview" data-k="${key}" data-d="${k}" title="${esc(WK_ST[x.status][0])}${x.note ? " — " + esc(x.note) : ""}${x.by ? " · " + esc(x.by) : ""} · click to review">${DSYM[x.status]} ${WK_ST[x.status][0]}</button>` : `<span class="dst ${x.status}" title="${esc(WK_ST[x.status][0])}${x.note ? " — " + esc(x.note) : ""}">${DSYM[x.status]} ${WK_ST[x.status][0]}</span>`) : "";
+    h += `<th class="${i === ci ? "today" : ""} ${rjDay(k) ? "drj" : ""}">${DY[wdOf(i)]}<span class="dd">${dmy(i)}</span>${pill}</th>`;
+  }
   h += `<th>Hours</th></tr></thead><tbody>`;
   for (const m of st.mem) {
     const p = st.per[m.id];
@@ -1387,7 +1463,7 @@ function weekTableHTML(D, ws) {
       if (!c) inner = `<span class="emc">–</span>`;
       else if (c.off) inner = `<span class="offc">${esc(c.ty.name)}${c.n ? `<small>${esc(c.n)}</small>` : ""}</span>`;
       else inner = `<span class="slot" style="--c:${esc(c.ty.color)}"><i class="sn">${esc(c.ty.name)}</i><b>${c.t ? esc(tLabel(c.t, 1)) : "—"}</b>${c.resp ? `<small>${esc(c.resp.name)}</small>` : ""}${c.n ? `<small class="nn">${esc(c.n)}</small>` : ""}</span>`;
-      h += `<td class="${i === ci ? "today" : ""} ${edit ? "editable" : ""}" ${edit ? `data-act="cellEdit" data-m="${esc(m.id)}" data-k="${k}" title="Edit ${esc(m.name)} · ${DAYS[wdOf(i)]}"` : ""}>${inner}${rqb ? `<div>${rqb}</div>` : ""}</td>`;
+      h += `<td class="${i === ci ? "today" : ""} ${edit ? "editable" : ""} ${rjDay(k) ? "drj" : ""}" ${edit ? `data-act="cellEdit" data-m="${esc(m.id)}" data-k="${k}" title="Edit ${esc(m.name)} · ${DAYS[wdOf(i)]}"` : ""}>${inner}${rqb ? `<div>${rqb}</div>` : ""}</td>`;
     });
     h += `<td class="tot">${hrs(p.work)}<small>${p.shifts} shift${p.shifts === 1 ? "" : "s"} · ${p.off} off</small></td></tr>`;
   }
@@ -1395,36 +1471,178 @@ function weekTableHTML(D, ws) {
   if (notes.some(Boolean)) h += `<tr class="notes"><td class="mem"><div class="nm">Notes</div></td>${notes.map((x) => `<td>${esc(x)}</td>`).join("")}<td></td></tr>`;
   return h + `</tbody>`;
 }
-// Weekly schedule approval: review → approved / rejected. Weeks from before approvals existed count as approved.
+// Weekly schedule approval, day by day. Each day is approved / in review / rejected (with a reason); the week follows its days:
+// any rejected day → Rejected, all seven approved → Approved, otherwise In review. Older weeks only carry a week-level status.
 const WK_ST = { review: ["In review", "rv"], approved: ["Approved", "ap"], rejected: ["Rejected", "rj"], draft: ["Draft", "dr"] };
+const DSYM = { approved: "✓", review: "●", rejected: "✕" };
+const deriveWeek = (days) => { const s = [0, 1, 2, 3, 4, 5, 6].map((i) => ((days || {})[i] || {}).status || "review"); return s.includes("rejected") ? "rejected" : s.every((x) => x === "approved") ? "approved" : "review"; };
 // A week with no status yet: this week or later still needs its first approval; older weeks were published before approvals existed.
-const wkStatus = (w, key) => (w && w.status) || (key && dIdx(key) >= wkStart(V(), curIdx()) ? "review" : "approved");
+const wkLegacy = (w, key) => !!w && !w.status && !w.days && !!key && dIdx(key) < wkStart(V(), curIdx());
+const wkStatus = (w, key) => (w && w.days ? deriveWeek(w.days) : (w && w.status) || (key && dIdx(key) >= wkStart(V(), curIdx()) ? "review" : "approved"));
+function dayDec(w, key, k) {
+  if (w && w.days) return w.days[k] || { status: "review" };
+  const st = wkStatus(w, key), d = (w && w.decided) || {};
+  return { status: st, by: st === "review" ? ((w && w.review) || {}).by : d.by, at: st === "review" ? ((w && w.review) || {}).at : d.at, note: st === "rejected" ? d.note : "" };
+}
+const daysOfWeek = (w, key) => Object.fromEntries([0, 1, 2, 3, 4, 5, 6].map((k) => [k, { ...dayDec(w, key, k) }]));
+const whenTxt = (x) => (x && x.at ? `${logFmt.format(new Date(x.at))} ${logTime.format(new Date(x.at))}` : "");
+function dayCounts(w, key) { const c = { approved: 0, review: 0, rejected: 0 }; for (let k = 0; k < 7; k++) c[dayDec(w, key, k).status]++; return c; }
 function weekStatusHTML(w, key) {
-  const st = wkStatus(w, key), [l, c] = WK_ST[st] || WK_ST.approved, d = w.decided || {}, rv = w.review || {};
-  const when = (x) => (x && x.at ? `${logFmt.format(new Date(x.at))} ${logTime.format(new Date(x.at))}` : "");
-  const info = st === "review" ? `${w.status ? "submitted" : "awaiting first approval"}${rv.by ? " by " + esc(rv.by) : ""}${rv.at ? " · " + when(rv) : ""}${rv.note ? " · " + esc(rv.note) : ""}` : st === "approved" ? (d.by ? `by ${esc(d.by)} · ${when(d)}` : "published before approvals") : st === "rejected" ? `by ${esc(d.by || "—")}${d.note ? ` — “${esc(d.note)}”` : ""}` : "";
-  const btns = canApprove() ? (st === "review" ? `<button class="btn sm primary" data-act="wkDecide" data-k="${key}" data-v="approved">Approve week</button><button class="btn sm" data-act="wkDecide" data-k="${key}" data-v="rejected">Reject</button>` : st === "approved" ? `<button class="btn sm ghost" data-act="wkDecide" data-k="${key}" data-v="review">Back to review</button>` : `<button class="btn sm primary" data-act="wkDecide" data-k="${key}" data-v="approved">Approve week</button><button class="btn sm ghost" data-act="wkDecide" data-k="${key}" data-v="review">Back to review</button>`) : "";
-  return `<span class="wkst ${c}"><b>● ${l}</b>${info ? `<small>${info}</small>` : ""}</span>${btns ? `<span class="wkbtns">${btns}</span>` : ""}`;
+  const st = wkStatus(w, key), [l, c] = WK_ST[st] || WK_ST.approved, d = w.decided || {}, rv = w.review || {}, n = dayCounts(w, key), legacy = wkLegacy(w, key);
+  const mix = n.approved && n.approved < 7 ? ` · ${n.approved}/7 days approved${n.rejected ? ` · ${n.rejected} rejected` : ""}` : n.rejected && n.rejected < 7 ? ` · ${n.rejected} day${n.rejected > 1 ? "s" : ""} rejected` : "";
+  const info = legacy ? "published before approvals"
+    : st === "review" ? `${w.status || w.days ? (rv.by ? "submitted by " + esc(rv.by) : "waiting for a decision") : "awaiting first approval"}${rv.at && (w.status || w.days) ? " · " + whenTxt(rv) : ""}${mix}`
+    : st === "approved" ? (d.by ? `by ${esc(d.by)} · ${whenTxt(d)}` : "approved")
+    : `by ${esc(d.by || "—")}${mix}`;
+  const seg = canApprove() ? `<span class="wkdec" role="group" aria-label="Week decision">${["approved", "review", "rejected"].map((v) => `<button class="${v} ${st === v && !legacy ? "on" : ""}" data-act="wkDecide" data-k="${key}" data-v="${v}">${DSYM[v]} ${v === "approved" ? "Approve" : v === "review" ? "In review" : "Reject"}</button>`).join("")}</span><button class="btn sm" data-act="wkReview" data-k="${key}">Review day by day</button>` : "";
+  return `<span class="wkst ${legacy ? "dr" : c}"><b>● ${legacy ? "Published" : l}</b>${info ? `<small>${info}</small>` : ""}</span>${seg ? `<span class="wkbtns">${seg}</span>` : ""}`;
+}
+// the reasons the team needs to act on, shown above the week to everyone who edits the schedule
+function weekNoticeHTML(D, w, key) {
+  if (!w || !S.me || !(can("schedule") || canApprove()) || wkLegacy(w, key)) return "";
+  const ws = dIdx(key), rj = [], rv = [];
+  for (let k = 0; k < 7; k++) { const x = dayDec(w, key, k); if (x.status === "rejected") rj.push([k, x]); else if (x.status === "review" && w.days) rv.push([k, x]); }
+  let h = "";
+  if (rj.length) h += `<div class="wkmsg rj"><b>✕ ${rj.length === 7 ? "Week rejected" : rj.length + " day" + (rj.length > 1 ? "s" : "") + " rejected"}${w.decided && w.decided.by ? ` by ${esc(w.decided.by)}` : ""}</b>${rj.map(([k, x]) => `<div><span class="dn">${DY[wdOf(ws + k)]} ${dmy(ws + k)}</span>${x.note ? esc(x.note) : `<i class="muted">No reason given</i>`}</div>`).join("")}${w.decided && w.decided.note ? `<div class="gn">${esc(w.decided.note)}</div>` : ""}${can("schedule") && !canApprove() ? `<small>Fix these days and save — they go back to review automatically.</small>` : ""}</div>`;
+  if (rv.length && rv.length < 7) h += `<div class="wkmsg rv"><b>● ${rv.length} day${rv.length > 1 ? "s" : ""} waiting for review</b><div>${rv.map(([k, x]) => `<span class="dn">${DY[wdOf(ws + k)]} ${dmy(ws + k)}</span>${x.note ? `<span class="muted">${esc(x.note)}${x.by ? " · " + esc(x.by) : ""}</span>` : ""}`).join(" ")}</div></div>`;
+  return h;
 }
 async function decideWeek(key, v) {
   if (!canApprove()) return;
   if (dirty()) return toast("You have unsaved changes in Manage — save or discard them first", true);
+  if (v === "rejected") return openReview(key, null, "rejected");
+  const w0 = S.data.weeks[key]; if (!w0) return;
+  if (wkStatus(w0, key) === v && w0.days && Object.values(w0.days).every((x) => x.status === v)) return toast(`Already ${WK_ST[v][0].toLowerCase()}`);
   let note = "";
-  if (v === "rejected") { const x = prompt("Why is this week rejected? (shown to the team leader)"); if (x === null) return; note = x.trim(); }
+  if (v === "review") { const x = prompt("Send the whole week back to review — note for the team (optional):", ""); if (x === null) return; note = x.trim(); }
+  if (v === "approved" && !approveGuard(key, [0, 1, 2, 3, 4, 5, 6])) return;
+  const at = new Date().toISOString(), days = Object.fromEntries([0, 1, 2, 3, 4, 5, 6].map((k) => [k, { status: v, by: S.me.name, at, ...(note ? { note } : {}) }]));
+  await commitReview(key, days, note);
+}
+// approving a day with an uncovered desk, a double-booked desk or an empty cell asks first — the reviewer signs off knowingly
+function approveGuard(key, ks) {
+  const ws = dIdx(key), lines = [];
+  for (const k of ks) { const bad = dayChecks(S.data, ws + k).out.filter(([c]) => c !== "ok"); if (bad.length) lines.push(`${DY[wdOf(ws + k)]} ${dmy(ws + k)}: ${bad.map(([, t]) => t).join("; ")}`); }
+  return !lines.length || confirm(`Approve with these open points?\n\n${lines.slice(0, 8).join("\n")}${lines.length > 8 ? `\n… and ${lines.length - 8} more days` : ""}`);
+}
+async function commitReview(key, days, note) {
   const keepOpen = S.admin.open;
   S.draft = clone(S.data);
   const w = S.draft.weeks[key]; if (!w) return;
-  w.status = v; if (v === "review") w.review = { by: S.me.name, at: new Date().toISOString(), note: "Sent back to review" }; else w.decided = { by: S.me.name, at: new Date().toISOString(), note };
+  w.days = days; w.status = deriveWeek(days); w.decided = { by: S.me.name, at: new Date().toISOString(), ...(note ? { note } : {}) };
+  if (w.status === "review") w.review = { by: S.me.name, at: w.decided.at, note: note || "Sent back to review" };
   await save();
   if (!keepOpen && !dirty()) S.draft = null;
   renderAll();
+}
+/* ---- notifications: decisions reach schedule editors, submissions reach approvers ---- */
+const NT = { list: [], unread: 0, open: false };
+async function loadNotices() {
+  if (!S.me || !S.token) { NT.list = []; NT.unread = 0; NT.open = false; return renderNotices(); }
+  try { const j = await call("/api/notices", "GET"); NT.list = j.list || []; NT.unread = j.unread || 0; } catch (e) { if (e.status === 404) NT.off = true; }
+  renderNotices(); renderBanners();
+}
+async function markNotices(ids) {
+  let n = 0; for (const x of NT.list) if (!x.read && (!ids || ids.includes(x.id))) { x.read = true; n++; }
+  if (!n) return renderNotices();
+  NT.unread = NT.list.filter((x) => !x.read).length; renderNotices(); renderBanners();
+  try { await call("/api/notices", "POST", { action: "seen", ...(ids ? { ids } : {}) }); } catch (e) {}
+}
+const ntVerb = { approved: "approved", rejected: "rejected", review: "sent back to review" };
+function noticeHTML(n) {
+  const i0 = dIdx(n.week), wk = `${dmy(i0)} – ${dmy(i0 + 6, 1)}`, by = esc((n.by && n.by.name) || "Someone"), days = n.days || [], dn = (d) => `${DY[wdOf(i0 + d.i)]} ${dmy(i0 + d.i)}`;
+  let t, sub = "", why = "";
+  if (n.kind === "submitted") { t = `<b>${by}</b> submitted schedule changes · week ${wk}`; sub = `${days.length && days.length < 7 ? days.map((d) => DY[wdOf(i0 + d.i)]).join(", ") + " · " : ""}Waiting for your decision`; }
+  else {
+    const all = !days.length || days.length === 7 && days.every((d) => d.status === days[0].status);
+    t = all ? `<b>${by}</b> ${ntVerb[n.status] || n.status} the week ${wk}` : `<b>${by}</b> reviewed week ${wk}`;
+    if (!all) sub = days.map((d) => `${DY[wdOf(i0 + d.i)]} ${DSYM[d.status]}`).join(" · ") + ` → week ${WK_ST[n.status] ? WK_ST[n.status][0].toLowerCase() : n.status}`;
+    why = days.filter((d) => d.status === "rejected" && d.note).map((d) => `<span class="why">${all && days.every((x) => x.note === d.note) ? "" : dn(d) + " — "}${esc(d.note)}</span>`).filter((x, j, a) => a.indexOf(x) === j).join("");
+    if (n.note) why += `<span class="why" style="color:var(--ink-2)">“${esc(n.note)}”</span>`;
+  }
+  const st = n.kind === "submitted" ? "review" : n.status;
+  return `<div class="nti ${n.read ? "" : "unread"}" data-act="ntOpen" data-id="${esc(n.id)}"><span class="ic ${st}">${DSYM[st] || "●"}</span><div style="min-width:0;flex:1">${t}${sub ? `<small>${sub}</small>` : ""}${why}<small>${whenTxt(n)}</small></div>${n.read ? "" : `<span class="dot"></span>`}</div>`;
+}
+function renderNotices() {
+  const wrap = $("#ntWrap"); if (!wrap) return;
+  const on = !!S.me && !NT.off && (can("schedule") || canApprove());
+  wrap.classList.toggle("hidden", !on);
+  const c = $("#ntCount"); c.textContent = NT.unread > 9 ? "9+" : NT.unread; c.classList.toggle("hidden", !NT.unread);
+  const p = $("#ntPanel"); p.classList.toggle("hidden", !NT.open || !on);
+  if (NT.open && on) p.innerHTML = `<div class="nth"><b>Notifications</b>${NT.unread ? `<a href="#" data-act="ntAll">Mark all as read</a>` : ""}</div><div class="ntl">${NT.list.length ? NT.list.map(noticeHTML).join("") : `<div class="muted" style="padding:22px 16px;font-size:13px;text-align:center">No notifications yet. Schedule decisions and submissions show up here.</div>`}</div>`;
+}
+/* ---- review day by day ---- */
+const RV = { key: null, days: null, note: "" };
+// automatic checks an executive reviewer wants before signing a day off
+function dayChecks(D, i) {
+  const cov = dayCoverage(D, i), mem = weekMembers(D, wkStart(D, i)), out = [];
+  let work = 0, off = 0, unset = 0; const byType = {};
+  for (const m of mem) { const c = cellAt(D, m.id, i); if (!c) unset++; else if (c.off) off++; else { work++; byType[c.ty.name] = (byType[c.ty.name] || 0) + 1; } }
+  for (const g of cov.gaps) out.push(["bad", `${g.r.name} · ${g.t.name}: no one`]);
+  for (const x of cov.rows) if (x.who.length > 1) out.push(["warn", `${x.r.name} · ${x.t.name}: ${x.who.length} people (${x.who.map((m) => first(m.name)).join(", ")})`]);
+  if (unset) out.push(["warn", `${unset} not set`]);
+  const pend = (D.requests || []).filter((r) => r.status === "pending" && (r.date === iDate(i) || r.date2 === iDate(i))).length;
+  if (pend) out.push(["warn", `${pend} record${pend > 1 ? "s" : ""} in review`]);
+  if (!out.length && cov.rows.length) out.push(["ok", "All desks covered"]);
+  return { out, sum: `${Object.entries(byType).map(([t, n]) => `${n} ${t.toLowerCase()}`).join(" · ")}${off ? ` · ${off} off` : ""}` };
+}
+function openReview(key, focus, preset) {
+  const w = S.data.weeks[key]; if (!w) return;
+  RV.key = key; RV.note = ""; RV.days = daysOfWeek(w, key);
+  if (wkLegacy(w, key)) for (const k in RV.days) RV.days[k] = { status: "approved" };
+  RV.orig = JSON.stringify(RV.days);
+  if (preset) for (const k in RV.days) RV.days[k] = { ...RV.days[k], status: preset };
+  RV.focus = focus;
+  renderReview();
+}
+function renderReview() {
+  const D = S.data, key = RV.key, ws = dIdx(key), w = D.weeks[key]; if (!w) return;
+  const n = { approved: 0, review: 0, rejected: 0 }; for (const k in RV.days) n[RV.days[k].status]++;
+  const editors = "everyone who edits the schedule";
+  let rows = "";
+  for (let k = 0; k < 7; k++) {
+    const i = ws + k, x = RV.days[k], ck = dayChecks(D, i), was = JSON.parse(RV.orig)[k];
+    rows += `<div class="rvrow ${x.status} ${RV.focus === k ? "focus" : ""}" data-k="${k}">
+      <div class="rvd"><b>${DY[wdOf(i)]}</b><span>${dmy(i, 1)}</span>${was && was.by ? `<small>${esc(WK_ST[was.status][0])} · ${esc(was.by)}</small>` : ""}</div>
+      <div class="rvc"><div class="rvsum">${esc(ck.sum) || "<span class='muted'>No shifts</span>"}</div><div class="rvck">${ck.out.map(([c, t]) => `<span class="ck ${c}">${c === "ok" ? "✓" : c === "bad" ? "!" : "•"} ${esc(t)}</span>`).join("")}</div></div>
+      <div class="rva"><span class="wkdec">${["approved", "review", "rejected"].map((v) => `<button class="${v} ${x.status === v ? "on" : ""}" data-act="rvSet" data-k="${k}" data-v="${v}">${DSYM[v]} ${v === "approved" ? "Approve" : v === "review" ? "In review" : "Reject"}</button>`).join("")}</span>
+      <input class="rvnote" data-k="${k}" placeholder="${x.status === "rejected" ? "Reason — required, sent to the team" : "Note (optional)"}" value="${esc(x.note || "")}" maxlength="500"></div></div>`;
+  }
+  const hist = (w.history || []).slice(-8).reverse();
+  $("#modalRoot").innerHTML = `<div class="overlay" data-act="rvClose"><div class="modal rvm"><div class="m-head"><h3>Review schedule · ${dmy(ws)} – ${dmy(ws + 6, 1)}</h3><button class="btn ghost" data-act="rvClose">✕</button></div>
+  <div class="m-body">
+    <div class="rvtop"><div class="rvkpi"><span class="ap">✓ ${n.approved} approved</span><span class="rv">● ${n.review} in review</span><span class="rj">✕ ${n.rejected} rejected</span><span class="muted">→ week will be <b>${WK_ST[deriveWeek(RV.days)][0]}</b></span></div>
+    <div class="rvall">Set all days: ${["approved", "review", "rejected"].map((v) => `<button class="btn sm ${v === "approved" ? "primary" : ""}" data-act="rvAll" data-v="${v}">${DSYM[v]} ${v === "approved" ? "Approve all" : v === "review" ? "All in review" : "Reject all"}</button>`).join("")}</div></div>
+    <div class="rvlist">${rows}</div>
+    <label class="field" style="margin-top:14px">Message to the team (optional)<textarea id="rvMsg" rows="2" maxlength="500" placeholder="e.g. Please balance the night desks before Thursday">${esc(RV.note)}</textarea></label>
+    <div class="muted" style="font-size:12px;margin-top:6px">Saving notifies ${editors}. Rejected days need a reason; when someone fixes a rejected day it comes back to review on its own.</div>
+    ${hist.length ? `<div class="rvhist"><h4>Decision history</h4>${hist.map((x) => `<div><span class="ss ${x.kind === "submitted" || x.status === "review" ? "pending" : x.status}">${x.kind === "submitted" ? "Submitted" : esc(WK_ST[x.status] ? WK_ST[x.status][0] : x.status)}</span> <b>${esc(x.by)}</b> · ${whenTxt(x)}${x.days && x.days.length && x.days.length < 7 ? ` · ${x.days.map((d) => `${DY[wdOf(ws + d.i)]}${x.kind === "decision" ? " " + DSYM[d.status] : ""}`).join(", ")}` : ""}${x.note ? ` — “${esc(x.note)}”` : ""}</div>`).join("")}</div>` : ""}
+  </div>
+  <div class="m-foot"><button class="btn" data-act="rvClose">Cancel</button><button class="btn primary" data-act="rvSave">Save decisions</button></div></div></div>`;
+  if (RV.focus != null) setTimeout(() => { const r = $(`.rvrow[data-k="${RV.focus}"]`); if (r) { r.scrollIntoView({ block: "center" }); const inp = r.querySelector("input"); if (RV.days[RV.focus].status === "rejected") inp.focus(); } }, 30);
+}
+// changing a day's decision drops the old system note ("Changed after approval"…) but keeps anything typed now
+function rvStatus(k, v) { const o = JSON.parse(RV.orig)[k] || {}, x = RV.days[k]; if (x.status === v) return; RV.days[k] = { ...x, status: v, note: x.note === o.note ? "" : x.note }; }
+function readReview() { document.querySelectorAll(".rvnote").forEach((el) => { RV.days[el.dataset.k].note = el.value.trim(); }); const m = $("#rvMsg"); if (m) RV.note = m.value.trim(); }
+async function saveReview() {
+  readReview();
+  const miss = Object.entries(RV.days).filter(([, x]) => x.status === "rejected" && !x.note);
+  if (miss.length) { const ws = dIdx(RV.key); toast(`Add a reason for ${miss.map(([k]) => DY[wdOf(ws + +k)]).join(", ")} — the team needs to know what to fix`, true); const r = $(`.rvrow[data-k="${miss[0][0]}"] input`); if (r) r.focus(); return; }
+  const orig = JSON.parse(RV.orig), at = new Date().toISOString(), days = {};
+  const newly = Object.keys(RV.days).filter((k) => RV.days[k].status === "approved" && (orig[k] || {}).status !== "approved").map(Number);
+  if (newly.length && !approveGuard(RV.key, newly)) return;
+  for (let k = 0; k < 7; k++) { const x = RV.days[k], o = orig[k] || {}; const same = o.status === x.status && (o.note || "") === (x.note || ""); days[k] = same && o.by ? o : { status: x.status, by: S.me.name, at, ...(x.note ? { note: x.note } : {}) }; }
+  const w = S.data.weeks[RV.key];
+  if (w && w.days && JSON.stringify(days) === JSON.stringify(w.days) && !RV.note) { $("#modalRoot").innerHTML = ""; return toast("No changes"); }
+  const key = RV.key; $("#modalRoot").innerHTML = ""; RV.key = null;
+  await commitReview(key, days, RV.note);
 }
 function renderWeek() {
   const D = V(), ws = viewWS(), created = !!weekAt(D, ws);
   $("#wkTitle").textContent = `${dmy(ws)} – ${dmy(ws + 6, 1)}`;
   $("#wkSub").innerHTML = (S.weekOffset === 0 ? "This week · " : S.weekOffset === 1 ? "Next week · " : S.weekOffset === -1 ? "Last week · " : "") +
     (created ? `${weekStatusHTML(weekAt(D, ws), iDate(ws))}${can("schedule") ? ` <span class="muted" style="font-size:12px">· click any cell to edit${canApprove() ? "" : " — your changes go to review"}</span>` : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
-  $("#wkBody").innerHTML = created ? `<div class="tblw"><table class="wk">${weekTableHTML(D, ws)}</table></div>` : `<div class="empty">This week hasn't been created yet.<br><button class="btn sm primary" style="margin-top:10px" data-act="openCreate">Create this week</button></div>`;
+  $("#wkBody").innerHTML = created ? `${weekNoticeHTML(D, weekAt(D, ws), iDate(ws))}<div class="tblw"><table class="wk">${weekTableHTML(D, ws)}</table></div>` : `<div class="empty">This week hasn't been created yet.<br><button class="btn sm primary" style="margin-top:10px" data-act="openCreate">Create this week</button></div>`;
   $("#wkPrev").disabled = S.weekOffset <= minOffset();
   $("#wkToday").classList.toggle("hidden", S.weekOffset === 0);
   $("#wkExport").disabled = !created;
@@ -1834,7 +2052,13 @@ function diffData(A, B) {
   }
   for (const r of B.requests || []) { const o = (A.requests || []).find((x) => x.id === r.id); if (o && isAdj(r) && !!o.settled !== !!r.settled) out.push(`Records: ${rn(r)} — marked ${r.settled ? ADJ[r.type].settled.toLowerCase() : ADJ[r.type].unsettled.toLowerCase()}`); }
   for (const o of A.requests || []) if (!(B.requests || []).some((r) => r.id === o.id)) out.push(`Records: deleted ${rn(o)}`);
-  for (const [k, w] of Object.entries(B.weeks || {})) { const o = (A.weeks || {})[k]; if (o && wkStatus(o, k) !== wkStatus(w, k)) out.push(`Approvals: week ${dmy(dIdx(k))} – ${dmy(dIdx(k) + 6, 1)} — ${WK_ST[wkStatus(o, k)][0]} → ${WK_ST[wkStatus(w, k)][0]}${w.decided && w.decided.note && wkStatus(w, k) === "rejected" ? ` (“${w.decided.note}”)` : ""}`); }
+  for (const [k, w] of Object.entries(B.weeks || {})) {
+    const o = (A.weeks || {})[k]; if (!o) continue;
+    const i0 = dIdx(k), wk = `week ${dmy(i0)} – ${dmy(i0 + 6, 1)}`, a = daysOfWeek(o, k), b = daysOfWeek(w, k);
+    const ch = [0, 1, 2, 3, 4, 5, 6].filter((d) => a[d].status !== b[d].status || (a[d].note || "") !== (b[d].note || ""));
+    if (wkStatus(o, k) !== wkStatus(w, k) || ch.length === 7) out.push(`Approvals: ${wk} — ${WK_ST[wkStatus(o, k)][0]} → ${WK_ST[wkStatus(w, k)][0]}${w.decided && w.decided.note ? ` (“${w.decided.note}”)` : ""}`);
+    if (ch.length < 7) for (const d of ch) out.push(`Approvals: ${wk} — ${DY[wdOf(i0 + d)]} ${dmy(i0 + d)} ${WK_ST[b[d].status][0].toLowerCase()}${b[d].note ? ` (“${b[d].note}”)` : ""}`);
+  }
   if (+A.settings.weekStart !== +B.settings.weekStart) out.push(`Settings: week starts on ${DAYS[+B.settings.weekStart]}`);
   if (A.settings.startDate !== B.settings.startDate) out.push(`Settings: schedule starts ${B.settings.startDate}`);
   if (A.settings.dayStart !== B.settings.dayStart) out.push(`Settings: the day switches at ${fmtT(hm(B.settings.dayStart))}`);
@@ -2247,13 +2471,13 @@ function renderReports() {
   const firstWeek = Object.keys(D.weeks).sort()[0];
   const G = graceOf(D), since = Math.min(...people.map((p) => p.stampSince ?? Infinity));
   h += `<section class="card"><div class="sh"><div><div class="eyebrow">Discipline · checked against the Weekly Schedule</div><h2>Report Submission &amp; Speed</h2><div class="sub">Each scheduled work day is due <b>${fmtDelay(G)} after her shift ends</b>. Written before that = on time · after = late · nothing by then = missing. Days off, approved excuses and days before her sheet started aren't counted.${firstWeek ? ` Schedule available from ${dmy(dIdx(firstWeek), 1)}.` : ""} ${isFinite(since) ? `Submission times recorded since ${dmy(Math.floor(since / 1440), 1)} — the on-time rate covers days from then on.` : `<b>Submission times start recording once the updated Apps Script is installed.</b>`}</div></div></div>
-    <div class="lbw"><table class="lbt ctb"><thead><tr><th>Team member</th><th>Submitted</th><th>On-time rate</th><th>Due</th><th>On time</th><th>Late</th><th>Missing</th><th>Typical time after shift</th><th>Speed</th><th>Excused</th><th>Last report</th><th></th></tr></thead><tbody>`;
+    <div class="lbw"><table class="lbt ctb"><thead><tr><th>Team member</th><th>Submitted</th><th>On-time rate</th><th>Due</th><th>On time</th><th>Late</th><th>Missing</th><th title="Typical time after the shift ends">Typical delay</th><th>Speed</th><th>Excused</th><th>Last report</th><th></th></tr></thead><tbody>`;
   h += withSched.map((p) => {
     const c = p.comp, open = RS.compOpen[p.key], tot = c.expected;
     const w = (n) => (tot ? ((n / tot) * 100).toFixed(1) : 0), pc = tot ? c.done / tot : null;
     const bk = c.buckets, bt = bk.reduce((x, y) => x + y, 0);
     return `<tr><td><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${p.first != null ? "Sheet since " + dmy(p.first, 1) : "No reports yet"}${c.pending ? ` · ${c.pending} due soon` : ""}</small></div></div></td>
-      <td style="min-width:170px"><div class="row" style="gap:10px;flex-wrap:nowrap;justify-content:flex-end"><div class="cbar" style="width:110px" title="On time ${c.onTime} · late ${c.late.length} · time not recorded ${c.unknown} · missing ${c.missing.length}">${tot ? `<i style="width:${w(c.onTime)}%"></i><i class="unk" style="width:${w(c.unknown)}%"></i><i class="late" style="width:${w(c.late.length)}%"></i><i class="miss" style="width:${w(c.missing.length)}%"></i>` : ""}</div><b class="cpc2 ${pc == null ? "" : pc >= 0.95 ? "ok" : pc >= 0.8 ? "warn" : "bad"}">${pc == null ? "—" : Math.round(pc * 100) + "%"}</b></div></td>
+      <td style="min-width:140px"><div class="row" style="gap:8px;flex-wrap:nowrap;justify-content:flex-end"><div class="cbar" style="width:84px" title="On time ${c.onTime} · late ${c.late.length} · time not recorded ${c.unknown} · missing ${c.missing.length}">${tot ? `<i style="width:${w(c.onTime)}%"></i><i class="unk" style="width:${w(c.unknown)}%"></i><i class="late" style="width:${w(c.late.length)}%"></i><i class="miss" style="width:${w(c.missing.length)}%"></i>` : ""}</div><b class="cpc2 ${pc == null ? "" : pc >= 0.95 ? "ok" : pc >= 0.8 ? "warn" : "bad"}">${pc == null ? "—" : Math.round(pc * 100) + "%"}</b></div></td>
       <td><b class="cpc2 ${c.rate == null ? "" : c.rate >= 0.95 ? "ok" : c.rate >= 0.8 ? "warn" : "bad"}" style="font-size:16px">${c.rate == null ? "—" : Math.round(c.rate * 100) + "%"}</b></td>
       <td>${c.expected}</td><td>${c.onTime}${c.unknown ? `<small class="muted" title="Written before time tracking started"> +${c.unknown} n/r</small>` : ""}${c.early.length ? `<small class="muted" style="display:block" title="${esc(c.early.slice(-6).map((x) => `${DY[wdOf(x.i)]} ${dmy(x.i)}: ${fmtDelay(-x.d)}`).join(" · "))}">${c.early.length} before shift end</small>` : ""}</td><td>${c.late.length ? `<b style="color:var(--warn)">${c.late.length}</b>` : "0"}</td><td>${c.missing.length ? `<b style="color:var(--bad)">${c.missing.length}</b>` : "0"}</td>
       <td>${c.median == null ? (c.unknown ? `<span class="muted" title="Written before time tracking started">not recorded</span>` : "—") : `<b>${fmtDelay(c.median)}</b>`}</td>
@@ -2878,7 +3102,11 @@ function renderApprovals() {
     if (done.length) h += `<div class="apg"><div class="aph"><h3>Recently settled <span>${done.length}</span></h3></div>${done.map((r) => apRow(D, r)).join("")}</div>`;
   } else if (AP.tab === "pending") {
     if (can("users") && resets.length) h += `<div class="apg"><div class="aph"><h3>Password reset requests <span>${resets.length}</span></h3></div>${resets.map((x) => `<div class="apr2"><div class="dt"><b>🔑</b><span>Reset</span></div><div><div class="tt">${esc(x.name)} <span class="ref">@${esc(x.username)}</span></div><div class="dd">Asked ${logFmt.format(new Date(x.at))} ${logTime.format(new Date(x.at))}</div></div><div class="apb"><button class="btn sm primary" data-act="userPass" data-u="${esc(x.username)}">Set temporary password</button></div></div>`).join("")}</div>`;
-    if (canApprove()) h += `<div class="apg"><div class="aph"><h3>Weekly schedules <span>${weeks.length}</span></h3></div>${weeks.map((k) => { const w = D.weeks[k], i = dIdx(k), rv = w.review || {}; return `<div class="apr2"><div class="dt"><b>${new Date(i * 864e5).getUTCDate()}</b><span>${MON[new Date(i * 864e5).getUTCMonth()]}</span></div><div style="min-width:0"><div class="tt">Week ${dmy(i)} – ${dmy(i + 6, 1)} <span class="ss pending">In review</span></div><div class="dd">${rv.by ? "Changed by " + esc(rv.by) : ""}${rv.at ? " · " + logFmt.format(new Date(rv.at)) + " " + logTime.format(new Date(rv.at)) : ""}${rv.note ? " · " + esc(rv.note) : ""} · ${w.memberIds.length} people</div></div><div class="apb"><button class="btn sm ghost" data-act="apWeekOpen" data-k="${k}">Open week</button><button class="btn sm" data-act="wkDecide" data-k="${k}" data-v="rejected">Reject</button><button class="btn sm primary" data-act="wkDecide" data-k="${k}" data-v="approved">Approve week</button></div></div>`; }).join("") || `<div class="muted" style="font-size:12.8px;padding:6px 0 10px">No schedule changes waiting.</div>`}</div>`;
+    if (canApprove()) h += `<div class="apg"><div class="aph"><h3>Weekly schedules <span>${weeks.length}</span></h3></div>${weeks.map((k) => {
+      const w = D.weeks[k], i = dIdx(k), rv = w.review || {}, dd = daysOfWeek(w, k), n = dayCounts(w, k);
+      const pills = [0, 1, 2, 3, 4, 5, 6].map((d) => `<button class="dst ${dd[d].status}" data-act="wkReview" data-k="${k}" data-d="${d}" title="${esc(WK_ST[dd[d].status][0])}${dd[d].note ? " — " + esc(dd[d].note) : ""}">${DSYM[dd[d].status]} ${DY[wdOf(i + d)]}</button>`).join("");
+      return `<div class="apr2"><div class="dt"><b>${new Date(i * 864e5).getUTCDate()}</b><span>${MON[new Date(i * 864e5).getUTCMonth()]}</span></div><div style="min-width:0"><div class="tt">Week ${dmy(i)} – ${dmy(i + 6, 1)} <span class="ss pending">In review</span> <span class="muted" style="font-size:12px">${n.approved}/7 approved${n.rejected ? ` · ${n.rejected} rejected` : ""}</span></div><div class="dd">${rv.by ? "Changed by " + esc(rv.by) : "Awaiting first approval"}${rv.at ? " · " + whenTxt(rv) : ""}${rv.note ? " · " + esc(rv.note) : ""} · ${w.memberIds.length} people</div><div class="apdays">${pills}</div></div><div class="apb"><button class="btn sm ghost" data-act="apWeekOpen" data-k="${k}">Open week</button><button class="btn sm" data-act="wkReview" data-k="${k}">Review day by day</button><button class="btn sm primary" data-act="wkDecide" data-k="${k}" data-v="approved">Approve week</button></div></div>`;
+    }).join("") || `<div class="muted" style="font-size:12.8px;padding:6px 0 10px">No schedule changes waiting.</div>`}</div>`;
     if (!canApprove()) h += `<div class="banner info">Your account reviews tasks only — records and schedules need <b>Approve / reject</b>.</div>`;
     else for (const [title, f] of AP_GROUPS) {
       const L = recs.filter(f).sort((a, b) => a.date.localeCompare(b.date));
@@ -3917,6 +4145,14 @@ document.addEventListener("click", async (e) => {
       return;
     }
     case "wkDecide": return decideWeek(el.dataset.k, el.dataset.v);
+    case "wkReview": if (!canApprove()) return; if (dirty()) return toast("You have unsaved changes in Manage — save or discard them first", true); return openReview(el.dataset.k, el.dataset.d != null ? +el.dataset.d : null);
+    case "rvSet": readReview(); rvStatus(el.dataset.k, el.dataset.v); RV.focus = +el.dataset.k; return renderReview();
+    case "rvAll": readReview(); for (const k in RV.days) rvStatus(k, el.dataset.v); RV.focus = el.dataset.v === "rejected" ? 0 : null; return renderReview();
+    case "rvClose": if (el.tagName === "BUTTON" || e.target === el) { RV.key = null; $("#modalRoot").innerHTML = ""; } return;
+    case "rvSave": return saveReview();
+    case "ntToggle": e.preventDefault(); NT.open = !NT.open; renderNotices(); if (NT.open) loadNotices(); return;
+    case "ntAll": e.preventDefault(); return markNotices(null);
+    case "ntOpen": { const n = NT.list.find((x) => x.id === el.dataset.id); if (!n) return; NT.open = false; markNotices([n.id]); S.weekOffset = (dIdx(n.week) - wkStart(V(), curIdx())) / 7; showView("ops"); renderAll(); setTimeout(() => $("#wkTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); if (n.kind === "submitted" && canApprove() && S.data.weeks[n.week] && !dirty()) openReview(n.week); return; }
     case "apSettle": return settleRecords(el.dataset.id ? [el.dataset.id] : null, el.dataset.v !== "0", el.dataset.t);
     case "apWeekOpen": S.weekOffset = (dIdx(el.dataset.k) - wkStart(V(), curIdx())) / 7; showView("ops"); renderAll(); setTimeout(() => $("#wkTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); return;
     case "apLogin": return openLogin("__approvals");
@@ -3970,6 +4206,7 @@ document.addEventListener("click", async (e) => {
 /* top-level controls */
 $("#adminBtn").onclick = () => openAdmin();
 $("#reqAdd").onclick = () => { S.admin.rq = null; openAdmin("requests"); };
+document.addEventListener("click", (e) => { if (NT.open && !e.target.closest(".ntw")) { NT.open = false; renderNotices(); } });
 document.addEventListener("click", (e) => { const b = e.target.closest("#logMore"); if (b) { S.logAll = !S.logAll; renderLog(); } });
 $("#wkEdit").onclick = () => { S.admin.mode = "week"; openAdmin("week"); };
 $("#dayPrev").onclick = () => { S.dayView = (S.dayView ?? curIdx()) - 1; renderDay(); };

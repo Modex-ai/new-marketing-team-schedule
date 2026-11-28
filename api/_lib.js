@@ -97,3 +97,14 @@ export async function appendLog(changes, by) {
   cur.log = [{ at: new Date().toISOString(), by, changes }, ...(cur.log || [])].slice(0, 500);
   await writeJSON(SCHEDULE, cur);
 }
+
+/* ---------- notifications (schedule decisions → schedule editors, submissions → approvers) ---------- */
+export const NOTICES = 'marketing-ops/notices';
+export async function pushNotices(list, by) {
+  const doc = (await readJSON(NOTICES)) || { list: [] }, at = new Date().toISOString();
+  for (const n of list) doc.list.unshift({ id: crypto.randomBytes(6).toString('hex'), at, by: { username: by.username, name: by.name }, seen: {}, ...n });
+  doc.list = doc.list.slice(0, 300);
+  await writeJSON(NOTICES, doc, 5);
+}
+// which notices an account receives: never its own; decisions go to schedule editors, submissions to approvers
+export const noticeFor = (me, n) => !!me && n.by.username !== me.username && (n.to === 'schedule' ? can(me, 'schedule') : n.to === 'approve' ? can(me, 'approve') : false);
