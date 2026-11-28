@@ -341,6 +341,8 @@ table.wgrid td.mc{background:none;border:none;vertical-align:middle;padding-left
 .opt b{display:block;font-size:13.5px}
 .opt span{font-size:12.5px;color:var(--muted)}
 .rqform{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end}
+.rqform>*{min-width:0}.rqform input,.rqform select{width:100%;min-width:0;box-sizing:border-box}
+@media (max-width:520px){.rqform{grid-template-columns:1fr!important}}
 .rqform .wide{grid-column:span 2}
 .rqform .swm,.rqform .rqpv{}
 .rqform .field.wide:has(.swm),.rqform .field.wide:has(.rqpv){grid-column:1/-1}
@@ -1778,13 +1780,15 @@ const PERM_INFO = [
   ["log", "Activity log", "See every change — who did what and when"],
   ["users", "Manage users", "Add users and set their permissions"],
 ];
-const PERM_PRESETS = { admin: PERM_INFO.map((x) => x[0]), editor: ["schedule", "records", "money", "reports", "tasks", "tasksManage", "tasksReview", "log"], viewer: ["reports", "tasks"] };
+const PERM_PRESETS = { admin: PERM_INFO.map((x) => x[0]), editor: ["schedule", "records", "money", "reports", "tasks", "tasksManage", "tasksReview", "log"], viewer: ["reports", "tasks"], member: ["reports", "tasks", "records"] };
+// a personal account can never do more than this, whatever is ticked (the server enforces it too)
+const SELF_MAX = ["reports", "tasks", "records"];
 const canApprove = () => can("approve");
 // accounts limited to some team members (Manage → Users → Team members) only see theirs
 const inScope = (id) => !S.me || S.me.owner || !(S.me.scope || []).length || S.me.scope.includes(id);
 const isOwner = () => !!(S.me && S.me.owner);
 const can = (p) => !!(S.me && (S.me.owner || (S.me.perms || []).includes(p)));
-const roleLabel = (u) => (u.owner || u.role === "owner" ? "Owner" : { admin: "Admin", editor: "Editor", viewer: "Viewer" }[u.role] || "Custom access");
+const roleLabel = (u) => (u.owner || u.role === "owner" ? "Owner" : { admin: "Admin", editor: "Editor", viewer: "Viewer", member: "Team member" }[u.role] || "Custom access");
 const canRecType = (t) => can(t === "bonus" || t === "deduction" ? "money" : "records");
 
 /* ============================ excuses, swaps, deductions & bonuses ============================ */
@@ -3672,10 +3676,11 @@ function openTask(id, fresh) {
   const t = (TK.list || []).find((x) => x.id === id); if (!t) return;
   TK.sel = id;
   const D = V(), now = cairoNow().abs, [sl, sc] = TST[t.status], ot = tOnTime(t), admin = isOwner() || can("users"), mg = can("tasksManage"), rv = can("tasksReview");
+  const mine = !!(S.me && S.me.self && t.member === S.me.member), mw = mg || mine; // her own task: she starts it, ticks it off and sends proof
   const sc0 = $(".overlay .tkm .m-body")?.scrollTop;
   const nowLocal = (() => { const c = cairoNow(); return `${c.date}T${pad(Math.floor(c.min / 60))}:${pad(Math.floor(c.min % 60))}`; })();
   let act = "";
-  if (OPEN.has(t.status) && mg) act = `<div class="panel"><h4>Record completion</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">When she replies that it's done, attach her reply / proof below, then mark it done.</p>
+  if (OPEN.has(t.status) && mw) act = `<div class="panel"><h4>${mine ? "Finish this task" : "Record completion"}</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">${mine ? "Attach your proof (screenshots / video) below, then mark it done — your manager reviews it." : "When she replies that it's done, attach her reply / proof below, then mark it done."}</p>
       <div class="tkgrid" style="grid-template-columns:1fr 2fr"><label class="field">Completed at<input type="datetime-local" id="tkDoneAt" value="${nowLocal}"></label><label class="field">Her note<input type="text" id="tkDoneNote" dir="auto" placeholder="e.g. Done — link in the drive"></label></div>
       <div class="row" style="justify-content:flex-end;margin-top:12px">${t.status === "assigned" ? `<button class="btn" data-act="tkSt" data-v="progress">Mark in progress</button>` : ""}<button class="btn primary" data-act="tkDone">✓ Mark as done</button></div></div>`;
   else if (t.status === "done" && rv) act = `<div class="panel rvw"><h4>Review &amp; rate</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">Delivered ${t.doneAt ? logFmt.format(new Date(t.doneAt)) + " " + logTime.format(new Date(t.doneAt)) : ""}${ot == null ? "" : ot ? ` · <b style="color:var(--ok)">on time</b>` : ` · <b style="color:var(--bad)">late</b>`}. How good is the work?</p>
@@ -3696,7 +3701,7 @@ function openTask(id, fresh) {
           <div class="tkh"><span class="tks ${sc}">${sl}</span><h2 dir="auto">${esc(t.title)}</h2></div>
           <div class="tkmeta">${meta.map(([l, v]) => `<div><span>${l}</span><b>${v}</b></div>`).join("")}</div>
           ${t.details ? `<div class="panel"><h4>Brief</h4><p class="tkp" dir="auto">${esc(t.details)}</p></div>` : ""}
-          ${(t.checklist || []).length ? `<div class="panel"><h4>Deliverables · ${t.checklist.filter((c) => c.d).length}/${t.checklist.length}</h4>${t.checklist.map((c, j) => `<label class="tkck ${c.d ? "d" : ""}"><input type="checkbox" data-tkck="${j}" ${c.d ? "checked" : ""} ${t.status === "cancelled" || !mg ? "disabled" : ""}><span dir="auto">${esc(c.t)}</span></label>`).join("")}</div>` : ""}
+          ${(t.checklist || []).length ? `<div class="panel"><h4>Deliverables · ${t.checklist.filter((c) => c.d).length}/${t.checklist.length}</h4>${t.checklist.map((c, j) => `<label class="tkck ${c.d ? "d" : ""}"><input type="checkbox" data-tkck="${j}" ${c.d ? "checked" : ""} ${t.status === "cancelled" || !mw ? "disabled" : ""}><span dir="auto">${esc(c.t)}</span></label>`).join("")}</div>` : ""}
           <div class="panel"><h4>Attachments for her · ${(t.files || []).length}</h4>
             <div class="row">${(t.files || []).map((x, j) => attTile(x, "tkAtt", j, ` data-k="${esc(t.id)}" data-l="files"`) + (mg ? `<button class="rm" data-act="tkAttDel" data-l="files" data-j="${j}" title="Remove">✕</button>` : "") + `</span>`).join("")}
             ${t.status !== "cancelled" && mg ? `<label class="btn sm">📎 Add photos / videos<input type="file" id="tkBriefFiles" accept="image/*,video/*" multiple class="hidden"></label>` : ""}</div>
@@ -3705,7 +3710,7 @@ function openTask(id, fresh) {
           ${t.doneNote ? `<div class="panel"><h4>Her note</h4><p class="tkp" dir="auto">${esc(t.doneNote)}</p></div>` : ""}
           <div class="panel"><h4>Proof &amp; replies (${(t.proof || []).length})</h4>
             <div class="row">${(t.proof || []).map((x, j) => `<span class="attx"><button class="att" data-act="tkAtt" data-l="proof" data-k="${esc(t.id)}" data-j="${j}" title="${esc(x.name)}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="" loading="lazy">`}</button>${mg ? `<button class="rm" data-act="tkAttDel" data-l="proof" data-j="${j}" title="Remove">✕</button>` : ""}</span>`).join("")}
-            ${mg ? `<label class="btn sm">📎 Attach her reply / screenshot<input type="file" id="tkFiles" accept="image/*,video/*" multiple class="hidden"></label>` : ""}</div>
+            ${mw ? `<label class="btn sm">📎 ${mine ? "Attach your proof" : "Attach her reply / screenshot"}<input type="file" id="tkFiles" accept="image/*,video/*" multiple class="hidden"></label>` : ""}</div>
             <div id="upStatus" class="upbar hidden" style="margin-top:10px"></div></div>
         </div>
         <div>
@@ -4111,7 +4116,8 @@ function renderAdmin() {
     else {
       const ago = (t) => { if (!t) return "Never"; const d = new Date(t); return logFmt.format(d) + " · " + logTime.format(d); };
       const nu = A.nu || (A.nu = { perms: PERM_PRESETS.editor.filter(can) });
-      const grid = (perms, attr, lockAll) => `<div class="pgrid">${PERM_INFO.map(([k, l, d]) => { const mine = can(k); return `<label class="${perms.includes(k) ? "on" : ""} ${mine && !lockAll ? "" : "dis"}" title="${mine ? "" : "You can't give a permission you don't have"}"><input type="checkbox" ${attr}="${k}" ${perms.includes(k) ? "checked" : ""} ${mine && !lockAll ? "" : "disabled"}><b>${l}</b><small>${d}</small></label>`; }).join("")}</div>`;
+      const grid = (perms, attr, lockAll, personal) => `<div class="pgrid">${PERM_INFO.map(([k, l, d]) => { const mine = can(k), off = personal && !SELF_MAX.includes(k), ok = mine && !lockAll && !off; return `<label class="${perms.includes(k) && !off ? "on" : ""} ${ok ? "" : "dis"}" title="${off ? "Not available for a personal account" : mine ? "" : "You can't give a permission you don't have"}"><input type="checkbox" ${attr}="${k}" ${perms.includes(k) && !off ? "checked" : ""} ${ok ? "" : "disabled"}><b>${l}</b><small>${off ? "Not for personal accounts" : d}</small></label>`; }).join("")}</div>`;
+      const selfNote = `<div class="pnote" style="margin-top:6px"><b>Personal account</b> — sees only her own schedule, reports, records, tasks and attendance, and checks in / out. She can start and finish her own tasks with proof, and (with <b>Excuses &amp; shift changes</b>) request excuses and swaps, which wait for your approval. Management permissions are locked.</div>`;
       const mems = S.draft.members.filter((m) => !m.former && inScope(m.id));
       const taken = new Set(S.users.map((u) => u.member).filter(Boolean));
       const memberOpts = (cur) => S.draft.members.filter((m) => !m.former).map((m) => `<option value="${esc(m.id)}" ${m.id === cur ? "selected" : ""}>${esc(m.name)}${taken.has(m.id) && m.id !== cur ? " (already linked)" : ""}</option>`).join("");
@@ -4124,10 +4130,10 @@ function renderAdmin() {
         <label class="field">Password<input type="text" id="nuPass" placeholder="At least 6 characters" autocomplete="new-password" value="${esc(nu.pass || "")}"></label>
         <label class="field">This account belongs to<select id="nuMember"><option value="">— Not a team member (manager) —</option>${memberOpts(nu.member || "")}</select></label>
       </div>
-      <label class="chk" style="margin-top:10px;display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="nuSelf" ${nu.self === false ? "" : "checked"}> <span><b>Personal account</b> — sees only her own schedule, reports, records, tasks and attendance (when linked to a team member)</span></label>
+      ${nu.member ? `<label class="chk" style="margin-top:10px;display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="nuSelf" ${nu.self === false ? "" : "checked"}> <span><b>Personal account</b> — sees only her own data (recommended for team members)</span></label>` : ""}
       <div class="pnote" style="margin-top:8px">Linking the account to a team member lets her <b>check in / out</b>, and sends her the decisions on her own records and tasks (dashboard + Telegram).</div>
-      <div class="field" style="margin-top:14px">What this person can do</div>${presetBtns('data-u=""')}${grid(nu.perms, "data-nperm")}
-      ${scopeBox(nu.scope || [], "data-nscope")}
+      <div class="field" style="margin-top:14px">What this person can do</div>${nu.member && nu.self !== false ? selfNote : presetBtns('data-u=""')}${grid(nu.perms, "data-nperm", false, nu.member && nu.self !== false)}
+      ${nu.member && nu.self !== false ? "" : scopeBox(nu.scope || [], "data-nscope")}
       <div class="pnote">Records added by someone without <b>Approve / reject</b> wait in <b>Approvals</b> until you (or someone with that permission) decide.</div>
       <div class="row" style="justify-content:space-between;margin-top:12px"><span class="muted" style="font-size:12px">Share the username and password with the person. They sign in from the Manage button.</span><button class="btn primary" data-act="userCreate">Create user</button></div></div>
       <div class="panel"><h4>Users (${S.users.length + 1})</h4>
@@ -4140,7 +4146,7 @@ function renderAdmin() {
             <small>@${esc(u.username)} · ${u.perms.length} permission${u.perms.length === 1 ? "" : "s"} · last sign-in ${esc(ago(u.lastLogin))} · added ${esc(ago(u.createdAt))}${u.createdBy ? " by " + esc(u.createdBy) : ""}</small>
             <div class="ptags">${PERM_INFO.filter(([k]) => u.perms.includes(k)).map(([, l]) => `<span>${l}</span>`).join("") || `<span class="none">No access — can only see the public dashboard</span>`}${(u.scope || []).length ? `<span class="sc2">Sees: ${u.scope.map((id) => esc(memName(S.draft, id))).join(", ")}</span>` : ""}${u.member ? `<span class="sc2" style="background:#E3F1EC;color:var(--ok)">👤 ${esc(memName(S.draft, u.member))}${u.self ? " · personal" : ""}</span>` : ""}</div></div>
           <div class="row" style="justify-content:flex-end;gap:6px">${me ? `<span class="muted" style="font-size:12px">You</span>` : `<button class="btn sm ${open ? "primary" : ""}" data-act="userPerms" data-u="${esc(u.username)}">${open ? "Close" : "Permissions"}</button><button class="btn sm" data-act="userPass" data-u="${esc(u.username)}">Temporary password</button><button class="btn sm ${u.disabled ? "primary" : ""}" data-act="userToggle" data-u="${esc(u.username)}">${u.disabled ? "Activate" : "Freeze"}</button><button class="btn sm danger" data-act="userDelete" data-u="${esc(u.username)}">Delete</button>`}</div></div>
-          ${open && !me ? `<div class="uperm"><div class="row" style="gap:14px;align-items:flex-end;margin-bottom:10px"><label class="field" style="max-width:340px">This account belongs to<select id="upMember"><option value="">— Not a team member (manager) —</option>${memberOpts(u.member || "")}</select></label><label style="display:flex;gap:7px;align-items:center;font-size:13px;padding-bottom:9px"><input type="checkbox" id="upSelf" ${u.self ? "checked" : ""}> <b>Personal account</b> — only her own data</label></div>${presetBtns(`data-u="${esc(u.username)}"`)}${grid(A.uPerms || u.perms, "data-uperm")}${scopeBox(A.uScope || u.scope || [], "data-uscope")}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm ghost" data-act="userPerms" data-u="${esc(u.username)}">Cancel</button><button class="btn sm primary" data-act="userPermSave" data-u="${esc(u.username)}">Save permissions</button></div></div>` : ""}</div>`; }).join("")}
+          ${open && !me ? (() => { const um = A.uMember ?? (u.member || ""), us = !!um && (A.uSelf ?? !!u.self); return `<div class="uperm"><div class="row" style="gap:14px;align-items:flex-end;margin-bottom:10px"><label class="field" style="max-width:340px">This account belongs to<select id="upMember" data-u="${esc(u.username)}"><option value="">— Not a team member (manager) —</option>${memberOpts(um)}</select></label>${um ? `<label style="display:flex;gap:7px;align-items:center;font-size:13px;padding-bottom:9px"><input type="checkbox" id="upSelf" data-u="${esc(u.username)}" ${us ? "checked" : ""}> <b>Personal account</b> — only her own data</label>` : ""}</div>${us ? selfNote : presetBtns(`data-u="${esc(u.username)}"`)}${grid(A.uPerms || u.perms, "data-uperm", false, us)}${us ? "" : scopeBox(A.uScope || u.scope || [], "data-uscope")}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm ghost" data-act="userPerms" data-u="${esc(u.username)}">Cancel</button><button class="btn sm primary" data-act="userPermSave" data-u="${esc(u.username)}">Save permissions</button></div></div>`; })() : ""}</div>`; }).join("")}
       </div>`;
     }
   } else if (A.tab === "settings") {
@@ -4193,9 +4199,14 @@ const getPath = (o, p) => p.split(".").reduce((x, k) => (x == null ? x : x[k]), 
 function setPath(o, p, v) { const ks = p.split("."), last = ks.pop(); let x = o; for (const k of ks) { if (x[k] == null || typeof x[k] !== "object") x[k] = {}; x = x[k]; } if (v === "" || v == null) delete x[last]; else x[last] = v; }
 const afterEdit = (full) => { renderKpis(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderRequests(); renderSaveBar(); $("#modalRoot [data-act=save]")?.toggleAttribute("disabled", !dirty()); if (full) renderAdmin(); };
 
-function keepNu() { const A = S.admin, nu = A.nu || (A.nu = { perms: [] }); if ($("#nuName")) { nu.name = $("#nuName").value; nu.user = $("#nuUser").value; nu.pass = $("#nuPass").value; } return nu; }
+function keepNu() { const A = S.admin, nu = A.nu || (A.nu = { perms: [] }); if ($("#nuName")) { nu.name = $("#nuName").value; nu.user = $("#nuUser").value; nu.pass = $("#nuPass").value; if ($("#nuMember")) nu.member = $("#nuMember").value; if ($("#nuSelf")) nu.self = $("#nuSelf").checked; } return nu; }
 document.addEventListener("change", (e) => {
   const np = e.target.closest("[data-nperm]"), up = e.target.closest("[data-uperm]");
+  // linking an account to a team member makes it her personal account with the Team member permissions
+  if (e.target.id === "nuMember") { const nu = keepNu(); if (nu.member) { nu.self = true; nu.perms = PERM_PRESETS.member.filter(can); nu.scope = []; } else { nu.self = false; nu.perms = PERM_PRESETS.editor.filter(can); } return renderAdmin(); }
+  if (e.target.id === "nuSelf") { const nu = keepNu(); if (nu.self) nu.perms = PERM_PRESETS.member.filter(can); return renderAdmin(); }
+  if (e.target.id === "upMember") { const A = S.admin, u = (S.users || []).find((x) => x.username === e.target.dataset.u); A.uMember = e.target.value; if (A.uMember && !(u && u.member)) { A.uSelf = true; A.uPerms = PERM_PRESETS.member.filter(can); } if (!A.uMember) A.uSelf = false; return renderAdmin(); }
+  if (e.target.id === "upSelf") { const A = S.admin, u = (S.users || []).find((x) => x.username === e.target.dataset.u); A.uSelf = e.target.checked; if (A.uSelf) A.uPerms = (A.uPerms || (u ? u.perms : [])).filter((p) => SELF_MAX.includes(p)); return renderAdmin(); }
   if (np) { const nu = keepNu(), k = np.dataset.nperm; nu.perms = np.checked ? [...new Set([...nu.perms, k])] : nu.perms.filter((x) => x !== k); return renderAdmin(); }
   const ns = e.target.closest("[data-nscope]"), us = e.target.closest("[data-uscope]");
   if (ns) { const nu = keepNu(), k = ns.dataset.nscope, cur = nu.scope || []; nu.scope = ns.checked ? [...new Set([...cur, k])] : cur.filter((x) => x !== k); return renderAdmin(); }
@@ -4515,13 +4526,14 @@ document.addEventListener("click", async (e) => {
     case "logout": e.preventDefault(); if (dirty() && !confirm("Sign out and discard unsaved changes?")) return; S.draft = null; S.admin.open = false; $("#modalRoot").innerHTML = ""; signedOut(); toast("Signed out"); return renderAll();
     case "userCreate": {
       const nu = S.admin.nu || { perms: [] };
-      const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), perms: nu.perms, scope: nu.scope || [], password: $("#nuPass").value, member: $("#nuMember").value, self: $("#nuSelf").checked };
+      const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), perms: nu.perms, scope: nu.scope || [], password: $("#nuPass").value, member: $("#nuMember").value, self: !!($("#nuSelf") && $("#nuSelf").checked) };
+      if (body.member && body.self) { body.perms = body.perms.filter((p) => SELF_MAX.includes(p)); body.scope = []; }
       if (!body.name || !body.username || !body.password) return toast("Fill in name, username and password", true);
       S.admin.nu = null;
       return userAction("POST", body, `User @${body.username} created`);
     }
-    case "userPerms": { const u = el.dataset.u; S.admin.uOpen = S.admin.uOpen === u ? null : u; S.admin.uPerms = null; S.admin.uScope = null; return renderAdmin(); }
-    case "userPermSave": { const u = S.users.find((x) => x.username === el.dataset.u); const member = $("#upMember") ? $("#upMember").value : u.member || "", self = $("#upSelf") ? $("#upSelf").checked : !!u.self; const perms = S.admin.uPerms || u.perms, scope = S.admin.uScope || u.scope || []; S.admin.uOpen = null; S.admin.uPerms = null; S.admin.uScope = null; return userAction("PATCH", { username: u.username, perms, scope, member, self }, `Access saved for ${u.name}`); }
+    case "userPerms": S.admin.uMember = S.admin.uSelf = undefined; { const u = el.dataset.u; S.admin.uOpen = S.admin.uOpen === u ? null : u; S.admin.uPerms = null; S.admin.uScope = null; return renderAdmin(); }
+    case "userPermSave": { const u = S.users.find((x) => x.username === el.dataset.u); const member = S.admin.uMember ?? (u.member || ""), self = !!member && (S.admin.uSelf ?? !!u.self); S.admin.uMember = S.admin.uSelf = undefined; const perms0 = S.admin.uPerms || u.perms, perms = self ? perms0.filter((p) => SELF_MAX.includes(p)) : perms0, scope = self ? [] : S.admin.uScope || u.scope || []; S.admin.uOpen = null; S.admin.uPerms = null; S.admin.uScope = null; return userAction("PATCH", { username: u.username, perms, scope, member, self }, `Access saved for ${u.name}`); }
     case "ownerEdit": S.admin.ownEdit = !S.admin.ownEdit; return renderAdmin();
     case "ownerRecovery": {
       const cur = $("#owCur").value; if (!cur) return toast("Enter your current password first", true);

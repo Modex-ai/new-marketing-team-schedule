@@ -13,7 +13,10 @@ export const PRESETS = {
   admin: PERMS,
   editor: PERMS.filter((p) => !['users', 'sources', 'settings', 'setup', 'approve'].includes(p)),
   viewer: ['reports', 'tasks'],
+  member: ['reports', 'tasks', 'records'], // a team member's personal account
 };
+// the most a personal account can ever do, whatever is ticked: see her own reports and tasks, request excuses / swaps
+export const SELF_MAX = ['reports', 'tasks', 'records'];
 // accounts made before permissions existed keep what they could do then (admin = everything, editor = all but users & sheets)
 const LEGACY = { admin: PERMS, editor: PERMS.filter((p) => !['users', 'sources', 'approve'].includes(p)) };
 export const permsOf = (u) => (Array.isArray(u.perms) ? u.perms.filter((p) => PERMS.includes(p)) : LEGACY[u.role] || PRESETS.viewer);
@@ -22,7 +25,7 @@ export const can = (me, p) => !!me && (me.owner || (me.perms || []).includes(p))
 export const scopeOf = (u) => (Array.isArray(u.scope) ? u.scope.filter((x) => typeof x === 'string' && x).slice(0, 100) : []);
 export const inScope = (me, memberId) => !me || me.owner || !(me.scope || []).length || me.scope.includes(memberId);
 // self: a team member's personal account — it only ever sees (and touches) her own data
-export const sessionUser = (u) => { const self = !!(u.self && u.member); return { username: u.username, name: u.name, role: u.role, perms: permsOf(u), scope: self ? [u.member] : scopeOf(u), owner: false, mustChange: !!u.mustChange, member: u.member || '', self }; };
+export const sessionUser = (u) => { const self = !!(u.self && u.member); return { username: u.username, name: u.name, role: u.role, perms: self ? permsOf(u).filter((p) => SELF_MAX.includes(p)) : permsOf(u), scope: self ? [u.member] : scopeOf(u), owner: false, mustChange: !!u.mustChange, member: u.member || '', self }; };
 // the owner's one-time recovery code (shown once, stored hashed) — used when the owner password is lost
 export const newRecoveryCode = () => crypto.randomBytes(12).toString('hex').toUpperCase().match(/.{1,4}/g).slice(0, 5).join('-');
 const SESSION_HOURS = 24;
