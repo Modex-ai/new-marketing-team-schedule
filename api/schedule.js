@@ -120,6 +120,39 @@ function settleWeeks(me, data, current) {
   }
   return notices;
 }
+// Excuses, swaps, bonuses and deductions: whoever a record is about (and whoever filed it) hears every decision on it,
+// with the reason; approvers hear about new records waiting for them.
+const RTYPE = { swap: 'Shift swap', change: 'Shift / desk change', excuse: 'Excuse / absence', late: 'Late arrival', early: 'Early leave', dayoff: 'Day-off change', deduction: 'Deduction', bonus: 'Bonus', other: 'Record' };
+const RWORD = { approved: 'approved', rejected: 'rejected', pending: 'moved back to review' };
+const DN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], MN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dShort = (iso) => { const d = new Date(String(iso) + 'T00:00:00Z'); return isNaN(d) ? String(iso || '') : `${DN[d.getUTCDay()]} ${d.getUTCDate()} ${MN[d.getUTCMonth()]}`; };
+function recordNotices(me, data, current) {
+  const old = new Map(((current && current.requests) || []).map((r) => [r.id, r])), out = [];
+  const nameOf = (id) => ((data.members || []).find((m) => m.id === id) || {}).name || id || '—';
+  const what = (r) => {
+    const t = RTYPE[r.type] || 'Record', money = r.type === 'deduction' || r.type === 'bonus';
+    const lines = [`${t}${r.ref ? ' ' + r.ref : ''} · ${nameOf(r.member)}${r.withMember ? ' ⇄ ' + nameOf(r.withMember) : ''}`, `📅 ${dShort(r.date)}${r.withDate && r.withDate !== r.date ? ' ⇄ ' + dShort(r.withDate) : ''}`];
+    if (money) lines.push(`💰 ${r.amount ? (+r.amount).toLocaleString('en-US') + ' EGP' : ''}${r.amount && r.days ? ' + ' : ''}${r.days ? r.days + ' day' + (r.days > 1 ? 's' : '') : ''}${r.reason ? ' — ' + r.reason : ''}`);
+    if (r.details) lines.push(`📝 ${String(r.details).slice(0, 300)}`);
+    return { t, lines, money };
+  };
+  const about = (r) => [r.member, r.withMember].filter(Boolean);
+  for (const r of data.requests || []) {
+    const o = old.get(r.id);
+    if (!o && !r.createdByU) r.createdByU = me.username; // who filed it, so they hear back
+    else if (o && o.createdByU) r.createdByU = o.createdByU;
+    const w = what(r), users = r.createdByU ? [r.createdByU] : [];
+    if (!o) {
+      if (r.status === 'pending') out.push({ kind: 'record', to: 'approve', status: 'review', title: `New ${w.t.toLowerCase()} waiting for approval`, lines: w.lines, link: '#approvals', linkText: 'Review it' });
+      else out.push({ kind: 'record', members: about(r), users, status: r.status, title: w.money ? `${w.t} recorded${r.status === 'approved' ? '' : ' — ' + RWORD[r.status]}` : `${w.t} ${RWORD[r.status] || r.status}`, lines: w.lines, note: r.decisionNote || '' });
+      continue;
+    }
+    if (o.status !== r.status) out.push({ kind: 'record', members: about(r), users, status: r.status === 'pending' ? 'review' : r.status, title: `${w.t} ${RWORD[r.status] || r.status}`, lines: w.lines, note: r.decisionNote || '' });
+    else if (!!o.settled !== !!r.settled && w.money) out.push({ kind: 'record', members: about(r), users, status: r.settled ? 'approved' : 'review', title: r.type === 'deduction' ? (r.settled ? 'Deduction applied to your pay' : 'Deduction marked as not applied yet') : (r.settled ? 'Bonus paid' : 'Bonus marked as not paid yet'), lines: w.lines, note: r.settleNote || '' });
+    else if ((o.decisionNote || '') !== (r.decisionNote || '') && r.decisionNote) out.push({ kind: 'record', members: about(r), users, status: r.status === 'pending' ? 'review' : r.status, title: `Note on your ${w.t.toLowerCase()}`, lines: w.lines, note: r.decisionNote });
+  }
+  return out;
+}
 function enforcePerms(me, data, current) {
   if (me.owner) return '';
   let allowed = 0;
@@ -177,7 +210,7 @@ export default async function handler(req, res) {
     if (!body.recordsLoaded && current) { data.requests = current.requests || []; if (current.reportSources) data.reportSources = current.reportSources; }
     // Permissions: whatever this account isn't allowed to change is put back to the stored copy.
     if (enforcePerms(me, data, current) === 'nothing') return res.status(403).json({ error: "Your account can't edit the schedule" });
-    const notices = settleWeeks(me, data, current);
+    const notices = [...settleWeeks(me, data, current), ...recordNotices(me, data, current)];
     data.updatedAt = new Date().toISOString();
     data.updatedBy = me.name;
     // activity log — the server stamps time and author; history comes from the stored copy, not the client

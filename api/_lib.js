@@ -21,7 +21,7 @@ export const can = (me, p) => !!me && (me.owner || (me.perms || []).includes(p))
 // scope = the team members this account may see in Reports, Tasks and Profiles (empty = everyone)
 export const scopeOf = (u) => (Array.isArray(u.scope) ? u.scope.filter((x) => typeof x === 'string' && x).slice(0, 100) : []);
 export const inScope = (me, memberId) => !me || me.owner || !(me.scope || []).length || me.scope.includes(memberId);
-export const sessionUser = (u) => ({ username: u.username, name: u.name, role: u.role, perms: permsOf(u), scope: scopeOf(u), owner: false, mustChange: !!u.mustChange });
+export const sessionUser = (u) => ({ username: u.username, name: u.name, role: u.role, perms: permsOf(u), scope: scopeOf(u), owner: false, mustChange: !!u.mustChange, member: u.member || '' });
 // the owner's one-time recovery code (shown once, stored hashed) — used when the owner password is lost
 export const newRecoveryCode = () => crypto.randomBytes(12).toString('hex').toUpperCase().match(/.{1,4}/g).slice(0, 5).join('-');
 const SESSION_HOURS = 24;
@@ -108,8 +108,19 @@ export async function pushNotices(list, by, origin) {
   await writeJSON(NOTICES, doc, 5);
   await telegramNotices(made, origin).catch(() => {});
 }
-// which notices an account receives: never its own; decisions go to schedule editors, submissions to approvers
-export const noticeFor = (me, n) => !!me && n.by.username !== me.username && (n.to === 'schedule' ? can(me, 'schedule') : n.to === 'approve' ? can(me, 'approve') : false);
+// which notices an account receives — never its own. A notice names its readers by any of:
+//   to: a permission ("schedule", "approve", "tasksReview"…) · users: usernames · members: team-member ids (the accounts linked to them)
+export const noticeFor = (me, n) => {
+  if (!me || (n.by && n.by.username === me.username)) return false;
+  if (Array.isArray(n.users) && n.users.includes(me.username)) return true;
+  if (Array.isArray(n.members) && me.member && n.members.includes(me.member)) return true;
+  return !!n.to && PERMS.includes(n.to) && can(me, n.to);
+};
+// every account that can sign in (the owner included), for delivering notices and messages
+export async function allAccounts() {
+  const d = (await readJSON(USERS)) || {};
+  return [ownerUser(d.owner || {}), ...(d.users || []).filter((u) => !u.disabled).map(sessionUser)];
+}
 
 /* ---------- Telegram (optional — needs TELEGRAM_BOT_TOKEN) ---------- */
 export const tgToken = () => process.env.TELEGRAM_BOT_TOKEN || '';
@@ -126,6 +137,13 @@ const dayAt = (key, i) => { const d = new Date(key + 'T00:00:00Z'); d.setUTCDate
 const dTxt = (key, i) => { const d = dayAt(key, i); return `${DN[d.getUTCDay()]} ${d.getUTCDate()} ${MN[d.getUTCMonth()]}`; };
 const SYM = { approved: '✅', review: '🟡', rejected: '❌' }, WORD = { approved: 'approved', review: 'sent back to review', rejected: 'rejected' };
 export function noticeText(n) {
+  if (n.title) { // records, tasks, attendance, messages…
+    let t = `${SYM[n.status] || n.icon || '🔔'} <b>${hx(n.title)}</b>`;
+    if (n.lines && n.lines.length) t += '\n' + n.lines.map(hx).join('\n');
+    if (n.note) t += `\n\n${n.status === 'rejected' ? '<b>Reason:</b> ' : '💬 '}${hx(n.note)}`;
+    if (n.by && n.by.name) t += `\n\n— ${hx(n.by.name)}`;
+    return t;
+  }
   const wk = `${dTxt(n.week, 0)} – ${dTxt(n.week, 6)}`, by = hx(n.by.name), days = n.days || [];
   if (n.kind === 'submitted') {
     const which = days.length && days.length < 7 ? `\nChanged: ${days.map((d) => dTxt(n.week, d.i)).join(', ')}` : '';
@@ -142,13 +160,14 @@ async function telegramNotices(list, origin) {
   if (!tgToken() || !list.length) return;
   const tg = (await readJSON(TELEGRAM)) || {}, links = tg.links || {};
   if (!Object.keys(links).length) return;
-  const udoc = (await readJSON(USERS)) || {};
-  const accounts = [ownerUser(udoc.owner || {}), ...(udoc.users || []).filter((u) => !u.disabled).map(sessionUser)];
+  const accounts = await allAccounts();
   const sends = [];
   for (const n of list) for (const a of accounts) {
     const l = links[a.username]; if (!l || !noticeFor(a, n)) continue;
-    const url = origin && /^https:/.test(origin) ? `${origin}/#week=${n.week}` : '';
-    sends.push(tgCall('sendMessage', { chat_id: l.chatId, text: noticeText(n), parse_mode: 'HTML', disable_web_page_preview: true, ...(url ? { reply_markup: { inline_keyboard: [[{ text: n.kind === 'submitted' ? 'Review now' : 'Open the week', url }]] } } : {}) }).catch(() => {}));
+    const path = n.week ? `#week=${n.week}` : n.link || '';
+    const url = origin && /^https:/.test(origin) && path ? `${origin}/${path}` : '';
+    const btn = n.week ? (n.kind === 'submitted' ? 'Review now' : 'Open the week') : n.linkText || 'Open the dashboard';
+    sends.push(tgCall('sendMessage', { chat_id: l.chatId, text: noticeText(n), parse_mode: 'HTML', disable_web_page_preview: true, ...(url ? { reply_markup: { inline_keyboard: [[{ text: btn, url }]] } } : {}) }).catch(() => {}));
   }
   await Promise.all(sends);
 }

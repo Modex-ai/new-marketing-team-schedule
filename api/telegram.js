@@ -5,7 +5,12 @@
 // POST /api/telegram  (from Telegram, with the webhook secret header) → handles /start <code> and /stop
 // Needs the TELEGRAM_BOT_TOKEN env var (a bot made with @BotFather). Without it everything here is switched off.
 import crypto from 'node:crypto';
-import { readJSON, writeJSON, userFromToken, bearer, parseBody, TELEGRAM, tgToken, tgSecret, tgCall } from './_lib.js';
+import { readJSON, writeJSON, userFromToken, bearer, parseBody, TELEGRAM, tgToken, tgSecret, tgCall, allAccounts } from './_lib.js';
+import { attend } from './_attendance.js';
+import { telegramReply } from './_messages.js';
+
+// the buttons under the chat: check in / out and today's shift
+const KEYBOARD = { keyboard: [[{ text: '✅ Check in' }, { text: '🏁 Check out' }], [{ text: '📅 My shift' }]], resize_keyboard: true, is_persistent: true };
 
 const originOf = (req) => `https://${req.headers['x-forwarded-host'] || req.headers.host}`;
 
@@ -24,7 +29,8 @@ export default async function handler(req, res) {
     if (secret !== undefined) {
       if (!tgToken() || secret !== tgSecret()) return res.status(401).json({ ok: false });
       const u = parseBody(req), m = u.message || u.edited_message;
-      if (!m || !m.chat || typeof m.text !== 'string') return res.status(200).json({ ok: true });
+      if (!m || !m.chat) return res.status(200).json({ ok: true });
+      if (typeof m.text !== 'string') { await tgCall('sendMessage', { chat_id: m.chat.id, text: 'Only text messages reach the dashboard for now — please type your reply.' }).catch(() => {}); return res.status(200).json({ ok: true }); }
       const tg = (await readJSON(TELEGRAM)) || {}; tg.links = tg.links || {}; tg.codes = tg.codes || {};
       const text = m.text.trim(), chatId = m.chat.id;
       let reply;
@@ -35,13 +41,29 @@ export default async function handler(req, res) {
           tg.links[c.username] = { chatId, name: [m.from && m.from.first_name, m.from && m.from.last_name].filter(Boolean).join(' '), at: new Date().toISOString() };
           delete tg.codes[code];
           await writeJSON(TELEGRAM, tg, 5);
-          reply = `✅ Connected to the Vendoor Operations dashboard as <b>${String(c.name || c.username).replace(/[<>&]/g, '')}</b>.\nYou'll get schedule approvals, rejections and submissions here.\nSend /stop to disconnect.`;
+          reply = `✅ Connected to the Vendoor Operations dashboard as <b>${String(c.name || c.username).replace(/[<>&]/g, '')}</b>.\n\n• Decisions on your schedule, records and tasks arrive here, with the reason.\n• Reply to any message to answer it — your reply reaches the dashboard.\n• Use the buttons below to check in and out of your shift.\n\nSend /stop to disconnect.`;
+          await tgCall('sendMessage', { chat_id: chatId, text: reply, parse_mode: 'HTML', reply_markup: KEYBOARD }).catch(() => {});
+          return res.status(200).json({ ok: true });
         } else reply = 'This link has expired. Open the dashboard → My account → Connect Telegram, and try again.';
       } else if (/^\/stop/.test(text)) {
         let n = 0; for (const [k, v] of Object.entries(tg.links)) if (v.chatId === chatId) { delete tg.links[k]; n++; }
         if (n) await writeJSON(TELEGRAM, tg, 5);
         reply = n ? 'Disconnected. You won\'t get dashboard notifications here anymore.' : 'This chat isn\'t connected.';
-      } else reply = 'To connect, open the dashboard → My account → Connect Telegram.';
+      } else {
+        // a linked chat: buttons / commands, otherwise the text is a reply to a dashboard message
+        const username = Object.keys(tg.links).find((k) => tg.links[k].chatId === chatId);
+        const account = username ? (await allAccounts()).find((a) => a.username === username) : null;
+        const origin = `https://${req.headers['x-forwarded-host'] || req.headers.host}`;
+        if (!account) reply = 'To connect, open the dashboard → My account → Connect Telegram.';
+        else if (/^(✅\s*)?check\s*in$|^\/in\b/i.test(text)) reply = (await attend(account, 'in', 'telegram', {}, origin)).msg;
+        else if (/^(🏁\s*)?check\s*out$|^\/out\b/i.test(text)) reply = (await attend(account, 'out', 'telegram', {}, origin)).msg;
+        else if (/^(📅\s*)?my\s*shift$|^\/shift\b/i.test(text)) reply = (await attend(account, 'status', 'telegram')).msg;
+        else if (/^\/start\b/.test(text)) reply = 'You are connected ✅ Use the buttons below, or reply to any message.';
+        else if (/^\//.test(text)) reply = 'Commands: /in · /out · /shift · /stop — or just write a message.';
+        else reply = (await telegramReply(account, chatId, text, m.reply_to_message && m.reply_to_message.message_id, origin)).msg;
+        await tgCall('sendMessage', { chat_id: chatId, text: reply, reply_markup: KEYBOARD, ...(m.message_id ? { reply_parameters: { message_id: m.message_id, allow_sending_without_reply: true } } : {}) }).catch(() => {});
+        return res.status(200).json({ ok: true });
+      }
       await tgCall('sendMessage', { chat_id: chatId, text: reply, parse_mode: 'HTML' }).catch(() => {});
       return res.status(200).json({ ok: true });
     }

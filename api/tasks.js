@@ -7,7 +7,7 @@
 //   op "delProof" { id, j }
 //   op "delete"   { id }                   → admins only
 // Every change is stamped on the task's own timeline and in the dashboard's activity log.
-import { readJSON, writeJSON, userFromToken, bearer, parseBody, appendLog, can, inScope } from './_lib.js';
+import { readJSON, writeJSON, userFromToken, bearer, parseBody, appendLog, can, inScope, pushNotices } from './_lib.js';
 
 const TASKS = 'marketing-ops/tasks';
 const STATUS = ['assigned', 'progress', 'done', 'approved', 'returned', 'cancelled'];
@@ -56,6 +56,8 @@ export default async function handler(req, res) {
     const ev = (t, type, note, extra) => (t.events = [...(t.events || []), { at: now, by, type, ...(note ? { note: str(note, 1000) } : {}), ...(extra || {}) }].slice(-80));
     const who = (t) => t.memberName || t.member || 'someone';
     let log = [], task = null;
+    const notes = []; // notices: the team member hears about her task, reviewers hear when it's done
+    const tline = (t) => [`${t.code} · ${t.title}`, ...(t.due ? [`⏰ Due ${t.due}${t.dueTime ? ' ' + t.dueTime : ''}`] : []), ...(t.priority && t.priority !== 'normal' ? [`Priority: ${t.priority}`] : [])];
 
     if (b.op === 'create') {
       const f = cleanFields(b.task || {}, {});
@@ -66,6 +68,7 @@ export default async function handler(req, res) {
       task = { id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), code: 'TSK-' + String(doc.seq).padStart(4, '0'), priority: 'normal', due: '', dueTime: '', desk: '', details: '', checklist: [], files: [], ...f, status: 'assigned', createdAt: now, createdBy: by, proof: [], rating: null, returns: 0, events: [] };
       ev(task, 'created');
       doc.tasks.unshift(task);
+      notes.push({ kind: 'task', members: [task.member], status: 'review', icon: '📌', title: 'New task for you', lines: tline(task), note: task.details ? str(task.details, 400) : '', link: '#tasks', linkText: 'Open the task' });
       log.push(`Task ${task.code} assigned to ${who(task)}: “${task.title}”${task.due ? ` — due ${task.due}${task.dueTime ? ' ' + task.dueTime : ''}` : ''} (${task.priority})`);
     } else if (b.op === 'update') {
       task = find(); if (!task) return res.status(404).json({ error: 'Task not found' });
@@ -73,6 +76,7 @@ export default async function handler(req, res) {
       if (p.member && !inScope(me, String(p.member))) return res.status(403).json({ error: "You can't move a task to that team member" });
       cleanFields(p, task);
       const edited = ['title', 'details', 'member', 'priority', 'due', 'dueTime', 'desk'].filter((k) => k in p && before[k] !== task[k]);
+      if (edited.some((k) => ['title', 'due', 'dueTime', 'priority', 'member'].includes(k)) && !p.status) notes.push({ kind: 'task', members: [task.member], status: 'review', icon: '✏️', title: 'Your task was updated', lines: tline(task), link: '#tasks', linkText: 'Open the task' });
       if (edited.length) { ev(task, 'edited', '', { fields: edited }); log.push(`Task ${task.code}: edited ${edited.join(', ')}`); }
       if ('files' in p && JSON.stringify((before.files || []).map((x) => x.url)) !== JSON.stringify(task.files.map((x) => x.url))) { ev(task, 'files', `${task.files.length} attachment${task.files.length === 1 ? '' : 's'}`); log.push(`Task ${task.code}: attachments updated (${task.files.length})`); }
       if ('checklist' in p && JSON.stringify(before.checklist) !== JSON.stringify(task.checklist) && !edited.length) ev(task, 'checklist');
@@ -91,6 +95,12 @@ export default async function handler(req, res) {
         if (p.status === 'cancelled') task.cancelledAt = now;
         task.status = p.status;
         ev(task, p.status, b.note, p.status === 'approved' ? { rating: task.rating } : p.status === 'done' ? { doneAt: task.doneAt } : undefined);
+        const st = p.status;
+        if (st === 'done') notes.push({ kind: 'task', to: 'tasksReview', status: 'review', title: `${who(task)} finished a task — review it`, lines: tline(task), note: task.doneNote || '', link: '#tasks', linkText: 'Review the task' });
+        else if (st === 'approved') notes.push({ kind: 'task', members: [task.member], status: 'approved', title: `Task approved — ${'★'.repeat(task.rating)}${'☆'.repeat(5 - task.rating)}`, lines: tline(task), note: task.reviewNote || '', link: '#tasks', linkText: 'Open the task' });
+        else if (st === 'returned') notes.push({ kind: 'task', members: [task.member], status: 'rejected', title: 'Task returned for rework', lines: tline(task), note: task.reviewNote || '', link: '#tasks', linkText: 'Open the task' });
+        else if (st === 'cancelled') notes.push({ kind: 'task', members: [task.member], status: 'rejected', title: 'Task cancelled', lines: tline(task), note: str(b.note, 400), link: '#tasks' });
+        else if (st === 'progress' && before.status !== 'assigned') notes.push({ kind: 'task', members: [task.member], status: 'review', title: 'Task reopened', lines: tline(task), note: str(b.note, 400), link: '#tasks', linkText: 'Open the task' });
         log.push(`Task ${task.code} (${who(task)}): ${LABEL[p.status]}${p.status === 'approved' ? ` — rated ${task.rating}/5` : ''}${b.note ? ` — ${str(b.note, 160)}` : ''}`);
       } else if (p.status === 'approved' && p.rating != null) { // re-rate
         const r = Math.round(+p.rating);
@@ -119,6 +129,7 @@ export default async function handler(req, res) {
     if (JSON.stringify(doc).length > 4_000_000) return res.status(400).json({ error: 'Task list too large' });
     await writeJSON(TASKS, doc);
     if (log.length) { try { await appendLog(log, by); } catch {} }
+    if (notes.length) await pushNotices(notes, me, `https://${req.headers['x-forwarded-host'] || req.headers.host}`).catch(() => {});
     return res.status(200).json({ ok: true, task, tasks: doc.tasks.filter(mine), seq: doc.seq, updatedAt: doc.updatedAt });
   } catch (e) {
     return res.status(500).json({ error: String((e && e.message) || e) });
