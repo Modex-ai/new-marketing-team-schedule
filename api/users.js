@@ -8,7 +8,7 @@ import { readJSON, writeJSON, USERS, PERMS, PRESETS, permsOf, scopeOf, can, hash
 
 const LABEL = { schedule: 'Edit schedule', setup: 'Team & setup', settings: 'Settings', records: 'Excuses & shift changes', money: 'Bonuses & deductions', approve: 'Approve / reject', log: 'Activity log', reports: 'View reports', sources: 'Report sheets', tasks: 'View tasks', tasksManage: 'Assign & manage tasks', tasksReview: 'Review & rate tasks', users: 'Manage users' };
 const presetOf = (perms) => Object.keys(PRESETS).find((k) => PRESETS[k].length === perms.length && PRESETS[k].every((p) => perms.includes(p))) || 'custom';
-const publicUser = (u) => { const perms = permsOf(u); return { username: u.username, name: u.name, role: presetOf(perms), perms, scope: scopeOf(u), member: u.member || '', disabled: !!u.disabled, createdAt: u.createdAt, createdBy: u.createdBy, lastLogin: u.lastLogin || null }; };
+const publicUser = (u) => { const perms = permsOf(u); return { username: u.username, name: u.name, role: presetOf(perms), perms, scope: scopeOf(u), member: u.member || '', self: !!(u.self && u.member), disabled: !!u.disabled, createdAt: u.createdAt, createdBy: u.createdBy, lastLogin: u.lastLogin || null }; };
 const roleName = (perms) => { const r = presetOf(perms); return r === 'custom' ? `custom access (${perms.map((p) => LABEL[p]).join(', ') || 'nothing'})` : r[0].toUpperCase() + r.slice(1); };
 
 export default async function handler(req, res) {
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
       if (String(b.password || '').length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
       const perms = wanted(b) || PRESETS.viewer, scope = wantScope(b) || (me.scope || []).slice();
       const member = typeof b.member === 'string' ? b.member.slice(0, 80) : '';
-      doc.users.push({ username: uname, name, role: presetOf(perms), perms, scope, member, ...hashPassword(b.password), createdAt: new Date().toISOString(), createdBy: me.name, disabled: false, lastLogin: null });
+      doc.users.push({ username: uname, name, role: presetOf(perms), perms, scope, member, self: !!(b.self && member), ...hashPassword(b.password), createdAt: new Date().toISOString(), createdBy: me.name, disabled: false, lastLogin: null });
       await writeJSON(USERS, doc, 10);
       await appendLog([`Users: added ${name} (@${uname}) — ${roleName(perms)}`], by);
       return res.status(200).json(reply(doc));
@@ -111,6 +111,7 @@ export default async function handler(req, res) {
       }
       // which team member this account belongs to (her check-ins, her records and tasks reach her)
       if (typeof b.member === 'string' && b.member.slice(0, 80) !== (u.member || '')) { u.member = b.member.slice(0, 80); changes.push(`Users: ${u.name} (@${uname}) ${u.member ? 'linked to a team member' : 'unlinked from the team'}`); }
+      if (typeof b.self === 'boolean' && b.self !== !!u.self) { u.self = b.self; changes.push(`Users: ${u.name} (@${uname}) ${b.self ? 'sees only her own data' : 'sees her usual access again'}`); }
       if (b.scope !== undefined) {
         if (uname === me.username) return res.status(400).json({ error: "You can't change your own access" });
         const next = wantScope(b), before = scopeOf(u);

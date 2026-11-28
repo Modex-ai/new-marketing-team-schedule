@@ -155,6 +155,12 @@ function recordNotices(me, data, current) {
 }
 function enforcePerms(me, data, current) {
   if (me.owner) return '';
+  // a personal account only ever saw its own row — it can add its own records, nothing else changes
+  if (me.self) {
+    for (const k of new Set([...Object.keys(data), ...Object.keys(current || {})])) if (k !== 'requests' && k !== 'log') keep(data, current, k);
+    data.requests = mergeRecords(me, data.requests, current ? current.requests : []);
+    return can(me, 'records') || can(me, 'money') ? '' : 'nothing';
+  }
   let allowed = 0;
   if (can(me, 'schedule')) { allowed++; if (!can(me, 'approve')) reviewWeeks(me, data, current); }
   else {
@@ -179,8 +185,11 @@ export default async function handler(req, res) {
       // the dashboard is private: nothing is served without a valid session
       const me = await userFromToken(bearer(req)).catch(() => null);
       if (!me) return res.status(401).json({ error: 'Please sign in' });
-      if (String((req.query && req.query.history) || new URL(req.url, 'http://x').searchParams.get('history') || '') === '1') return res.status(200).json({ history: HISTORY });
+      // a personal account gets the weeks with her own row only
+      const own = (weeks) => (me.self ? Object.fromEntries(Object.entries(weeks || {}).map(([k, w]) => [k, { ...w, memberIds: (w.memberIds || []).filter((x) => x === me.member), cells: { [me.member]: (w.cells || {})[me.member] || {} }, notes: {} }])) : weeks);
+      if (String((req.query && req.query.history) || new URL(req.url, 'http://x').searchParams.get('history') || '') === '1') return res.status(200).json({ history: me.self ? { ...HISTORY, weeks: own(HISTORY.weeks) } : HISTORY });
       const data = await readJSON(SCHEDULE);
+      if (data && me.self) data.weeks = own(data.weeks);
       if (data && !can(me, 'log')) delete data.log;
       // excuses / bonuses / deductions and the report sheet list are for signed-in accounts only;
       // an account limited to some team members only gets theirs

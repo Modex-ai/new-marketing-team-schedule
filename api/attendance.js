@@ -31,8 +31,26 @@ export default async function handler(req, res) {
     const b = parseBody(req);
     if (b.action === 'in' || b.action === 'out') {
       const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim().slice(0, 60), ua = String(req.headers['user-agent'] || '').slice(0, 160);
-      const r = await attend(me, b.action, 'dashboard', { ip, ua }, origin);
+      const g = b.geo && typeof b.geo === 'object' ? { lat: b.geo.lat, lng: b.geo.lng, acc: b.geo.acc, error: b.geo.error } : null;
+      const r = await attend(me, b.action, 'dashboard', { ip, ua }, origin, g);
       return res.status(r.ok ? 200 : 400).json(r.ok ? r : { error: r.msg });
+    }
+    // Settings → Office location: turn a Google Maps link (short links too) into coordinates
+    if (b.action === 'resolveMap') {
+      if (!can(me, 'settings') && !can(me, 'approve')) return res.status(403).json({ error: "Your account can't change the office location" });
+      let url = String(b.url || '').trim(), seen = [];
+      if (!/^https:\/\/([\w-]+\.)*(google\.[a-z.]+|goo\.gl|maps\.app\.goo\.gl)\//i.test(url)) return res.status(400).json({ error: 'Paste a Google Maps link' });
+      const pick = (t) => { t = decodeURIComponent(String(t || '')); let m = /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/.exec(t) || /[?&](?:q|query|ll|destination|center)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/.exec(t) || /@(-?\d+\.\d+),(-?\d+\.\d+)/.exec(t) || /\/search\/(-?\d+\.\d+),\+?(-?\d+\.\d+)/.exec(t); return m ? { lat: +m[1], lng: +m[2] } : null; };
+      let at = pick(url), body = '';
+      for (let k = 0; k < 6 && !at; k++) {
+        const r = await fetch(url, { redirect: 'manual', headers: { 'user-agent': 'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/120 Safari/537.36', 'accept-language': 'en' } });
+        const loc = r.headers.get('location'); seen.push(url);
+        if (loc) { url = new URL(loc, url).href; at = pick(url); continue; }
+        body = await r.text(); at = pick(body); break;
+      }
+      if (!at) return res.status(400).json({ error: "Couldn't read the location from that link — open it in Google Maps, long-press the pin and paste the coordinates instead" });
+      const name = (/\/place\/([^/@]+)/.exec(decodeURIComponent(url)) || [])[1];
+      return res.status(200).json({ ok: true, lat: +at.lat.toFixed(6), lng: +at.lng.toFixed(6), name: name ? name.replace(/\+/g, ' ').slice(0, 120) : '', url });
     }
     if (b.action === 'fix') {
       if (!can(me, 'approve')) return res.status(403).json({ error: 'Only approvers can correct attendance' });

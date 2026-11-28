@@ -738,7 +738,7 @@ table.wk td.drj{background:#FDF4F5}table.wk thead th.drj{box-shadow:inset 0 -3px
 .okc{color:var(--ok)}.wnc{color:var(--warn)}.bdc{color:var(--bad)}
 .myshift{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,#0E3B3D,#14494B);color:#fff;border-radius:18px;padding:16px 20px;margin:0 0 18px;box-shadow:0 10px 30px rgba(6,26,27,.18)}
 .myshift .msi{display:flex;flex-direction:column;gap:3px;min-width:0}.myshift .eyebrow2{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#E7B977;font-weight:800}
-.myshift b{font-size:17px}.myshift small{font-size:12.8px;color:rgba(255,255,255,.82)}.myshift small b{font-size:12.8px}.myshift .hot{color:#FFB3A3}.myshift .cool{color:#9FE3C4}
+.myshift b{font-size:17px}.myshift small{font-size:12.8px;color:rgba(255,255,255,.82)}.myshift small b{font-size:12.8px}.myshift .hot{color:#FFB3A3}.myshift .wh{font-size:11.5px;color:#E7B977;margin-top:2px}.myshift .cool{color:#9FE3C4}
 .myshift .btn.primary{background:#E7B977;color:#0B2E30;border-color:#E7B977;font-weight:800;padding:11px 20px}
 .atboard{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
 .atb{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:#fff}
@@ -747,6 +747,7 @@ table.wk td.drj{background:#FDF4F5}table.wk thead th.drj{box-shadow:inset 0 -3px
 .atc{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:2px 9px}
 .atc.ok{background:var(--ok-bg);color:var(--ok)}.atc.bad{background:var(--bad-bg);color:var(--bad)}.atc.rv{background:var(--warn-bg);color:var(--warn)}.atc.mut{background:var(--line-2);color:var(--muted)}
 table.attbl td,table.attbl th{white-space:nowrap}
+.plc{display:inline-block;font-size:11.5px;font-weight:700;border-radius:7px;padding:1px 7px;text-decoration:none}.plc.ok{background:var(--ok-bg);color:var(--ok)}.plc.bad{background:var(--bad-bg);color:var(--bad)}.plc.rm{background:#EEF1F6;color:#3C5576}
 .msbox{display:grid;grid-template-columns:320px 1fr;padding:0!important;overflow:hidden;min-height:560px}
 .msl{border-right:1px solid var(--line-2);display:flex;flex-direction:column;max-height:72vh;overflow-y:auto}
 .mslh{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line-2);position:sticky;top:0;background:#fff;z-index:1}
@@ -774,6 +775,7 @@ table.attbl td,table.attbl th{white-space:nowrap}
   .myshift{padding:14px 16px}.myshift .msb{width:100%}.myshift .msb .btn{width:100%;justify-content:center}
   .sechead h2{font-size:22px}
 }
+body.selfview .teamonly,body.selfview #kpis,body.selfview #dayCov,body.selfview #saveAllCards,body.selfview #timeline .desks,body.selfview #wkEdit,body.selfview #wkFoot{display:none!important}
 .ntw{position:relative}
 .ntbtn{position:relative;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;cursor:pointer}
 .ntbtn:hover{background:rgba(255,255,255,.14)}
@@ -1023,7 +1025,7 @@ table.tkp{min-width:1000px}
   <div class="kpis" id="kpis"></div>
   <div id="banners"></div>
 
-  <section class="card">
+  <section class="card teamonly">
     <div class="sh"><div><div class="eyebrow">Live</div><h2>On Duty Now</h2><div class="sub" id="liveSub"></div></div></div>
     <div class="live" id="live"></div>
   </section>
@@ -1059,7 +1061,7 @@ table.tkp{min-width:1000px}
     <div class="fn" id="wkFoot"></div>
   </section>
 
-  <div class="grid2">
+  <div class="grid2 teamonly">
     <section class="card">
       <div class="sh"><div><div class="eyebrow">Weekly Insights</div><h2>Desk Coverage</h2><div class="sub">People on each desk, per shift and day. Red means no one is assigned.</div></div></div>
       <div style="overflow-x:auto" id="covTbl"></div>
@@ -1395,6 +1397,7 @@ function renderGate() {
   if (locked && !$("#modalRoot").innerHTML.trim()) openLogin(null, S.gateMsg);
 }
 function renderAll() {
+  document.body.classList.toggle("selfview", !!(S.me && S.me.self));
   renderGate(); renderHeader(); renderNotices(); renderMsBadge(); renderMyShift(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderProfiles(); renderRequests(); renderLog(); renderSaveBar(); renderReports(); renderApprovals(); renderAccess();
   if (S.admin.open) renderAdmin();
 }
@@ -1485,7 +1488,7 @@ function renderDay() {
 function weekTableHTML(D, ws) {
   const st = weekStats(D, ws), ci = curIdx(), edit = can("schedule"), key = iDate(ws), w = weekAt(D, ws);
   // day-by-day decision pills (signed-in accounts only; older weeks published before approvals show none)
-  const showDec = !!w && !!S.me && !wkLegacy(w, key), dec = showDec ? daysOfWeek(w, key) : {};
+  const showDec = !!w && !!S.me && (can("schedule") || canApprove()) && !wkLegacy(w, key), dec = showDec ? daysOfWeek(w, key) : {};
   const rjDay = (k) => showDec && dec[k].status === "rejected";
   let h = `<thead><tr><th>Team member</th>`;
   for (let k = 0; k < 7; k++) {
@@ -1686,7 +1689,7 @@ function renderWeek() {
   const D = V(), ws = viewWS(), created = !!weekAt(D, ws);
   $("#wkTitle").textContent = `${dmy(ws)} – ${dmy(ws + 6, 1)}`;
   $("#wkSub").innerHTML = (S.weekOffset === 0 ? "This week · " : S.weekOffset === 1 ? "Next week · " : S.weekOffset === -1 ? "Last week · " : "") +
-    (created ? `${weekStatusHTML(weekAt(D, ws), iDate(ws))}${can("schedule") ? ` <span class="muted" style="font-size:12px">· click any cell to edit${canApprove() ? "" : " — your changes go to review"}</span>` : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
+    (created ? `${can("schedule") || canApprove() ? weekStatusHTML(weekAt(D, ws), iDate(ws)) : ""}${can("schedule") ? ` <span class="muted" style="font-size:12px">· click any cell to edit${canApprove() ? "" : " — your changes go to review"}</span>` : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
   $("#wkBody").innerHTML = created ? `${weekNoticeHTML(D, weekAt(D, ws), iDate(ws))}<div class="tblw"><table class="wk">${weekTableHTML(D, ws)}</table></div>` : `<div class="empty">This week hasn't been created yet.<br><button class="btn sm primary" style="margin-top:10px" data-act="openCreate">Create this week</button></div>`;
   $("#wkPrev").disabled = S.weekOffset <= minOffset();
   $("#wkToday").classList.toggle("hidden", S.weekOffset === 0);
@@ -2722,9 +2725,25 @@ async function loadAttendance(quiet) {
   try { AT.data = await call(`/api/attendance?from=${iDate(Math.min(a, b - 1) - 1)}&to=${iDate(Math.max(b, Math.floor(nowAbs() / 1440)) + 1)}`, "GET"); AT.err = ""; } catch (e) { AT.err = e.message; }
   AT.loading = false; renderAttendance(); renderMyShift();
 }
+// on office shifts the browser's location goes with the check-in (the server decides what counts as remote)
+function officeShift(action) {
+  const D = V(), o = D.settings.office || {}; if (!(+o.lat || +o.lng)) return false;
+  const me = AT.data && AT.data.me, m = D.members.find((x) => x.id === S.me.member) || {};
+  if (m.remote) return false;
+  if (action === "out") return !(me && me.rec && me.rec.remote);
+  const sh = me && me.shift; if (!sh || sh.none || sh.off) return true;
+  return !(rmShifts(D).includes(sh.type) || rmDays(D).includes(wdOf(sh.i)));
+}
+const getPos = () => new Promise((ok) => { if (!navigator.geolocation) return ok({ error: "This browser can't share its location" }); navigator.geolocation.getCurrentPosition((p) => ok({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }), (e) => ok({ error: e.code === 1 ? "Location permission denied" : e.message || "Location unavailable" }), { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }); });
 async function attendAct(action) {
   if (AT.busy) return; AT.busy = true; renderMyShift();
-  try { const j = await call("/api/attendance", "POST", { action }); toast(j.msg.split("\n")[0]); await loadAttendance(true); }
+  try {
+    let geo = null;
+    if (officeShift(action)) { toast("📍 Getting your location…"); geo = await getPos(); }
+    const j = await call("/api/attendance", "POST", { action, ...(geo ? { geo } : {}) });
+    const lines = j.msg.split("\n"); toast(lines[0] + (lines.find((l) => /📍/.test(l)) ? " · " + lines.find((l) => /📍/.test(l)).replace("📍 ", "") : ""), /notified/.test(j.msg));
+    await loadAttendance(true);
+  }
   catch (e) { toast(e.message, true); }
   AT.busy = false; renderMyShift();
 }
@@ -2744,6 +2763,16 @@ function atDay(D, mid, i) {
   else st = "missing";
   return { c, r, st, exc };
 }
+// where a check-in / out happened: at the office, how far away, remote, or no location
+const distTxt = (m) => (m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`);
+function placeHTML(r, which) {
+  const p = r && r[which] && r[which].place; if (!p) return r && r.remote && which === "in" ? `<span class="plc rm">🏠 Remote</span>` : "";
+  if (p.remote) return `<span class="plc rm" title="${esc(p.remote)}">🏠 Remote</span>`;
+  if (p.none) return `<span class="plc bad" title="${esc(p.why || "")}">📍 No location</span>`;
+  const map = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
+  return p.away ? `<a class="plc bad" href="${map}" target="_blank" rel="noopener" title="±${distTxt(p.acc || 0)}">⚠️ ${distTxt(p.dist)} away</a>` : `<a class="plc ok" href="${map}" target="_blank" rel="noopener" title="±${distTxt(p.acc || 0)}">📍 Office · ${distTxt(p.dist)}</a>`;
+}
+const isAway = (r) => !!r && ["in", "out"].some((k) => r[k] && r[k].place && (r[k].place.away || r[k].place.none));
 const AT_ST = { ontime: ["On time", "ok"], late: ["Late", "bad"], extra: ["Unscheduled", "rv"], off: ["Off", "mut"], none: ["No shift", "mut"], excused: ["Excused", "rv"], before: ["—", "mut"], upcoming: ["Upcoming", "mut"], due: ["Starting", "rv"], notin: ["Not checked in", "bad"], missing: ["No check-in", "bad"] };
 function renderMyShift() {
   const box = $("#myShift"); if (!box) return;
@@ -2756,7 +2785,8 @@ function renderMyShift() {
   if (open) { stat = `Checked in ${fmtT(r.in.abs)} · ${fmtDur(now - r.in.abs)} so far${r.status === "late" ? ` · <b class="hot">${fmtDur(r.late)} late</b>` : ` · <b class="cool">on time</b>`}`; btn = `<button class="btn primary" data-act="atOut" ${AT.busy ? "disabled" : ""}>🏁 Check out</button>`; }
   else if (r && r.out) { stat = `Done · ${fmtT(r.in.abs)} – ${fmtT(r.out.abs)} · ${fmtDur(r.worked)}${r.late > ((AT.data || {}).grace ?? 10) ? ` · ${fmtDur(r.late)} late` : ""}${r.early > ((AT.data || {}).grace ?? 10) ? ` · left ${fmtDur(r.early)} early` : ""}`; btn = `<span class="ss approved">✓ Shift complete</span>`; }
   else { stat = sh.s != null ? (now < sh.s ? `Starts in ${fmtDur(sh.s - now)}` : `<b class="hot">Started ${fmtDur(now - sh.s)} ago — check in now</b>`) : "Check in when you start working"; btn = `<button class="btn primary" data-act="atIn" ${AT.busy ? "disabled" : ""}>✅ Check in</button>`; }
-  box.innerHTML = `<div class="myshift"><div class="msi"><span class="eyebrow2">My shift</span><b>${label}</b><small>${stat}</small></div><div class="msb">${btn}</div></div>`;
+  const where = (V().settings.office || {}).lat ? (officeShift(open ? "out" : "in") ? `<span class="wh">📍 Office shift — your location is checked</span>` : `<span class="wh">🏠 Remote — no location needed</span>`) : "";
+  box.innerHTML = `<div class="myshift"><div class="msi"><span class="eyebrow2">My shift</span><b>${label}</b><small>${stat}</small>${where}</div><div class="msb">${btn}</div></div>`;
 }
 function renderAttendance() {
   const v = $("#atView"); if (!v || v.classList.contains("hidden")) return;
@@ -2777,28 +2807,28 @@ function renderAttendance() {
     const yNight = mems.map((m) => [m, atRec(iDate(ci - 1), m.id)]).filter(([, r]) => r && r.in && !r.out);
     h += `<section class="card"><div class="sh"><div><h2>Today · ${DY[wdOf(ci)]} ${dmy(ci, 1)}</h2></div></div><div class="atboard">${rows.map(([m, x]) => {
       const [l, c] = AT_ST[x.st]; const r = x.r;
-      return `<div class="atb ${c}"><div class="nm"><span class="dot" style="background:${m.color}"></span><b>${esc(m.name)}</b></div><div class="sh">${x.c ? (x.c.off ? "Off" : `${esc(x.c.ty.name)}${x.c.s != null ? ` · ${fmtT(x.c.s, 1)}–${fmtT(x.c.e, 1)}` : ""}`) : "No shift"}</div><div class="ast"><span class="atc ${c}">${l}</span>${r ? `<small>in ${fmtT(r.in.abs)}${r.late ? ` (+${fmtDur(r.late)})` : ""}${r.out ? ` · out ${fmtT(r.out.abs)}` : ""}</small>` : x.st === "notin" || x.st === "missing" ? `<small>shift started ${fmtDur(nowAbs() - x.c.s)} ago</small>` : ""}</div></div>`;
+      return `<div class="atb ${c}"><div class="nm"><span class="dot" style="background:${m.color}"></span><b>${esc(m.name)}</b></div><div class="sh">${x.c ? (x.c.off ? "Off" : `${esc(x.c.ty.name)}${x.c.s != null ? ` · ${fmtT(x.c.s, 1)}–${fmtT(x.c.e, 1)}` : ""}`) : "No shift"}</div><div class="ast"><span class="atc ${c}">${l}</span>${r ? `<small>in ${fmtT(r.in.abs)}${r.late ? ` (+${fmtDur(r.late)})` : ""}${r.out ? ` · out ${fmtT(r.out.abs)}` : ""}</small><small>${placeHTML(r, "in")}${r.out ? " " + placeHTML(r, "out") : ""}</small>` : x.st === "notin" || x.st === "missing" ? `<small>shift started ${fmtDur(nowAbs() - x.c.s)} ago</small>` : ""}</div></div>`;
     }).join("") || `<div class="muted" style="padding:10px 2px">Nobody is scheduled today.</div>`}${yNight.map(([m, r]) => `<div class="atb rv"><div class="nm"><span class="dot" style="background:${m.color}"></span><b>${esc(m.name)}</b></div><div class="sh">Last night's shift</div><div class="ast"><span class="atc rv">Still in</span><small>since ${fmtT(r.in.abs)}</small></div></div>`).join("")}</div></section>`;
   }
   // summary per person
   const sum = mems.map((m) => {
-    const z = { m, sched: 0, inn: 0, ontime: 0, late: 0, lateMin: 0, early: 0, earlyMin: 0, missing: 0, excused: 0, over: 0, worked: 0, extra: 0 };
+    const z = { m, sched: 0, inn: 0, ontime: 0, late: 0, lateMin: 0, early: 0, earlyMin: 0, missing: 0, excused: 0, over: 0, worked: 0, extra: 0, away: 0 };
     for (let i = a; i <= b; i++) {
       const x = atDay(D, m.id, i);
       if (x.c && x.c.work && !["before", "upcoming", "due"].includes(x.st)) z.sched++;
-      if (x.r) { z.inn++; if (x.r.status === "late") { z.late++; z.lateMin += x.r.late || 0; } else if (x.r.status === "ontime") z.ontime++; else z.extra++; if (x.r.early > (A.grace || 0)) { z.early++; z.earlyMin += x.r.early; } z.over += x.r.over || 0; z.worked += x.r.worked || 0; }
+      if (x.r) { z.inn++; if (x.r.status === "late") { z.late++; z.lateMin += x.r.late || 0; } else if (x.r.status === "ontime") z.ontime++; else z.extra++; if (x.r.early > (A.grace || 0)) { z.early++; z.earlyMin += x.r.early; } z.over += x.r.over || 0; z.worked += x.r.worked || 0; if (isAway(x.r)) z.away++; }
       if (x.st === "missing") z.missing++; if (x.st === "excused") z.excused++;
     }
     z.rate = z.ontime + z.late ? Math.round((z.ontime / (z.ontime + z.late)) * 100) : null;
     return z;
   });
-  h += `<section class="card"><div class="sh"><div><h2>Summary · ${dmy(a)} – ${dmy(b, 1)}</h2></div></div><div class="tw"><table class="stbl attbl"><thead><tr><th>Team member</th><th>Shifts</th><th>Checked in</th><th>On time</th><th>Late</th><th>Late time</th><th>Left early</th><th>No check-in</th><th>Excused</th><th>Worked</th><th>Overtime</th></tr></thead><tbody>${sum.map((z) => `<tr><td><span class="dot" style="background:${z.m.color}"></span> <b>${esc(z.m.name)}</b></td><td>${z.sched}</td><td>${z.inn}${z.extra ? ` <small class="muted">(+${z.extra} extra)</small>` : ""}</td><td>${z.rate == null ? "—" : `<b class="${z.rate >= 90 ? "okc" : z.rate >= 70 ? "wnc" : "bdc"}">${z.rate}%</b>`}</td><td>${z.late || "—"}</td><td>${z.lateMin ? fmtDur(z.lateMin) + (z.late ? ` <small class="muted">avg ${fmtDur(z.lateMin / z.late)}</small>` : "") : "—"}</td><td>${z.early ? `${z.early} · ${fmtDur(z.earlyMin)}` : "—"}</td><td>${z.missing ? `<b class="bdc">${z.missing}</b>` : "—"}</td><td>${z.excused || "—"}</td><td>${z.worked ? fmtDur(z.worked) : "—"}</td><td>${z.over ? fmtDur(z.over) : "—"}</td></tr>`).join("")}</tbody></table></div></section>`;
+  h += `<section class="card"><div class="sh"><div><h2>Summary · ${dmy(a)} – ${dmy(b, 1)}</h2></div></div><div class="tw"><table class="stbl attbl"><thead><tr><th>Team member</th><th>Shifts</th><th>Checked in</th><th>On time</th><th>Late</th><th>Late time</th><th>Left early</th><th>No check-in</th><th>Away from office</th><th>Excused</th><th>Worked</th><th>Overtime</th></tr></thead><tbody>${sum.map((z) => `<tr><td><span class="dot" style="background:${z.m.color}"></span> <b>${esc(z.m.name)}</b></td><td>${z.sched}</td><td>${z.inn}${z.extra ? ` <small class="muted">(+${z.extra} extra)</small>` : ""}</td><td>${z.rate == null ? "—" : `<b class="${z.rate >= 90 ? "okc" : z.rate >= 70 ? "wnc" : "bdc"}">${z.rate}%</b>`}</td><td>${z.late || "—"}</td><td>${z.lateMin ? fmtDur(z.lateMin) + (z.late ? ` <small class="muted">avg ${fmtDur(z.lateMin / z.late)}</small>` : "") : "—"}</td><td>${z.early ? `${z.early} · ${fmtDur(z.earlyMin)}` : "—"}</td><td>${z.missing ? `<b class="bdc">${z.missing}</b>` : "—"}</td><td>${z.away ? `<b class="bdc">${z.away}</b>` : "—"}</td><td>${z.excused || "—"}</td><td>${z.worked ? fmtDur(z.worked) : "—"}</td><td>${z.over ? fmtDur(z.over) : "—"}</td></tr>`).join("")}</tbody></table></div></section>`;
   // day-by-day log
   const log = [];
   for (let i = b; i >= a; i--) for (const m of mems) { const x = atDay(D, m.id, i); if (x.r || ["missing", "notin", "excused"].includes(x.st)) log.push([i, m, x]); }
-  h += `<section class="card"><div class="sh"><div><h2>Day by day</h2></div><span class="muted" style="font-size:12px">${log.length} entr${log.length === 1 ? "y" : "ies"}</span></div>${log.length ? `<div class="tw"><table class="stbl attbl"><thead><tr><th>Day</th><th>Team member</th><th>Shift</th><th>In</th><th>Out</th><th>Status</th><th>Worked</th><th>Via</th>${can("approve") ? "<th></th>" : ""}</tr></thead><tbody>${log.slice(0, 400).map(([i, m, x]) => {
+  h += `<section class="card"><div class="sh"><div><h2>Day by day</h2></div><span class="muted" style="font-size:12px">${log.length} entr${log.length === 1 ? "y" : "ies"}</span></div>${log.length ? `<div class="tw"><table class="stbl attbl"><thead><tr><th>Day</th><th>Team member</th><th>Shift</th><th>In</th><th>Out</th><th>Status</th><th>Location</th><th>Worked</th><th>Via</th>${can("approve") ? "<th></th>" : ""}</tr></thead><tbody>${log.slice(0, 400).map(([i, m, x]) => {
     const r = x.r, [l, c] = AT_ST[x.st];
-    return `<tr><td>${DY[wdOf(i)]} ${dmy(i)}</td><td><span class="dot" style="background:${m.color}"></span> ${esc(m.name)}</td><td>${x.c ? (x.c.off ? "Off" : `${esc(x.c.ty.name)}${x.c.s != null ? ` <small class="muted">${fmtT(x.c.s, 1)}–${fmtT(x.c.e, 1)}</small>` : ""}`) : r && r.shift ? esc(r.shift) : "—"}</td><td>${r ? fmtT(r.in.abs) + (r.late ? ` <small class="${r.status === "late" ? "bdc" : "muted"}">+${fmtDur(r.late)}</small>` : "") : "—"}</td><td>${r && r.out ? fmtT(r.out.abs) + (r.early > (A.grace || 0) ? ` <small class="bdc">−${fmtDur(r.early)}</small>` : r.over > 15 ? ` <small class="okc">+${fmtDur(r.over)}</small>` : "") : r ? `<small class="muted">still in</small>` : "—"}</td><td><span class="atc ${c}">${l}</span>${x.exc ? ` <small class="muted">${esc(REQ_TYPES[x.exc.type])}</small>` : ""}</td><td>${r && r.worked ? fmtDur(r.worked) : "—"}</td><td><small class="muted">${r ? (r.edited ? `✎ ${esc(r.edited.by)}` : r.in.via === "telegram" ? "Telegram" : "Dashboard") : ""}</small></td>${can("approve") ? `<td><button class="btn sm ghost" data-act="atFix" data-m="${esc(m.id)}" data-d="${iDate(i)}">Edit</button></td>` : ""}</tr>`;
+    return `<tr><td>${DY[wdOf(i)]} ${dmy(i)}</td><td><span class="dot" style="background:${m.color}"></span> ${esc(m.name)}</td><td>${x.c ? (x.c.off ? "Off" : `${esc(x.c.ty.name)}${x.c.s != null ? ` <small class="muted">${fmtT(x.c.s, 1)}–${fmtT(x.c.e, 1)}</small>` : ""}`) : r && r.shift ? esc(r.shift) : "—"}</td><td>${r ? fmtT(r.in.abs) + (r.late ? ` <small class="${r.status === "late" ? "bdc" : "muted"}">+${fmtDur(r.late)}</small>` : "") : "—"}</td><td>${r && r.out ? fmtT(r.out.abs) + (r.early > (A.grace || 0) ? ` <small class="bdc">−${fmtDur(r.early)}</small>` : r.over > 15 ? ` <small class="okc">+${fmtDur(r.over)}</small>` : "") : r ? `<small class="muted">still in</small>` : "—"}</td><td><span class="atc ${c}">${l}</span>${x.exc ? ` <small class="muted">${esc(REQ_TYPES[x.exc.type])}</small>` : ""}</td><td>${r ? `${placeHTML(r, "in")}${r.out && r.out.place && !r.out.place.remote ? `<br><small class="muted">out:</small> ${placeHTML(r, "out")}` : ""}` || "—" : "—"}</td><td>${r && r.worked ? fmtDur(r.worked) : "—"}</td><td><small class="muted">${r ? (r.edited ? `✎ ${esc(r.edited.by)}` : r.in.via === "telegram" ? "Telegram" : "Dashboard") : ""}</small></td>${can("approve") ? `<td><button class="btn sm ghost" data-act="atFix" data-m="${esc(m.id)}" data-d="${iDate(i)}">Edit</button></td>` : ""}</tr>`;
   }).join("")}</tbody></table></div>` : `<div class="muted" style="padding:18px">Nothing recorded in this period yet.</div>`}</section>`;
   v.innerHTML = h;
 }
@@ -4027,6 +4057,23 @@ function requestsEditor(D) {
   }).join("") : `<div class="muted">No records yet.</div>`) + `</div>`;
   return body;
 }
+// Settings → where people work from: the office (checked by location) or remotely
+const rmShifts = (D) => (Array.isArray(D.settings.remoteShifts) ? D.settings.remoteShifts : ["night"]);
+const rmDays = (D) => (Array.isArray(D.settings.remoteDays) ? D.settings.remoteDays.map(Number) : [5]);
+function officePanel(D) {
+  const o = D.settings.office || {}, has = o.lat !== "" && o.lat != null && o.lng !== "" && o.lng != null && (+o.lat || +o.lng);
+  return `<div class="panel"><h4>Office location — check-in by location</h4>
+    <p class="muted" style="margin:0 0 10px;font-size:12.5px">On office shifts the dashboard and Telegram ask for the person's location when they check in or out. Farther than the radius → you get an alert with the distance (in m / km).</p>
+    <div class="row" style="gap:8px;align-items:flex-end;flex-wrap:wrap"><label class="field" style="flex:1;min-width:260px">Google Maps link<input type="url" id="offLink" placeholder="https://maps.app.goo.gl/…" value="${esc(o.link || "")}"></label><button class="btn sm primary" data-act="offResolve">Read location from link</button><button class="btn sm" data-act="offHere">📍 Use my current location</button></div>
+    <div class="row" style="gap:12px;margin-top:10px;flex-wrap:wrap"><label class="field">Latitude<input type="number" step="any" data-path="settings.office.lat" data-num="1" value="${esc(o.lat ?? "")}" style="width:150px"></label><label class="field">Longitude<input type="number" step="any" data-path="settings.office.lng" data-num="1" value="${esc(o.lng ?? "")}" style="width:150px"></label><label class="field">Allowed radius (m)<input type="number" min="20" step="10" data-path="settings.office.radius" data-num="1" value="${esc(o.radius ?? 150)}" style="width:120px"></label></div>
+    <div style="margin-top:8px;font-size:12.5px">${has ? `<span class="ss approved">✓ Location checks on</span> ${o.name ? `<b>${esc(o.name)}</b> · ` : ""}<a href="https://www.google.com/maps?q=${+o.lat},${+o.lng}" target="_blank" rel="noopener">Check the pin on the map ↗</a>` : `<span class="ss pending">Not set</span> <span class="muted">— check-ins aren't location-checked until you set the office.</span>`}</div>
+  </div>
+  <div class="panel"><h4>Remote work — no location check</h4>
+    <div class="field">Shifts that are always remote</div><div class="tkmem">${D.shiftTypes.filter((t) => t.kind !== "off").map((t) => `<label class="${rmShifts(D).includes(t.id) ? "on" : ""}"><input type="checkbox" data-act="rmShift" data-v="${esc(t.id)}" ${rmShifts(D).includes(t.id) ? "checked" : ""}>${esc(t.name)}</label>`).join("")}</div>
+    <div class="field" style="margin-top:12px">Days that are always remote</div><div class="tkmem">${DAYS.map((d, k) => `<label class="${rmDays(D).includes(k) ? "on" : ""}"><input type="checkbox" data-act="rmDay" data-v="${k}" ${rmDays(D).includes(k) ? "checked" : ""}>${d}</label>`).join("")}</div>
+    <div class="field" style="margin-top:12px">People who always work remotely</div><div class="tkmem">${D.members.filter((m) => !m.former).map((m) => `<label class="${m.remote ? "on" : ""}"><input type="checkbox" data-act="rmMember" data-v="${esc(m.id)}" ${m.remote ? "checked" : ""}>${esc(m.name)}</label>`).join("")}</div>
+  </div>`;
+}
 function renderAdmin() {
   const D = S.draft, A = S.admin;
   const tabs = adminTabs();
@@ -4077,6 +4124,7 @@ function renderAdmin() {
         <label class="field">Password<input type="text" id="nuPass" placeholder="At least 6 characters" autocomplete="new-password" value="${esc(nu.pass || "")}"></label>
         <label class="field">This account belongs to<select id="nuMember"><option value="">— Not a team member (manager) —</option>${memberOpts(nu.member || "")}</select></label>
       </div>
+      <label class="chk" style="margin-top:10px;display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="nuSelf" ${nu.self === false ? "" : "checked"}> <span><b>Personal account</b> — sees only her own schedule, reports, records, tasks and attendance (when linked to a team member)</span></label>
       <div class="pnote" style="margin-top:8px">Linking the account to a team member lets her <b>check in / out</b>, and sends her the decisions on her own records and tasks (dashboard + Telegram).</div>
       <div class="field" style="margin-top:14px">What this person can do</div>${presetBtns('data-u=""')}${grid(nu.perms, "data-nperm")}
       ${scopeBox(nu.scope || [], "data-nscope")}
@@ -4090,9 +4138,9 @@ function renderAdmin() {
             <div class="row" style="justify-content:space-between;margin-top:10px">${S.ownerInfo && S.ownerInfo.custom ? `<button class="btn sm ghost" data-act="ownerRecovery">New recovery code</button>` : "<span></span>"}<button class="btn sm primary" data-act="ownerSave">Save owner sign-in</button></div></div>` : ""}</div>
         ${S.users.map((u) => { const me = u.username === S.me.username, open = A.uOpen === u.username; return `<div class="urow" style="${u.disabled ? "opacity:.6" : ""}"><div class="uh"><div><b>${esc(u.name)}</b> <span class="rb ${u.role}">${roleLabel(u)}</span>${u.disabled ? ` <span class="rb off">Frozen</span>` : ` <span class="rb act">Active</span>`}${u.mustChange ? ` <span class="rb viewer">Temporary password</span>` : ""}
             <small>@${esc(u.username)} · ${u.perms.length} permission${u.perms.length === 1 ? "" : "s"} · last sign-in ${esc(ago(u.lastLogin))} · added ${esc(ago(u.createdAt))}${u.createdBy ? " by " + esc(u.createdBy) : ""}</small>
-            <div class="ptags">${PERM_INFO.filter(([k]) => u.perms.includes(k)).map(([, l]) => `<span>${l}</span>`).join("") || `<span class="none">No access — can only see the public dashboard</span>`}${(u.scope || []).length ? `<span class="sc2">Sees: ${u.scope.map((id) => esc(memName(S.draft, id))).join(", ")}</span>` : ""}${u.member ? `<span class="sc2" style="background:#E3F1EC;color:var(--ok)">👤 ${esc(memName(S.draft, u.member))}</span>` : ""}</div></div>
+            <div class="ptags">${PERM_INFO.filter(([k]) => u.perms.includes(k)).map(([, l]) => `<span>${l}</span>`).join("") || `<span class="none">No access — can only see the public dashboard</span>`}${(u.scope || []).length ? `<span class="sc2">Sees: ${u.scope.map((id) => esc(memName(S.draft, id))).join(", ")}</span>` : ""}${u.member ? `<span class="sc2" style="background:#E3F1EC;color:var(--ok)">👤 ${esc(memName(S.draft, u.member))}${u.self ? " · personal" : ""}</span>` : ""}</div></div>
           <div class="row" style="justify-content:flex-end;gap:6px">${me ? `<span class="muted" style="font-size:12px">You</span>` : `<button class="btn sm ${open ? "primary" : ""}" data-act="userPerms" data-u="${esc(u.username)}">${open ? "Close" : "Permissions"}</button><button class="btn sm" data-act="userPass" data-u="${esc(u.username)}">Temporary password</button><button class="btn sm ${u.disabled ? "primary" : ""}" data-act="userToggle" data-u="${esc(u.username)}">${u.disabled ? "Activate" : "Freeze"}</button><button class="btn sm danger" data-act="userDelete" data-u="${esc(u.username)}">Delete</button>`}</div></div>
-          ${open && !me ? `<div class="uperm"><label class="field" style="max-width:340px;margin-bottom:10px">This account belongs to<select id="upMember"><option value="">— Not a team member (manager) —</option>${memberOpts(u.member || "")}</select></label>${presetBtns(`data-u="${esc(u.username)}"`)}${grid(A.uPerms || u.perms, "data-uperm")}${scopeBox(A.uScope || u.scope || [], "data-uscope")}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm ghost" data-act="userPerms" data-u="${esc(u.username)}">Cancel</button><button class="btn sm primary" data-act="userPermSave" data-u="${esc(u.username)}">Save permissions</button></div></div>` : ""}</div>`; }).join("")}
+          ${open && !me ? `<div class="uperm"><div class="row" style="gap:14px;align-items:flex-end;margin-bottom:10px"><label class="field" style="max-width:340px">This account belongs to<select id="upMember"><option value="">— Not a team member (manager) —</option>${memberOpts(u.member || "")}</select></label><label style="display:flex;gap:7px;align-items:center;font-size:13px;padding-bottom:9px"><input type="checkbox" id="upSelf" ${u.self ? "checked" : ""}> <b>Personal account</b> — only her own data</label></div>${presetBtns(`data-u="${esc(u.username)}"`)}${grid(A.uPerms || u.perms, "data-uperm")}${scopeBox(A.uScope || u.scope || [], "data-uscope")}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm ghost" data-act="userPerms" data-u="${esc(u.username)}">Cancel</button><button class="btn sm primary" data-act="userPermSave" data-u="${esc(u.username)}">Save permissions</button></div></div>` : ""}</div>`; }).join("")}
       </div>`;
     }
   } else if (A.tab === "settings") {
@@ -4102,6 +4150,7 @@ function renderAdmin() {
       <label class="field">The day switches at<input type="time" step="900" data-path="settings.dayStart" value="${esc(D.settings.dayStart || "03:00")}"></label>
       <label class="field">Late after (grace, minutes)<input type="number" min="0" max="120" step="1" data-path="settings.lateGrace" data-num="1" value="${esc(D.settings.lateGrace ?? 10)}"></label></div>
       <p class="muted" style="font-size:12.5px">The daily view and “today” run from ${fmtT(dayStartMin(D))} to ${fmtT(dayStartMin(D))} the next day, so a night shift ending at 3 AM stays on its own day. Changing the week start after creating weeks hides those weeks.</p>
+      ${officePanel(D)}
       <div class="panel"><h4>Schedule history</h4><p class="muted" style="margin:0 0 10px;font-size:12.5px">Brings in the weekly schedules from the old Google Sheets (15 Feb – 28 Nov 2026) so Team Reports can check every report against the real schedule. Weeks already in the dashboard are kept as they are.</p>
         <button class="btn sm primary" data-act="importHistory">${D.weeks["2026-02-15"] ? "Re-check history (adds missing weeks only)" : "Import schedule history"}</button></div>
       <div class="panel"><h4>Backup</h4><div class="row"><button class="btn sm" data-act="export">Download backup (JSON)</button><label class="btn sm">Restore from file<input type="file" accept="application/json" id="importFile" class="hidden"></label><button class="btn sm danger" data-act="logout" style="margin-left:auto">Sign out</button></div></div>`;
@@ -4409,6 +4458,22 @@ document.addEventListener("click", async (e) => {
     }
     case "wkDecide": return decideWeek(el.dataset.k, el.dataset.v);
     case "tgLink": return tgLink();
+    case "rmShift": { const D = S.draft, l = rmShifts(D).slice(), v = el.dataset.v; D.settings.remoteShifts = el.checked ? [...new Set([...l, v])] : l.filter((x) => x !== v); return renderAdmin(); }
+    case "rmDay": { const D = S.draft, l = rmDays(D).slice(), v = +el.dataset.v; D.settings.remoteDays = el.checked ? [...new Set([...l, v])].sort() : l.filter((x) => x !== v); return renderAdmin(); }
+    case "rmMember": { const m = S.draft.members.find((x) => x.id === el.dataset.v); if (m) { if (el.checked) m.remote = true; else delete m.remote; } return renderAdmin(); }
+    case "offResolve": {
+      const url = $("#offLink").value.trim(); if (!url) return toast("Paste the Google Maps link first", true);
+      el.disabled = true;
+      try { const j = await call("/api/attendance", "POST", { action: "resolveMap", url }); S.draft.settings.office = { ...(S.draft.settings.office || {}), lat: j.lat, lng: j.lng, link: url, name: j.name || "", radius: (S.draft.settings.office || {}).radius || 150 }; toast(`Location found${j.name ? ": " + j.name : ""} — check the pin, then Save`); renderAdmin(); }
+      catch (err) { toast(err.message, true); el.disabled = false; }
+      return;
+    }
+    case "offHere": {
+      if (!navigator.geolocation) return toast("This browser can't share its location", true);
+      toast("Getting your location…");
+      navigator.geolocation.getCurrentPosition((p) => { S.draft.settings.office = { ...(S.draft.settings.office || {}), lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6), name: "Set from this device", radius: (S.draft.settings.office || {}).radius || 150 }; toast(`Location set (±${Math.round(p.coords.accuracy)} m) — Save to apply`); renderAdmin(); }, (err) => toast("Couldn't get the location: " + err.message, true), { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+      return;
+    }
     case "atIn": return attendAct("in");
     case "atOut": return attendAct("out");
     case "atMode": AT.mode = el.dataset.v; renderAttendance(); return loadAttendance(true);
@@ -4450,13 +4515,13 @@ document.addEventListener("click", async (e) => {
     case "logout": e.preventDefault(); if (dirty() && !confirm("Sign out and discard unsaved changes?")) return; S.draft = null; S.admin.open = false; $("#modalRoot").innerHTML = ""; signedOut(); toast("Signed out"); return renderAll();
     case "userCreate": {
       const nu = S.admin.nu || { perms: [] };
-      const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), perms: nu.perms, scope: nu.scope || [], password: $("#nuPass").value, member: $("#nuMember").value };
+      const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), perms: nu.perms, scope: nu.scope || [], password: $("#nuPass").value, member: $("#nuMember").value, self: $("#nuSelf").checked };
       if (!body.name || !body.username || !body.password) return toast("Fill in name, username and password", true);
       S.admin.nu = null;
       return userAction("POST", body, `User @${body.username} created`);
     }
     case "userPerms": { const u = el.dataset.u; S.admin.uOpen = S.admin.uOpen === u ? null : u; S.admin.uPerms = null; S.admin.uScope = null; return renderAdmin(); }
-    case "userPermSave": { const u = S.users.find((x) => x.username === el.dataset.u); const member = $("#upMember") ? $("#upMember").value : u.member || ""; const perms = S.admin.uPerms || u.perms, scope = S.admin.uScope || u.scope || []; S.admin.uOpen = null; S.admin.uPerms = null; S.admin.uScope = null; return userAction("PATCH", { username: u.username, perms, scope, member }, `Access saved for ${u.name}`); }
+    case "userPermSave": { const u = S.users.find((x) => x.username === el.dataset.u); const member = $("#upMember") ? $("#upMember").value : u.member || "", self = $("#upSelf") ? $("#upSelf").checked : !!u.self; const perms = S.admin.uPerms || u.perms, scope = S.admin.uScope || u.scope || []; S.admin.uOpen = null; S.admin.uPerms = null; S.admin.uScope = null; return userAction("PATCH", { username: u.username, perms, scope, member, self }, `Access saved for ${u.name}`); }
     case "ownerEdit": S.admin.ownEdit = !S.admin.ownEdit; return renderAdmin();
     case "ownerRecovery": {
       const cur = $("#owCur").value; if (!cur) return toast("Enter your current password first", true);

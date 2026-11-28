@@ -6,7 +6,8 @@
 // Needs the TELEGRAM_BOT_TOKEN env var (a bot made with @BotFather). Without it everything here is switched off.
 import crypto from 'node:crypto';
 import { readJSON, writeJSON, userFromToken, bearer, parseBody, TELEGRAM, tgToken, tgSecret, tgCall, allAccounts } from './_lib.js';
-import { attend } from './_attendance.js';
+import { attend, needsGeo } from './_attendance.js';
+const LOCATE = (verb) => ({ keyboard: [[{ text: `📍 Share my location to ${verb}`, request_location: true }], [{ text: 'Cancel' }]], resize_keyboard: true, one_time_keyboard: true });
 import { telegramReply } from './_messages.js';
 
 // the buttons under the chat: check in / out and today's shift
@@ -30,6 +31,21 @@ export default async function handler(req, res) {
       if (!tgToken() || secret !== tgSecret()) return res.status(401).json({ ok: false });
       const u = parseBody(req), m = u.message || u.edited_message;
       if (!m || !m.chat) return res.status(200).json({ ok: true });
+      if (m.location) { // the answer to "share your location to check in / out"
+        const tg = (await readJSON(TELEGRAM)) || {}; tg.links = tg.links || {}; tg.pending = tg.pending || {};
+        const chatId = m.chat.id, username = Object.keys(tg.links).find((k) => tg.links[k].chatId === chatId);
+        const account = username ? (await allAccounts()).find((a) => a.username === username) : null, p = tg.pending[chatId];
+        let reply;
+        if (!account) reply = 'To connect, open the dashboard → My account → Connect Telegram.';
+        else if (m.forward_origin || m.forward_date) reply = 'Please send your current location with the button — forwarded locations don\'t count.';
+        else if (!p || p.exp < Date.now()) reply = 'Tap ✅ Check in or 🏁 Check out first.';
+        else {
+          delete tg.pending[chatId]; await writeJSON(TELEGRAM, tg, 5);
+          reply = (await attend(account, p.action, 'telegram', {}, `https://${req.headers['x-forwarded-host'] || req.headers.host}`, { lat: m.location.latitude, lng: m.location.longitude, acc: m.location.horizontal_accuracy || 0 })).msg;
+        }
+        await tgCall('sendMessage', { chat_id: chatId, text: reply, reply_markup: KEYBOARD }).catch(() => {});
+        return res.status(200).json({ ok: true });
+      }
       if (typeof m.text !== 'string') { await tgCall('sendMessage', { chat_id: m.chat.id, text: 'Only text messages reach the dashboard for now — please type your reply.' }).catch(() => {}); return res.status(200).json({ ok: true }); }
       const tg = (await readJSON(TELEGRAM)) || {}; tg.links = tg.links || {}; tg.codes = tg.codes || {};
       const text = m.text.trim(), chatId = m.chat.id;
@@ -55,8 +71,16 @@ export default async function handler(req, res) {
         const account = username ? (await allAccounts()).find((a) => a.username === username) : null;
         const origin = `https://${req.headers['x-forwarded-host'] || req.headers.host}`;
         if (!account) reply = 'To connect, open the dashboard → My account → Connect Telegram.';
-        else if (/^(✅\s*)?check\s*in$|^\/in\b/i.test(text)) reply = (await attend(account, 'in', 'telegram', {}, origin)).msg;
-        else if (/^(🏁\s*)?check\s*out$|^\/out\b/i.test(text)) reply = (await attend(account, 'out', 'telegram', {}, origin)).msg;
+        else if (/^(✅\s*)?check\s*in$|^\/in\b|^(🏁\s*)?check\s*out$|^\/out\b/i.test(text)) {
+          const action = /in$|\/in\b/i.test(text) ? 'in' : 'out';
+          if (await needsGeo(account, action)) { // office shift: ask for the location first
+            tg.pending = tg.pending || {}; tg.pending[chatId] = { action, exp: Date.now() + 10 * 60e3 }; await writeJSON(TELEGRAM, tg, 5);
+            await tgCall('sendMessage', { chat_id: chatId, text: `📍 This is an office shift — tap the button below to share your location and ${action === 'in' ? 'check in' : 'check out'}.`, reply_markup: LOCATE(action === 'in' ? 'check in' : 'check out') }).catch(() => {});
+            return res.status(200).json({ ok: true });
+          }
+          reply = (await attend(account, action, 'telegram', {}, origin)).msg;
+        }
+        else if (/^cancel$/i.test(text)) { if (tg.pending && tg.pending[chatId]) { delete tg.pending[chatId]; await writeJSON(TELEGRAM, tg, 5); } reply = 'Cancelled.'; }
         else if (/^(📅\s*)?my\s*shift$|^\/shift\b/i.test(text)) reply = (await attend(account, 'status', 'telegram')).msg;
         else if (/^\/start\b/.test(text)) reply = 'You are connected ✅ Use the buttons below, or reply to any message.';
         else if (/^\//.test(text)) reply = 'Commands: /in · /out · /shift · /stop — or just write a message.';
