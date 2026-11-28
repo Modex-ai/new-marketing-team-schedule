@@ -690,6 +690,10 @@ html{overflow-x:hidden}
 .wkst.ap{background:var(--ok-bg);color:var(--ok)}.wkst.rv{background:var(--warn-bg);color:var(--warn)}.wkst.rj{background:var(--bad-bg);color:var(--bad)}.wkst.dr{background:var(--line-2);color:var(--muted)}
 .wkbtns{display:inline-flex;gap:6px;vertical-align:middle;margin:4px 6px 4px 0}
 .wkbtns{flex-wrap:wrap;align-items:center}
+.tgbox{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-2);font-size:13px}.tgbox h4{margin:0 0 6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.tgok{color:var(--ok);font-weight:700;margin-bottom:4px}
+body.locked main,body.locked .viewrow,body.locked .hero-right,body.locked #saveRoot,body.locked #lbRoot{display:none!important}
+body.locked .hero{min-height:100vh}
+.overlay.gateov{background:rgba(6,26,27,.25);align-items:center}
 .apdays{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}.apdays .dst{font-size:10.5px;font-weight:800;border:none;border-radius:999px;padding:3px 9px;font-family:inherit}
 .wkdec{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
 .wkdec button{border:none;background:none;padding:7px 12px;font:inherit;font-size:12.3px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-right:1px solid var(--line-2)}
@@ -1078,34 +1082,13 @@ table.tkp{min-width:1000px}
    requests         — excuses, swaps, bonuses and deductions logged after the schedule was sent
    A shift belongs to the day it starts (a 7 PM – 3 AM night shift is that day's night).
    ================================================================= */
-const SEED_MEMBERS = [["suhaila", "Suhaila Magdy", "8361201"], ["basant", "Basant", "2112011"], ["mai", "Mai", "1252188"], ["heba", "Heba", "7321101"], ["habiba", "Habiba", "5432678"], ["snapel", "Snapel", "3327611"], ["roaa", "Roaa", "1420061"]];
-// Week of 22–28 Nov 2026, one line per day (Sun → Sat), one code per member in the order above.
-// M/N/O = Morning/Night/Off · P/W/T = Modex - Porto / Whatsapp - Styllano / Task · "5" = 11 AM – 5 PM
-const SEED_DAYS = ["MP NP MT O NW MW O", "NW NW MT MT MP NP MW", "NW MP O MT MW MT5 NP", "O NW MP O NP O MW", "NP O MT O MW NW MP", "NP MW MT MT O MP NP", "MW NP MT MT NW MP MT"];
+// No team data ships with the page — everything comes from the server after sign-in.
 const PALETTE = ["#14494B", "#D08A3E", "#2B6A6C", "#9C6B3A", "#5B7F95", "#7E8C5A", "#3F6E57", "#9A4F5E", "#6B5B95", "#B07A2E"];
-function seedWeek() {
-  const T = { M: "morning", N: "night", O: "off" }, R = { P: "modex-porto", W: "wa-styllano", T: "task" }, TM = { M: "11:00-19:00", N: "19:00-03:00" };
-  const cells = {};
-  SEED_DAYS.forEach((line, k) => line.split(" ").forEach((code, j) => {
-    const id = SEED_MEMBERS[j][0], s = T[code[0]];
-    (cells[id] = cells[id] || {})[k] = s === "off" ? { s } : { s, r: R[code[1]], t: code[2] === "5" ? "11:00-17:00" : TM[code[0]] };
-  }));
-  return { memberIds: SEED_MEMBERS.map((m) => m[0]), cells, notes: {}, createdAt: "2026-11-22T00:00:00.000Z" };
-}
-const DEFAULT_SOURCES = [
-  { id: "src-heba", sheetId: "1dcGo7iY0jCJ6bzJF9CHXMcmgcCrEgdwMp3hueYNJxZE", memberId: "heba" },
-  { id: "src-mai", sheetId: "1JzFWJe6rO-nsPGArSe22bgmCJTfyS64hLDIGhdJVa2c", memberId: "mai" },
-  { id: "src-roaa", sheetId: "1x2YBcCXVPrdwglstbJEoecH0FyKXuH9PydRR8mqm9YI", memberId: "roaa" },
-  { id: "src-basant", sheetId: "1pz6qqCg6LNWu-Q6WvnAhuT39VYOGvrFlV_kz1u90lJw", memberId: "basant" },
-  { id: "src-suhaila", sheetId: "1l-cQr2Hp-rdk5jJr23p1ZctTca4epiwk8apIssEZCcw", memberId: "suhaila" },
-  { id: "src-snapel", sheetId: "1fMFZ6e2VznvImyYaD63emUtplY39BGhx4gCSfZTfO0Y", memberId: "snapel" },
-  { id: "src-shams", sheetId: "18zI8u9XpnZUOhOQkP3o8DMjoegMDDX1a3hU7Cc6D84w", memberId: "", name: "Shams" },
-];
 const DEFAULT_DATA = {
   version: 1,
   updatedAt: null,
   settings: { weekStart: 0, startDate: "2026-11-22", dayStart: "03:00", reportGrace: 60 },
-  members: SEED_MEMBERS.map(([id, name, code], k) => ({ id, name, code, color: PALETTE[k % PALETTE.length] })),
+  members: [],
   shiftTypes: [
     { id: "morning", name: "Morning", color: "#F0B84A", kind: "work", icon: "sun", time: "11:00-19:00", track: true },
     { id: "night", name: "Night", color: "#0F3A3C", kind: "work", icon: "moon", time: "19:00-03:00", track: true },
@@ -1117,9 +1100,9 @@ const DEFAULT_DATA = {
     { id: "task", name: "Task", color: "#E4E0D4", track: false },
   ],
   timeSlots: ["11:00-19:00", "19:00-03:00", "11:00-17:00"],
-  weeks: { "2026-11-22": seedWeek() },
+  weeks: {},
   requests: [],
-  reportSources: DEFAULT_SOURCES,
+  reportSources: [],
   log: [],
 };
 
@@ -1291,7 +1274,7 @@ function normalize(d) {
   for (const w of Object.values(x.weeks)) { w.memberIds = w.memberIds || []; w.cells = w.cells || {}; w.notes = w.notes || {}; }
   return x;
 }
-S.data = normalize(DEFAULT_DATA);
+S.data = normalize(clone(DEFAULT_DATA));
 const curIdx = () => opIdx(V(), cairoNow());
 const viewWS = () => wkStart(V(), curIdx()) + S.weekOffset * 7;
 const minOffset = () => { const D = V(); return D.settings.startDate ? Math.min(0, (wkStart(D, dIdx(D.settings.startDate)) - wkStart(D, curIdx())) / 7) : -999; };
@@ -1302,7 +1285,12 @@ const setOffset = (o) => { S.weekOffset = Math.max(minOffset(), o); };
 // layered under the saved schedule, so report checks and profiles cover every past week. Weeks saved
 // in the dashboard always win; history only fills weeks that don't exist yet.
 let HIST = null;
-const histReady = fetch("assets/schedule-history.json").then((r) => r.json()).then((h) => { HIST = h; }).catch(() => {});
+// the schedule history from the old sheets is private too — fetched once after sign-in
+let histReady = Promise.resolve();
+function fetchHistory() {
+  if (HIST || !S.token) return histReady;
+  return (histReady = fetch("/api/schedule?history=1", { cache: "no-store", headers: { authorization: "Bearer " + S.token } }).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j && j.history) HIST = j.history; }).catch(() => {}));
+}
 function withHistory(x) {
   if (!HIST || !x) return x;
   for (const k of ["members", "shiftTypes", "responsibilities"]) for (const o of HIST[k] || []) if (!x[k].some((y) => y.id === o.id)) x[k].push(clone(o));
@@ -1311,17 +1299,19 @@ function withHistory(x) {
   return x;
 }
 async function load(silent) {
-  await histReady;
+  if (!S.token) { S.serverOK = true; return renderAll(); } // private dashboard: nothing loads before sign-in
+  await fetchHistory();
   try {
     const authed = !!S.token;
     const r = await fetch("/api/schedule", { cache: "no-store", headers: authed ? { authorization: "Bearer " + S.token } : {} });
+    if (r.status === 401) { S.serverOK = true; return signedOut("Your session ended — please sign in again."); }
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
     if (j.data && !dirty()) S.recAuth = authed && Array.isArray(j.data.requests);
     S.serverOK = true; S.fresh = !j.data;
     if (j.data && !dirty()) { S.data = withHistory(normalize(j.data)); if (S.draft) S.draft = clone(S.data); }
   } catch (e) { if (!silent) S.serverOK = false; }
-  if (!S.histApplied && !dirty()) { withHistory(S.data); if (S.draft) S.draft = clone(S.data); S.histApplied = true; }
+  if (!S.histApplied && HIST && !dirty()) { withHistory(S.data); if (S.draft) S.draft = clone(S.data); S.histApplied = true; }
   renderAll();
   if (S.me) loadNotices(); else if (NT.list.length) { NT.list = []; NT.unread = 0; renderNotices(); }
 }
@@ -1353,8 +1343,14 @@ async function save() {
 }
 
 /* ============================ render ============================ */
+// the whole dashboard is private: signed out, only the sign-in shows
+function renderGate() {
+  const locked = !S.token;
+  document.body.classList.toggle("locked", locked);
+  if (locked && !$("#modalRoot").innerHTML.trim()) openLogin(null, S.gateMsg);
+}
 function renderAll() {
-  renderHeader(); renderNotices(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderProfiles(); renderRequests(); renderLog(); renderSaveBar(); renderReports(); renderApprovals(); renderAccess();
+  renderGate(); renderHeader(); renderNotices(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderProfiles(); renderRequests(); renderLog(); renderSaveBar(); renderReports(); renderApprovals(); renderAccess();
   if (S.admin.open) renderAdmin();
 }
 function renderHeader() {
@@ -1856,7 +1852,7 @@ function recPreview(D, f) {
   return { ok, rows: ppl.map(([id, i], k) => ({ name: memName(D, id), i, before: before[k], after: ok ? cellText(T, id, i) : before[k] })) };
 }
 /* attachments (photos / videos, stored privately in Vercel Blob, served via /api/file) */
-const fileUrl = (a) => "/api/file?u=" + encodeURIComponent(a.url);
+const fileUrl = (a) => "/api/file?u=" + encodeURIComponent(a.url) + (S.token ? "&t=" + encodeURIComponent(S.token) : "");
 const fmtSize = (b) => (b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB");
 function attThumbs(r, small) {
   const L = r.attachments || [];
@@ -3558,9 +3554,10 @@ function openAdmin(tab) {
 }
 function closeAdmin() { S.admin.open = false; S.admin.hl = null; $("#modalRoot").innerHTML = ""; renderAll(); }
 function openLogin(tab, msg) {
-  if (!S.serverOK) return toast("Not connected to the server — editing works on the live site.", true);
-  $("#modalRoot").innerHTML = `<div class="overlay"><div class="modal small"><div class="m-head"><h3>Sign in</h3><button class="btn ghost" data-act="closeModal">✕</button></div>
-    <form class="m-body" id="loginForm">${msg ? `<div class="banner warn" style="margin-bottom:12px">${esc(msg)}</div>` : ""}
+  const gate = !S.token;
+  if (!S.serverOK && !gate) return toast("Not connected to the server — editing works on the live site.", true);
+  $("#modalRoot").innerHTML = `<div class="overlay ${gate ? "gateov" : ""}"><div class="modal small"><div class="m-head"><h3>Sign in</h3>${gate ? "" : `<button class="btn ghost" data-act="closeModal">✕</button>`}</div>
+    <form class="m-body" id="loginForm">${msg ? `<div class="banner warn" style="margin-bottom:12px">${esc(msg)}</div>` : gate ? `<div class="muted" style="font-size:13px;margin-bottom:14px">This dashboard is private. Sign in with the account you were given.</div>` : ""}
     <label class="field">Username<input type="text" id="liUser" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
     <label class="field" style="margin-top:10px">Password<input type="password" id="liPass" autocomplete="current-password"></label>
     <div class="row" style="margin-top:16px;justify-content:space-between"><a href="#" data-act="forgot" style="font-size:12.5px;color:var(--brand)">Forgot password?</a><button class="btn primary" type="submit">Sign in</button></div></form></div></div>`;
@@ -3574,6 +3571,8 @@ function openLogin(tab, msg) {
       if (!dirty()) { S.draft = null; await load(true); } // records, report sheets and the activity log come with sign-in
       if (can("users")) loadUsers();
       if (S.me.mustChange) return openAccount(true);
+      S.gateMsg = "";
+      if (gate) { $("#modalRoot").innerHTML = ""; renderAll(); openHash(); if (S.me.mustChange) openAccount(true); return; }
       if (tab === "__reports") { $("#modalRoot").innerHTML = ""; RS.raw = null; showView("reports"); } else if (tab === "__tasks") { $("#modalRoot").innerHTML = ""; TK.list = null; showView("tasks"); } else if (tab === "__approvals") { $("#modalRoot").innerHTML = ""; showView("approvals"); } else openAdmin(tab);
     } catch (err) { toast(err.status === 401 ? "Wrong username or password" : err.message, true); }
   };
@@ -3599,8 +3598,36 @@ function openAccount(forced) {
     <label class="field">Current password<input type="password" id="acCur" autocomplete="current-password" placeholder="${forced ? "The temporary password" : ""}"></label>
     <label class="field" style="margin-top:10px">New password<input type="password" id="acNew" autocomplete="new-password" placeholder="At least ${S.me.owner ? 8 : 6} characters"></label>
     <label class="field" style="margin-top:10px">Repeat new password<input type="password" id="acNew2" autocomplete="new-password"></label>
-    <div class="row" style="margin-top:16px;justify-content:flex-end">${forced ? `<button class="btn ghost" data-act="logout">Sign out</button>` : ""}<button class="btn primary" data-act="accSave">Change password</button></div></div></div></div>`;
+    <div class="row" style="margin-top:16px;justify-content:flex-end">${forced ? `<button class="btn ghost" data-act="logout">Sign out</button>` : ""}<button class="btn primary" data-act="accSave">Change password</button></div>
+    ${forced ? "" : `<div class="tgbox" id="tgBox"><h4>Telegram notifications</h4><div class="muted">Loading…</div></div>`}</div></div></div>`;
   $("#acCur").focus();
+  if (!forced) loadTg();
+}
+/* ---- Telegram: each account links its own chat and gets the same notices as the bell ---- */
+const TG = { st: null, poll: null };
+async function loadTg() {
+  try { TG.st = await call("/api/telegram", "GET"); } catch (e) { TG.st = { error: e.message }; }
+  renderTg();
+}
+function renderTg() {
+  const b = $("#tgBox"); if (!b) { clearInterval(TG.poll); TG.poll = null; return; }
+  const st = TG.st || {};
+  let h = `<h4>Telegram notifications</h4>`;
+  if (st.error) h += `<div class="muted">Couldn't check Telegram: ${esc(st.error)}</div>`;
+  else if (!st.configured) h += `<div class="muted">Not switched on yet — the bot token has to be added in Vercel first.</div>`;
+  else if (st.linked) h += `<div class="tgok">✓ Connected${st.name ? ` · ${esc(st.name)}` : ""}</div><div class="muted">Approvals, rejections with their reasons, and schedule submissions arrive on Telegram too.</div><div class="row" style="margin-top:10px;gap:8px"><button class="btn sm" data-act="tgTest">Send a test</button><button class="btn sm ghost" data-act="tgUnlink">Disconnect</button></div>`;
+  else h += `<div class="muted">Get schedule decisions and submissions on Telegram the moment they happen.</div><div class="row" style="margin-top:10px;gap:8px"><button class="btn sm primary" data-act="tgLink">Connect Telegram</button>${TG.poll ? `<span class="muted" style="font-size:12px">Press <b>Start</b> in Telegram — waiting…</span>` : ""}</div>${TG.url ? `<div class="muted" style="font-size:12px;margin-top:6px">Didn't open? <a href="${esc(TG.url)}" target="_blank" rel="noopener">Open the bot</a></div>` : ""}`;
+  b.innerHTML = h;
+}
+async function tgLink() {
+  const win = window.open("", "_blank");
+  try {
+    const j = await call("/api/telegram", "POST", { action: "link" }); TG.url = j.url;
+    if (win) win.location = j.url; else location.href = j.url;
+    clearInterval(TG.poll); let n = 0;
+    TG.poll = setInterval(async () => { if (++n > 60 || !$("#tgBox")) { clearInterval(TG.poll); TG.poll = null; return renderTg(); } try { const st = await call("/api/telegram", "GET"); if (st.linked) { TG.st = st; clearInterval(TG.poll); TG.poll = null; toast("Telegram connected"); renderTg(); } } catch (e) {} }, 3000);
+    renderTg();
+  } catch (e) { if (win) win.close(); toast(e.message, true); }
 }
 function showRecoveryCode(code) {
   $("#modalRoot").innerHTML = `<div class="overlay"><div class="modal small"><div class="m-head"><h3>Your owner recovery code</h3></div><div class="m-body">
@@ -3610,19 +3637,30 @@ function showRecoveryCode(code) {
 }
 function signedOut(msg) {
   S.token = ""; S.me = null; S.users = null; localStorage.removeItem("vmo_token"); S.recAuth = false;
-  if (!dirty()) { S.draft = null; setTimeout(() => load(true), 0); }
+  // nothing stays on screen or in memory after signing out (unsaved edits survive an expired session, hidden behind the sign-in)
+  S.admin.open = false; NT.list = []; NT.unread = 0; NT.open = false; S.gateMsg = msg || "";
+  if (!dirty()) { S.draft = null; S.data = normalize(clone(DEFAULT_DATA)); HIST = null; S.histApplied = false; }
+  $("#modalRoot").innerHTML = "";
   RS.raw = null; RS.error = ""; renderReports(); TK.list = null; TK.sel = null; renderTasks();
-  const keep = S.admin.open; S.admin.open = false;
-  renderHeader();
-  if (keep || msg) openLogin(S.admin.tab, msg);
+  renderAll();
 }
 async function checkSession() {
   if (!S.token) return;
   try { const j = await call("/api/auth", "GET"); S.me = j.user; if (S.me.mustChange) setTimeout(() => openAccount(true), 300); if (can("users")) loadUsers(); } catch (e) { if (e.status === 401) { S.token = ""; localStorage.removeItem("vmo_token"); } }
   renderAll();
-  if (location.hash === "#reports") showView("reports");
-  if (location.hash === "#tasks") showView("tasks");
-  if (location.hash === "#approvals") showView("approvals");
+  openHash();
+}
+// #reports / #tasks / #approvals open that page; #week=YYYY-MM-DD (the Telegram button) opens that week
+function openHash() {
+  const h = location.hash;
+  if (h === "#reports") showView("reports");
+  if (h === "#tasks") showView("tasks");
+  if (h === "#approvals") showView("approvals");
+  const m = /^#week=(\d{4}-\d{2}-\d{2})$/.exec(h);
+  if (m && S.me) {
+    const goWeek = () => { if (!S.data.weeks[m[1]]) return; S.weekOffset = (dIdx(m[1]) - wkStart(V(), curIdx())) / 7; showView("ops"); renderAll(); setTimeout(() => $("#wkTitle")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); history.replaceState(null, "", location.pathname); };
+    if (S.data.weeks[m[1]]) goWeek(); else setTimeout(goWeek, 1500);
+  }
 }
 async function loadUsers() {
   try { const j = await call("/api/users", "GET"); S.users = j.users; S.ownerInfo = j.owner; S.resetReqs = j.resetRequests || []; renderAccess(); renderApprovals(); } catch (e) { S.users = []; if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
@@ -4014,7 +4052,7 @@ document.addEventListener("click", async (e) => {
     }
     case "viewAtt": case "lbNav": { const r = (V().requests || []).find((x) => x.id === el.dataset.r); if (r) openLightbox(r, +el.dataset.j); return; }
     case "closeLb": if (e.target === el || el.tagName === "BUTTON") $("#lbRoot").innerHTML = ""; return;
-    case "closeModal": if (S.admin.open) closeAdmin(); else $("#modalRoot").innerHTML = ""; return;
+    case "closeModal": if (S.admin.open) closeAdmin(); else { $("#modalRoot").innerHTML = ""; if (!S.token) renderGate(); } return;
     case "save": return save();
     case "discard": if (confirm("Discard all unsaved changes?")) { S.draft = clone(S.data); R(); } return;
     case "tab": S.admin.tab = el.dataset.tab; return R();
@@ -4145,6 +4183,9 @@ document.addEventListener("click", async (e) => {
       return;
     }
     case "wkDecide": return decideWeek(el.dataset.k, el.dataset.v);
+    case "tgLink": return tgLink();
+    case "tgTest": try { await call("/api/telegram", "POST", { action: "test" }); toast("Test sent — check Telegram"); } catch (err) { toast(err.message, true); } return;
+    case "tgUnlink": if (!confirm("Stop Telegram notifications for this account?")) return; try { await call("/api/telegram", "POST", { action: "unlink" }); toast("Telegram disconnected"); loadTg(); } catch (err) { toast(err.message, true); } return;
     case "wkReview": if (!canApprove()) return; if (dirty()) return toast("You have unsaved changes in Manage — save or discard them first", true); return openReview(el.dataset.k, el.dataset.d != null ? +el.dataset.d : null);
     case "rvSet": readReview(); rvStatus(el.dataset.k, el.dataset.v); RV.focus = +el.dataset.k; return renderReview();
     case "rvAll": readReview(); for (const k in RV.days) rvStatus(k, el.dataset.v); RV.focus = el.dataset.v === "rejected" ? 0 : null; return renderReview();

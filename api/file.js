@@ -27,6 +27,9 @@ export default async function handler(req, res) {
       await del(u);
       return res.status(200).json({ ok: true });
     }
+    // private: images and videos load with ?t=<session token> (an <img> can't send a header)
+    const tok = bearer(req) || String((req.query && req.query.t) || new URL(req.url, 'http://x').searchParams.get('t') || '');
+    if (!(await userFromToken(tok))) return res.status(401).json({ error: 'Please sign in' });
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.setHeader('Allow', 'GET, HEAD, DELETE');
       return res.status(405).json({ error: 'method not allowed' });

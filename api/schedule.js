@@ -1,4 +1,4 @@
-// GET /api/schedule                         → { data }          (public, read-only)
+// GET /api/schedule                         → { data }          (signed in; ?history=1 → { history } — the old sheets)
 // PUT /api/schedule {data, baseUpdatedAt, changes}  (signed in) → { ok, updatedAt, entry }
 //
 // Env vars:
@@ -8,6 +8,7 @@
 //   OWNER_NAME            — optional display name for the owner account
 //   BLOB_ACCESS           — optional: 'private' (default) or 'public'
 import { readJSON, writeJSON, SCHEDULE, userFromToken, bearer, parseBody, can, inScope, pushNotices } from './_lib.js';
+import HISTORY from './_history.js';
 
 function validate(d) {
   if (!d || typeof d !== 'object') return 'data missing';
@@ -111,8 +112,10 @@ function settleWeeks(me, data, current) {
       notices.push({ kind: 'submitted', to: 'approve', week: k, status: stB, days, note: w.review.note || '' });
     }
   }
-  for (const [k, w] of Object.entries(data.weeks || {})) if (!cur[k] && w.review && !approver && w.status === 'review') {
-    w.history.push({ at: now, by: me.name, kind: 'submitted', status: 'review', days: DAYK.map((i) => ({ i, status: 'review', note: '' })), note: 'New week' });
+  // a new week, whoever made it, is announced to the approvers (never to the one who made it)
+  for (const [k, w] of Object.entries(data.weeks || {})) if (!cur[k] && !/^imported/.test(String(w.src || ''))) {
+    if (!w.review) w.review = { by: me.name, at: now, note: 'New week' };
+    w.history.push({ at: now, by: me.name, kind: 'submitted', status: w.days ? deriveWeek(w.days) : w.status || 'review', days: DAYK.map((i) => ({ i, status: 'review', note: '' })), note: 'New week' });
     notices.push({ kind: 'submitted', to: 'approve', week: k, status: 'review', days: [], note: 'New week' });
   }
   return notices;
@@ -140,7 +143,11 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       // the activity log is only sent to accounts allowed to see it
-      const data = await readJSON(SCHEDULE), me = await userFromToken(bearer(req)).catch(() => null);
+      // the dashboard is private: nothing is served without a valid session
+      const me = await userFromToken(bearer(req)).catch(() => null);
+      if (!me) return res.status(401).json({ error: 'Please sign in' });
+      if (String((req.query && req.query.history) || new URL(req.url, 'http://x').searchParams.get('history') || '') === '1') return res.status(200).json({ history: HISTORY });
+      const data = await readJSON(SCHEDULE);
       if (data && !can(me, 'log')) delete data.log;
       // excuses / bonuses / deductions and the report sheet list are for signed-in accounts only;
       // an account limited to some team members only gets theirs
@@ -184,7 +191,7 @@ export default async function handler(req, res) {
     data.log = entry ? [entry, ...prevLog].slice(0, 500) : prevLog;
 
     await writeJSON(SCHEDULE, data);
-    if (notices.length) await pushNotices(notices, me).catch(() => {});
+    if (notices.length) await pushNotices(notices, me, `https://${req.headers['x-forwarded-host'] || req.headers.host}`).catch(() => {});
     return res.status(200).json({ ok: true, updatedAt: data.updatedAt, entry });
   } catch (e) {
     return res.status(500).json({ error: String((e && e.message) || e) });
