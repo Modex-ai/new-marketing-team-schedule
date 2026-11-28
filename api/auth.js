@@ -82,11 +82,10 @@ export default async function handler(req, res) {
     // sign in
     // 5 wrong passwords lock the username for 15 minutes; every sign-in is written to the security log
     const uname = String(b.username || '').trim().toLowerCase(), password = b.password || '', client = clientOf(req);
-    const wait = uname ? await secLocked(uname) : 0;
+    const wait = uname ? await secLocked(uname).catch(() => 0) : 0;
     if (wait) { await sleep(600); return res.status(429).json({ error: `Too many wrong passwords — try again in ${wait} minute${wait === 1 ? '' : 's'}` }); }
     if (uname === ownerLogin) {
       if (ownerOk(o, password)) {
-        o.lastLogin = new Date(now).toISOString(); doc.owner = o; await writeJSON(USERS, doc, 10);
         await secResult(uname, true, client, o.name || 'Owner').catch(() => {});
         return res.status(200).json({ token: signToken({ u: 'owner', iat: now }), user: ownerUser(o) });
       }
@@ -94,8 +93,7 @@ export default async function handler(req, res) {
       const u = doc.users.find((x) => x.username === uname);
       if (u && checkPassword(password, u.salt, u.hash)) {
         if (u.disabled) { await sleep(400); return res.status(403).json({ error: 'This account is frozen — ask an admin to activate it' }); }
-        u.lastLogin = new Date(now).toISOString();
-        await writeJSON(USERS, doc, 10);
+        // last sign-in lives in the security log — signing in never rewrites the accounts file (no clash with an admin editing users)
         await secResult(uname, true, client, u.name).catch(() => {});
         return res.status(200).json({ token: signToken({ u: u.username, iat: now }), user: sessionUser(u) });
       }

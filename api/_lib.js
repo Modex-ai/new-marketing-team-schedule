@@ -35,18 +35,32 @@ async function versions(prefix) {
   const { blobs } = await list({ prefix, limit: 1000 });
   return blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
 }
+// Each save is a new blob; old copies are pruned later. When many people use the dashboard at once, the newest copy
+// in the listing can already be gone (or not readable yet) — so fall back to the next newest instead of failing.
 export async function readJSON(prefix) {
-  const v = await versions(prefix);
-  if (!v.length) return null;
-  const r = await get(v[0].url, { access: ACCESS, useCache: false });
-  if (!r || !r.stream) return null;
-  return new Response(r.stream).json();
+  let err = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const v = await versions(prefix);
+    if (!v.length) return null;
+    for (const b of v.slice(0, 6)) {
+      try {
+        const r = await get(b.url, { access: ACCESS, useCache: false });
+        if (r && r.stream) return await new Response(r.stream).json();
+      } catch (e) { err = e; }
+    }
+    await sleep(250);
+  }
+  if (err) throw err;
+  return null;
 }
 export async function writeJSON(prefix, data, keep = 15) {
   await put(prefix + '.json', JSON.stringify(data), { access: ACCESS, addRandomSuffix: true, contentType: 'application/json' });
-  const v = await versions(prefix);
-  const old = v.slice(keep).map((b) => b.url);
-  if (old.length) await del(old);
+  // prune old copies, but never ones from the last few minutes — someone may be reading them right now
+  try {
+    const v = await versions(prefix), now = Date.now();
+    const old = v.slice(Math.max(keep, 5)).filter((b) => now - new Date(b.uploadedAt).getTime() > 5 * 60e3).map((b) => b.url);
+    if (old.length) await del(old);
+  } catch { /* pruning is housekeeping — never fail a save over it */ }
 }
 
 /* ---------- passwords & sessions ---------- */
@@ -195,7 +209,7 @@ export async function secResult(uname, ok, client, name) {
   d.fails = d.fails || {};
   const at = new Date().toISOString();
   let locked = false;
-  if (ok) { delete d.fails[uname]; d.log = [{ at, type: 'signin', username: uname, name, ...client }, ...(d.log || [])]; }
+  if (ok) { delete d.fails[uname]; d.last = { ...(d.last || {}), [uname]: at }; d.log = [{ at, type: 'signin', username: uname, name, ...client }, ...(d.log || [])]; }
   else {
     let f = d.fails[uname] || { n: 0 };
     if ((f.until && f.until < Date.now()) || (f.last && Date.now() - Date.parse(f.last) > LOCK_MIN * 60e3)) f = { n: 0 }; // an old streak starts over

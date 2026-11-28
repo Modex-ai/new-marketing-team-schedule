@@ -18,7 +18,8 @@ export default async function handler(req, res) {
     if (!me) return res.status(401).json({ error: 'Please sign in again' });
     if (!can(me, 'users')) return res.status(403).json({ error: "Your account can't manage users" });
     const by = { username: me.username, name: me.name };
-    const reply = (doc, extra) => ({ ok: true, users: doc.users.map(publicUser), resetRequests: (doc.resetRequests || []).filter((r) => doc.users.some((u) => u.username === r.username)), owner: { login: (doc.owner || {}).username || 'owner', name: (doc.owner || {}).name || me.name, custom: !!(doc.owner || {}).hash, recovery: !!(doc.owner || {}).recovery }, perms: PERMS, presets: PRESETS, ...extra });
+    const lastIn = ((await readJSON(SECURITY).catch(() => null)) || {}).last || {};
+    const reply = (doc, extra) => ({ ok: true, users: doc.users.map((u) => ({ ...publicUser(u), lastLogin: lastIn[u.username] || u.lastLogin || null })), resetRequests: (doc.resetRequests || []).filter((r) => doc.users.some((u) => u.username === r.username)), owner: { login: (doc.owner || {}).username || 'owner', name: (doc.owner || {}).name || me.name, custom: !!(doc.owner || {}).hash, recovery: !!(doc.owner || {}).recovery }, perms: PERMS, presets: PRESETS, ...extra });
     // which team members the account sees (empty = everyone); a limited manager can only hand out part of their own list
     const wantScope = (b) => {
       if (!Array.isArray(b.scope)) return null;
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
       // governance view: the security log, live lockouts and who gets alerts on Telegram
       const sec = (await readJSON(SECURITY).catch(() => null)) || {}, tg = (await readJSON(TELEGRAM).catch(() => null)) || {};
       const locks = Object.entries(sec.fails || {}).filter(([, f]) => f.until && f.until > Date.now()).map(([u, f]) => ({ username: u, until: new Date(f.until).toISOString() }));
-      return res.status(200).json({ ...reply(doc), security: (sec.log || []).slice(0, 200), locks, telegram: Object.keys(tg.links || {}), ownerLastLogin: (doc.owner || {}).lastLogin || null });
+      return res.status(200).json({ ...reply(doc), security: (sec.log || []).slice(0, 200), locks, telegram: Object.keys(tg.links || {}), ownerLastLogin: lastIn[(doc.owner || {}).username || 'owner'] || (doc.owner || {}).lastLogin || null });
     }
 
     const b = parseBody(req);

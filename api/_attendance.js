@@ -4,7 +4,31 @@
 // so a night shift 19:00–03:00 simply ends at 1620 minutes of its day.
 import { readJSON, writeJSON, SCHEDULE, pushNotices } from './_lib.js';
 
-export const ATTEND = 'marketing-ops/attendance';
+export const ATTEND = 'marketing-ops/attendance'; // the first version kept everyone in one file — read-only now
+// one file per team member, so people checking in at the same moment never overwrite each other
+const fileOf = (mid) => `marketing-ops/att/${String(mid).replace(/[^\w-]/g, '_')}~`;
+let legacy = null;
+async function legacyDoc() { if (!legacy) legacy = (await readJSON(ATTEND).catch(() => null)) || { days: {} }; return legacy; }
+export async function loadMember(mid) {
+  const own = (await readJSON(fileOf(mid))) || {}, L = await legacyDoc(), doc = { days: {}, cleared: own.cleared || [] };
+  for (const [k, v] of Object.entries(L.days || {})) if (v[mid]) doc.days[k] = { [mid]: v[mid] };
+  for (const [k, v] of Object.entries(own.days || {})) if (v[mid]) doc.days[k] = { [mid]: v[mid] };
+  for (const k of doc.cleared) if (!((own.days || {})[k] || {})[mid]) delete doc.days[k]; // a day an approver cleared
+  doc.startedAt = Object.keys(doc.days).sort()[0] || null;
+  return doc;
+}
+export async function saveMember(mid, doc) {
+  const days = {};
+  for (const [k, v] of Object.entries(doc.days || {})) if (v && v[mid]) days[k] = { [mid]: v[mid] };
+  await writeJSON(fileOf(mid), { member: mid, days, cleared: doc.cleared || [] }, 10);
+}
+export async function loadAll(mids) {
+  const out = { days: {}, startedAt: null };
+  const docs = await Promise.all([...new Set(mids)].map((m) => loadMember(m).then((d) => [m, d]).catch(() => [m, { days: {} }])));
+  for (const [m, d] of docs) for (const [k, v] of Object.entries(d.days)) if (v[m]) (out.days[k] = out.days[k] || {})[m] = v[m];
+  out.startedAt = Object.keys(out.days).sort()[0] || null;
+  return out;
+}
 const cairo = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
 export const dIdx = (s) => { const [y, m, d] = String(s).split('-').map(Number); return Math.round(Date.UTC(y, m - 1, d) / 864e5); };
 export const iDate = (i) => new Date(i * 864e5).toISOString().slice(0, 10);
@@ -50,7 +74,7 @@ export const distTxt = (m) => (m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).t
 export async function needsGeo(me, action) {
   if (!me.member) return false;
   const D = (await readJSON(SCHEDULE)) || {}; if (!officeOf(D)) return false;
-  const doc = (await readJSON(ATTEND)) || { days: {} }, now = cairoAbs(Date.now()), today = Math.floor(now / 1440);
+  const doc = await loadMember(me.member), now = cairoAbs(Date.now()), today = Math.floor(now / 1440);
   if (action === 'out') { const open = [today, today - 1].map((i) => (((doc.days || {})[iDate(i)] || {})[me.member])).find((r) => r && r.in && !r.out); return !!open && !open.remote; }
   return !remoteWhy(D, me.member, pickShift(D, doc, me.member, now));
 }
@@ -89,8 +113,7 @@ function pickShift(D, doc, mid, now) {
 // action: "in" | "out" | "status". Returns { ok, msg, rec?, shift? }  (msg is plain text with emoji, for Telegram and toasts)
 export async function attend(me, action, via, meta = {}, origin = '', geo = null) {
   if (!me.member) return { ok: false, msg: "This account isn't linked to a team member yet. Ask the admin to link it (Manage → Users → Team member)." };
-  const D = (await readJSON(SCHEDULE)) || {}, doc = (await readJSON(ATTEND)) || { days: {} };
-  doc.days = doc.days || {};
+  const D = (await readJSON(SCHEDULE)) || {}, doc = await loadMember(me.member);
   const mid = me.member, nowMs = Date.now(), now = cairoAbs(nowMs), today = Math.floor(now / 1440), grace = graceOf(D);
   const name = ((D.members || []).find((m) => m.id === mid) || {}).name || me.name;
   const recOf = (i) => (doc.days[iDate(i)] || {})[mid];
@@ -114,8 +137,7 @@ export async function attend(me, action, via, meta = {}, origin = '', geo = null
     const pl = placeOf(D, r, geo); if (pl) r.in.place = pl;
     Object.assign(r, grade(r, grace));
     (doc.days[key] = doc.days[key] || {})[mid] = r;
-    if (!doc.startedAt) doc.startedAt = key;
-    await writeJSON(ATTEND, doc, 10);
+    await saveMember(mid, doc);
     let msg = `✅ Checked in at ${clock(now)} — ${shiftTxt(r)}`;
     const placeNote = (p, verb) => { if (!p || p.remote) return; if (p.none) { msg += `\n📍 No location — your manager is notified`; notes.push({ kind: 'attendance', to: 'approve', status: 'rejected', icon: '📍', title: `${name} ${verb} without sharing the location`, lines: [`${dayTxt(sh.i)} · ${clock(now)}`, p.why], link: '#attendance', linkText: 'Open attendance' }); } else if (p.away) { msg += `\n📍 ${distTxt(p.dist)} from the office — your manager is notified`; notes.push({ kind: 'attendance', to: 'approve', status: 'rejected', icon: '📍', title: `${name} ${verb} ${distTxt(p.dist)} away from the office`, lines: [`${dayTxt(sh.i)} · ${clock(now)} · ${shiftTxt(r)}`, `Accuracy ±${distTxt(p.acc || 0)}`], link: '#attendance', linkText: 'Open attendance' }); } else msg += `\n📍 At the office (${distTxt(p.dist)})`; };
     placeNote(r.in.place, 'checked in');
@@ -133,7 +155,7 @@ export async function attend(me, action, via, meta = {}, origin = '', geo = null
     r.out = { at: new Date(nowMs).toISOString(), abs: now, via, ...meta };
     const pl = placeOf(D, r, geo); if (pl) r.out.place = pl;
     Object.assign(r, grade(r, grace));
-    await writeJSON(ATTEND, doc, 10);
+    await saveMember(mid, doc);
     let msg = `🏁 Checked out at ${clock(now)} — worked ${dur(r.worked)}`;
     const p = r.out.place;
     if (p && !p.remote) {
