@@ -7,7 +7,7 @@
 //   op "delProof" { id, j }
 //   op "delete"   { id }                   → admins only
 // Every change is stamped on the task's own timeline and in the dashboard's activity log.
-import { readJSON, writeJSON, userFromToken, bearer, parseBody, appendLog, can } from './_lib.js';
+import { readJSON, writeJSON, userFromToken, bearer, parseBody, appendLog, can, inScope } from './_lib.js';
 
 const TASKS = 'marketing-ops/tasks';
 const STATUS = ['assigned', 'progress', 'done', 'approved', 'returned', 'cancelled'];
@@ -41,7 +41,10 @@ export default async function handler(req, res) {
     if (!can(me, 'tasks') && !can(me, 'tasksManage') && !can(me, 'tasksReview')) return res.status(403).json({ error: "Your account doesn't have access to Tasks" });
     const by = { username: me.username, name: me.name };
     const doc = (await readJSON(TASKS)) || { tasks: [], seq: 0 };
-    if (req.method === 'GET') return res.status(200).json(doc);
+    // accounts limited to some team members only see (and touch) those members' tasks
+    const mine = (t) => inScope(me, t.member);
+    const out = (o) => ({ ...o, tasks: (o.tasks || []).filter(mine) });
+    if (req.method === 'GET') return res.status(200).json(out(doc));
     if (req.method !== 'POST') { res.setHeader('Allow', 'GET, POST'); return res.status(405).json({ error: 'method not allowed' }); }
 
     const b = parseBody(req), now = new Date().toISOString();
@@ -49,7 +52,7 @@ export default async function handler(req, res) {
     const review = b.op === 'update' && b.patch && (['approved', 'returned'].includes(b.patch.status) || b.patch.rating != null);
     if (review && !can(me, 'tasksReview')) return res.status(403).json({ error: "Your account can't review or rate tasks" });
     if (!review && b.op !== 'delete' && !can(me, 'tasksManage')) return res.status(403).json({ error: "Your account can't assign or change tasks" });
-    const find = () => doc.tasks.find((t) => t.id === b.id);
+    const find = () => doc.tasks.find((t) => t.id === b.id && mine(t));
     const ev = (t, type, note, extra) => (t.events = [...(t.events || []), { at: now, by, type, ...(note ? { note: str(note, 1000) } : {}), ...(extra || {}) }].slice(-80));
     const who = (t) => t.memberName || t.member || 'someone';
     let log = [], task = null;
@@ -58,6 +61,7 @@ export default async function handler(req, res) {
       const f = cleanFields(b.task || {}, {});
       if (!f.title) return res.status(400).json({ error: 'Write a title for the task' });
       if (!f.member) return res.status(400).json({ error: 'Choose who the task is for' });
+      if (!inScope(me, f.member)) return res.status(403).json({ error: "You can't give tasks to that team member" });
       doc.seq = (+doc.seq || 0) + 1;
       task = { id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), code: 'TSK-' + String(doc.seq).padStart(4, '0'), priority: 'normal', due: '', dueTime: '', desk: '', details: '', checklist: [], files: [], ...f, status: 'assigned', createdAt: now, createdBy: by, proof: [], rating: null, returns: 0, events: [] };
       ev(task, 'created');
@@ -66,6 +70,7 @@ export default async function handler(req, res) {
     } else if (b.op === 'update') {
       task = find(); if (!task) return res.status(404).json({ error: 'Task not found' });
       const p = b.patch || {}, before = { ...task };
+      if (p.member && !inScope(me, String(p.member))) return res.status(403).json({ error: "You can't move a task to that team member" });
       cleanFields(p, task);
       const edited = ['title', 'details', 'member', 'priority', 'due', 'dueTime', 'desk'].filter((k) => k in p && before[k] !== task[k]);
       if (edited.length) { ev(task, 'edited', '', { fields: edited }); log.push(`Task ${task.code}: edited ${edited.join(', ')}`); }
@@ -105,7 +110,7 @@ export default async function handler(req, res) {
       if (x) { ev(task, L === 'files' ? 'fileRemoved' : 'proofRemoved', x.name); log.push(`Task ${task.code}: removed attachment ${x.name}`); }
     } else if (b.op === 'delete') {
       if (!me.owner && !can(me, 'users')) return res.status(403).json({ error: 'Only the owner or a user manager can delete tasks — cancel it instead' });
-      const k = doc.tasks.findIndex((t) => t.id === b.id); if (k < 0) return res.status(404).json({ error: 'Task not found' });
+      const k = doc.tasks.findIndex((t) => t.id === b.id && mine(t)); if (k < 0) return res.status(404).json({ error: 'Task not found' });
       const [t] = doc.tasks.splice(k, 1);
       log.push(`Task ${t.code} deleted (“${t.title}”, ${who(t)})`);
     } else return res.status(400).json({ error: 'Unknown operation' });
@@ -114,7 +119,7 @@ export default async function handler(req, res) {
     if (JSON.stringify(doc).length > 4_000_000) return res.status(400).json({ error: 'Task list too large' });
     await writeJSON(TASKS, doc);
     if (log.length) { try { await appendLog(log, by); } catch {} }
-    return res.status(200).json({ ok: true, task, tasks: doc.tasks, seq: doc.seq, updatedAt: doc.updatedAt });
+    return res.status(200).json({ ok: true, task, tasks: doc.tasks.filter(mine), seq: doc.seq, updatedAt: doc.updatedAt });
   } catch (e) {
     return res.status(500).json({ error: String((e && e.message) || e) });
   }

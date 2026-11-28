@@ -620,10 +620,69 @@ tr.cdays .offl{text-decoration:underline dotted var(--bad);text-underline-offset
 .urow{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;background:#fff}
 .uh{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
 .uh small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
-.ptags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.ptags span{font-size:11px;font-weight:700;background:var(--pale-2);color:var(--brand);border-radius:999px;padding:3px 9px}.ptags span.none{background:var(--line-2);color:var(--muted)}
+.ptags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.ptags span{font-size:11px;font-weight:700;background:var(--pale-2);color:var(--brand);border-radius:999px;padding:3px 9px}.ptags span.sc2{background:#FBF1DC;color:#8A5A12}.ptags span.none{background:var(--line-2);color:var(--muted)}
 .uperm{border-top:1px dashed var(--line);margin-top:12px;padding-top:6px}
 .rb.viewer,.rb.custom{background:var(--line-2);color:var(--ink-2)}
 @media (max-width:900px){.pgrid{grid-template-columns:1fr 1fr}}@media (max-width:560px){.pgrid{grid-template-columns:1fr}}
+.views .nb{background:#C0392B;color:#fff;font-size:10.5px;font-weight:800;border-radius:999px;padding:1px 7px;margin-left:2px}
+.apg{border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+.aph{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.aph h3{margin:0;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--deep)}.aph h3 span{background:var(--pale-2);color:var(--brand);border-radius:999px;padding:1px 8px;font-size:11px;margin-left:6px}
+.apr2{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:start;padding:12px 0;border-bottom:1px dashed var(--line-2)}
+.apr2:last-child{border-bottom:none}
+.apr2 .dt{text-align:center;background:var(--pale-3);border-radius:10px;padding:6px 0}.apr2 .dt b{display:block;font-family:var(--serif);font-size:20px;color:var(--deep);font-variant-numeric:lining-nums}.apr2 .dt span{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}
+.apr2 .tt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13.5px;font-weight:600}
+.apr2 .dd{font-size:12.8px;color:var(--ink-2);margin-top:4px}.apr2 .apw{background:var(--pale-3);border-radius:8px;padding:6px 9px;line-height:1.6}
+.apb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:640px){.apr2{grid-template-columns:44px minmax(0,1fr)}.apb{grid-column:1/-1;justify-content:flex-start}}
+.recctl{margin:-4px 0 14px;gap:8px}.recctl select,.recctl input{font-size:12.5px;padding:6px 9px}
+.asm{border:1px solid #E6D6B4;border-radius:16px;background:linear-gradient(135deg,#FFFCF5,#FBF4E4);padding:16px 18px;margin-bottom:14px}
+.asm-h{display:grid;grid-template-columns:170px 1fr;gap:18px;align-items:center}
+.asm-h>div:first-child span,.asm-p span{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9A7A3A}
+.asm-h>div:first-child b{display:block;font-family:var(--serif);font-variant-numeric:lining-nums;font-size:52px;line-height:1;font-weight:600;color:var(--deep);margin-top:4px}
+.asm-h b small{font-size:18px;color:var(--muted);margin-left:2px}.asm-h em{display:block;font-style:normal;font-weight:800;font-size:13px;margin-top:4px}
+.asm-h .ok{color:var(--ok)}.asm-h .warn{color:var(--warn)}.asm-h .bad{color:var(--bad)}
+.asm-p{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px}
+.asm-p>div{display:grid;grid-template-columns:1fr 34px;gap:2px 8px;align-items:center}
+.asm-p span{grid-column:1/-1;letter-spacing:.08em}.asm-p .bar{height:7px;border-radius:7px;background:#EDE5D3;overflow:hidden}
+.asm-p .bar i{display:block;height:100%;border-radius:7px;background:var(--ok)}.asm-p .bar i.warn{background:#D9A441}.asm-p .bar i.bad{background:var(--bad)}
+.asm-p b{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}.asm-p small{grid-column:1/-1;font-size:11px;color:var(--muted)}
+.asm-b{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px;border-top:1px solid #EADFC6;padding-top:12px}
+.asm-b h5{margin:0 0 6px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ok)}.asm-b h5.w{color:var(--bad)}.asm-b h5.n{color:var(--deep)}
+.asm-b ul{margin:0;padding-left:16px;font-size:12.6px;line-height:1.55;color:var(--ink-2)}.asm-b p{margin:0;font-size:12.6px;line-height:1.55;color:var(--ink-2)}
+@media (max-width:760px){.asm-h{grid-template-columns:1fr}.asm-p{grid-template-columns:1fr}.asm-b{grid-template-columns:1fr}}
+.viewrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.xall{font-size:12.5px;padding:7px 13px}
+main section.card{position:relative}
+.xbtn{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--brand);font-size:15px;font-weight:800;line-height:1;display:grid;place-items:center;opacity:.55;transition:opacity .15s,box-shadow .15s;z-index:2}
+.xbtn:hover,.xbtn:focus{opacity:1;box-shadow:0 4px 14px rgba(10,46,48,.12)}
+main section.card>.sh{padding-right:40px}
+.xmenu{position:absolute;z-index:200;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(10,46,48,.18);padding:6px;min-width:200px}
+.xmenu .xm-t{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:6px 10px 8px;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xmenu button{display:block;width:100%;text-align:left;border:none;background:none;padding:9px 10px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink)}
+.xmenu button:hover:not(:disabled){background:var(--pale-2)}.xmenu button:disabled{opacity:.4}
+.xcap{width:1280px;padding:26px 30px;background:#F6F4EF;font-family:var(--sans)}
+.xcap .hidden{display:none!important}
+.xcap section.card{margin-bottom:18px}
+.xcap .lbw,.xcap .tw,.xcap .stw,.xcap [style*="overflow"]{overflow:visible!important}
+.xcap .rfilter{position:static!important}
+.xcap-h{display:flex;align-items:center;gap:16px;border-bottom:2px solid #E2D6BC;padding-bottom:14px;margin-bottom:18px}
+.xcap-h img{height:30px}.xcap-h b{display:block;font-family:var(--serif);font-size:26px;color:var(--deep);font-weight:600}.xcap-h span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#9A7A3A;font-weight:800}.xcap-h em{margin-left:auto;font-style:normal;font-size:12px;color:var(--muted)}
+.xsel{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:12.5px;background:#fff;min-width:60px}
+/* ---------- phones: nothing may push the page wider than the screen ---------- */
+html{overflow-x:hidden}
+.views{max-width:100%;overflow-x:auto;scrollbar-width:none}.views::-webkit-scrollbar{display:none}
+.views button{white-space:nowrap;flex:none}
+.kpi .dl,.kpi .s{white-space:normal;overflow-wrap:anywhere}
+@media (max-width:760px){
+  .views button{padding:7px 11px;font-size:12.5px}
+  main section.card table:not(.pfw),.modal .m-body table:not(.pfw){display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  main section.card,.modal .panel,.modal .m-body{min-width:0;max-width:100%}
+  .xall span{display:none}
+  .modal .m-head{flex-wrap:wrap;gap:8px}
+  .modal .m-head .row{flex-wrap:wrap}
+  .pf-h{flex-wrap:wrap}.pf-r{margin-left:0;text-align:left}
+}
 /* ---------- team profiles ---------- */
 .pfctl select,.pfctl input{font-size:13px;padding:7px 10px}
 .pfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
@@ -839,7 +898,7 @@ table.tkp{min-width:1000px}
       <button class="btn light" id="adminBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Manage</span></button>
     </div>
   </div>
-  <div class="wrap viewrow"><nav class="views"><button class="active" data-v="ops" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Operations</button><button data-v="reports" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg>Team Reports</button><button data-v="tasks" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Tasks</button></nav></div>
+  <div class="wrap viewrow"><nav class="views"><button class="active" data-v="ops" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Operations</button><button data-v="reports" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg>Team Reports</button><button data-v="tasks" data-act="view"><svg class="ico lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Tasks</button><button data-v="approvals" data-act="view" id="apNav" class="hidden"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Approvals<span class="nb hidden" id="apBadge"></span></button></nav><button class="btn light xall" data-act="xAll" title="Export the whole page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span>Export page</span></button></div>
 </header>
 
 <main class="wrap" id="opsView">
@@ -873,6 +932,7 @@ table.tkp{min-width:1000px}
         <button class="btn sm" id="wkPrev">‹ Prev</button>
         <select id="wkSelect" style="padding:5px 8px;font-size:12px"></select>
         <button class="btn sm" id="wkNext">Next ›</button>
+        <button class="btn sm primary hidden" id="wkToday">This week</button>
         <button class="btn sm" id="wkEdit">Edit week</button>
         <button class="btn sm primary" id="wkExport"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Save report image</button>
       </div>
@@ -900,7 +960,7 @@ table.tkp{min-width:1000px}
     <div class="people" id="people"></div>
   </section>
 
-  <section class="card">
+  <section class="card" id="pfSec">
     <div class="sh">
       <div><div class="eyebrow">Analytics</div><h2>Team Profiles</h2><div class="sub" id="pfSub"></div></div>
       <div class="row pfctl" id="pfCtl"></div>
@@ -908,15 +968,17 @@ table.tkp{min-width:1000px}
     <div class="pfgrid" id="profiles"></div>
   </section>
 
-  <section class="card">
+  <section class="card" id="recSec">
     <div class="sh">
       <div><div class="eyebrow">After the schedule was sent</div><h2>Excuses, Shifts, Bonuses &amp; Deductions</h2><div class="sub" id="reqSub"></div></div>
-      <div class="row"><button class="btn sm" data-act="recImg" data-v="week">⤓ Week image</button><button class="btn sm" data-act="recImg" data-v="month">⤓ Month image</button><button class="btn sm" id="reqAdd">+ Add record</button></div>
+      <div class="row"><button class="btn sm" data-act="recImg">⤓ Image</button><button class="btn sm" id="reqAdd">+ Add record</button></div>
+    </div>
+    <div class="row recctl" id="recCtl">
     </div>
     <div id="reqList"></div>
   </section>
 
-  <section class="card">
+  <section class="card" id="logSec">
     <div class="sh"><div><div class="eyebrow">Audit trail</div><h2>Activity Log</h2><div class="sub">Every saved change — who made it, when, and what was done.</div></div></div>
     <div id="logList"></div>
   </section>
@@ -924,6 +986,7 @@ table.tkp{min-width:1000px}
 
 <main class="wrap hidden" id="repView"></main>
 <main class="wrap hidden" id="tkView"></main>
+<main class="wrap hidden" id="apView"></main>
 
 <div id="exportStage"></div>
 <div id="modalRoot"></div>
@@ -1088,7 +1151,8 @@ const shiftEnd = (D, c) => (c.e != null ? c.e : (c.i + 1) * 1440 + dayStartMin(D
 // "42 min", "2h 10m", "3d 4h" after the shift ended
 function fmtDelay(m) {
   if (m == null) return "—";
-  if (m <= 0) return "before shift end";
+  if (Math.round(m) === 0) return "at shift end";
+  if (m < 0) return fmtDelay(-m) + " before shift end";
   m = Math.round(m);
   if (m < 60) return `${m} min`;
   if (m < 1440) return `${Math.floor(m / 60)}h${m % 60 ? " " + (m % 60) + "m" : ""}`;
@@ -1178,9 +1242,11 @@ function withHistory(x) {
 async function load(silent) {
   await histReady;
   try {
-    const r = await fetch("/api/schedule", { cache: "no-store" });
+    const authed = !!S.token;
+    const r = await fetch("/api/schedule", { cache: "no-store", headers: authed ? { authorization: "Bearer " + S.token } : {} });
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
+    if (j.data && !dirty()) S.recAuth = authed && Array.isArray(j.data.requests);
     S.serverOK = true; S.fresh = !j.data;
     if (j.data && !dirty()) { S.data = withHistory(normalize(j.data)); if (S.draft) S.draft = clone(S.data); }
   } catch (e) { if (!silent) S.serverOK = false; }
@@ -1199,7 +1265,7 @@ async function save() {
   try {
     const changes = diffData(S.data, S.draft);
     if (S.restored) changes.unshift("Restored the schedule from a backup file");
-    const j = await call("/api/schedule", "PUT", { data: S.draft, baseUpdatedAt: S.data.updatedAt, changes: changes.length ? changes : ["Saved the schedule"] });
+    const j = await call("/api/schedule", "PUT", { data: S.draft, baseUpdatedAt: S.data.updatedAt, recordsLoaded: !!S.recAuth, changes: changes.length ? changes : ["Saved the schedule"] });
     S.draft.updatedAt = j.updatedAt;
     if (j.entry) S.draft.log = [j.entry, ...(S.draft.log || [])].slice(0, 500);
     const srcChanged = JSON.stringify(S.data.reportSources) !== JSON.stringify(S.draft.reportSources);
@@ -1215,7 +1281,7 @@ async function save() {
 
 /* ============================ render ============================ */
 function renderAll() {
-  renderHeader(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderProfiles(); renderRequests(); renderLog(); renderSaveBar(); renderReports();
+  renderHeader(); renderKpis(); renderBanners(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderProfiles(); renderRequests(); renderLog(); renderSaveBar(); renderReports(); renderApprovals(); renderAccess();
   if (S.admin.open) renderAdmin();
 }
 function renderHeader() {
@@ -1328,6 +1394,7 @@ function renderWeek() {
     (created ? `<span class="chip-s pub">● Published week</span>${can("schedule") ? ` <span class="muted" style="font-size:12px">· click any cell to edit</span>` : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
   $("#wkBody").innerHTML = created ? `<div class="tblw"><table class="wk">${weekTableHTML(D, ws)}</table></div>` : `<div class="empty">This week hasn't been created yet.<br><button class="btn sm primary" style="margin-top:10px" data-act="openCreate">Create this week</button></div>`;
   $("#wkPrev").disabled = S.weekOffset <= minOffset();
+  $("#wkToday").classList.toggle("hidden", S.weekOffset === 0);
   $("#wkExport").disabled = !created;
   $("#wkFoot").textContent = "Shifts belong to the day they start — a 7:00 PM – 3:00 AM night shift is that day's night. Hours are shift length. All times Cairo.";
   const keys = new Set(Object.keys(D.weeks)); keys.add(iDate(ws)); keys.add(iDate(wkStart(D, curIdx()))); keys.add(iDate(wkStart(D, curIdx()) + 7));
@@ -1402,16 +1469,21 @@ const PERM_INFO = [
   ["schedule", "Edit the schedule", "Week editor, new weeks, editing cells"],
   ["setup", "Team & setup", "Team members, shift types, desks, time slots"],
   ["settings", "Settings", "Week start, day switch time, report rules"],
-  ["records", "Excuses & shift changes", "Add excuses, late / early, swaps, desk changes — sent for the owner's approval"],
-  ["money", "Bonuses & deductions", "Add bonuses and deductions — sent for the owner's approval"],
+  ["records", "Excuses & shift changes", "Add excuses, late / early, swaps, desk changes — sent for approval"],
+  ["money", "Bonuses & deductions", "Add bonuses and deductions — sent for approval"],
+  ["approve", "Approve / reject", "Approve or reject excuses, swaps, desk changes, bonuses and deductions"],
   ["reports", "View team reports", "Sales, feedback, report discipline"],
   ["sources", "Manage report sheets", "Add or change the team's Google Sheets"],
   ["tasks", "View tasks", "See the task board and task scores"],
   ["tasksManage", "Assign & manage tasks", "Create, edit, attach proof, mark done, cancel"],
   ["tasksReview", "Review & rate tasks", "Approve, return for rework, rate"],
+  ["log", "Activity log", "See every change — who did what and when"],
   ["users", "Manage users", "Add users and set their permissions"],
 ];
-const PERM_PRESETS = { admin: PERM_INFO.map((x) => x[0]), editor: ["schedule", "records", "money", "reports", "tasks", "tasksManage", "tasksReview"], viewer: ["reports", "tasks"] };
+const PERM_PRESETS = { admin: PERM_INFO.map((x) => x[0]), editor: ["schedule", "records", "money", "reports", "tasks", "tasksManage", "tasksReview", "log"], viewer: ["reports", "tasks"] };
+const canApprove = () => can("approve");
+// accounts limited to some team members (Manage → Users → Team members) only see theirs
+const inScope = (id) => !S.me || S.me.owner || !(S.me.scope || []).length || S.me.scope.includes(id);
 const isOwner = () => !!(S.me && S.me.owner);
 const can = (p) => !!(S.me && (S.me.owner || (S.me.perms || []).includes(p)));
 const roleLabel = (u) => (u.owner || u.role === "owner" ? "Owner" : { admin: "Admin", editor: "Editor", viewer: "Viewer" }[u.role] || "Custom access");
@@ -1575,20 +1647,58 @@ async function uploadFiles(files, done) {
   }
   st("");
 }
+// Records period: the week on screen, a whole month (for closing the month) or any range
+const REC = { mode: "week", month: "", from: "", to: "", type: "", mem: "" };
+function recRange() {
+  const ws = viewWS();
+  if (REC.mode === "month") { const m = REC.month || iDate(curIdx()).slice(0, 7), y = +m.slice(0, 4), mo = +m.slice(5) - 1; return [U0(y, mo, 1), U0(y, mo + 1, 0), `${MONF[mo]} ${y}`]; }
+  if (REC.mode === "range") { let a = REC.from ? dIdx(REC.from) : ws, b = REC.to ? dIdx(REC.to) : ws + 6; if (b < a) [a, b] = [b, a]; return [a, b, rngTxt(a, b)]; }
+  return [ws, ws + 6, `${dmy(ws)} – ${dmy(ws + 6, 1)}`];
+}
+function recSummaryHTML(D, L) {
+  const ids = [...new Set(L.flatMap((r) => (r.type === "swap" ? [r.member, r.withMember] : [r.member])))].filter(inScope);
+  if (!ids.length) return "";
+  const z = () => ({ excuse: 0, late: 0, early: 0, dayoff: 0, swap: 0, bonus: 0, ded: 0, dd: 0, pend: 0 });
+  const per = Object.fromEntries(ids.map((id) => [id, z()])), T = z();
+  for (const r of L) {
+    if (r.status === "rejected") continue;
+    for (const id of r.type === "swap" ? [r.member, r.withMember] : [r.member]) {
+      const p = per[id]; if (!p) continue;
+      if (r.status === "pending") p.pend++;
+      if (r.type === "bonus" && id === r.member) p.bonus += +r.amount || 0;
+      else if (r.type === "deduction" && id === r.member) { p.ded += +r.amount || 0; p.dd += +r.days || 0; }
+      else if (r.type === "change" || r.type === "swap") p.swap++;
+      else if (p[r.type] != null) p[r.type]++;
+    }
+  }
+  for (const id of ids) for (const k in T) T[k] += per[id][k];
+  const net = (p) => { const v = p.bonus - p.ded; return `<span class="${v < 0 ? "neg" : v > 0 ? "pos" : ""}">${v < 0 ? "− " : v > 0 ? "+ " : ""}${esc(money(Math.abs(v)))}</span>${p.dd ? ` <span class="ref">− ${dayStr(p.dd)}</span>` : ""}`; };
+  const row = (name, p, cls) => `<tr class="${cls || ""}"><td>${name}${p.pend && !cls ? ` <span class="ref">(${p.pend} pending)</span>` : ""}</td><td>${p.excuse || "–"}</td><td>${p.late || "–"}</td><td>${p.early || "–"}</td><td>${p.dayoff || "–"}</td><td>${p.swap || "–"}</td><td>${p.bonus ? `<span class="pos">+ ${esc(money(p.bonus))}</span>` : "–"}</td><td>${p.ded || p.dd ? `<span class="neg">− ${esc(dedText({ amount: p.ded, days: p.dd }))}</span>` : "–"}</td><td>${net(p)}</td></tr>`;
+  return `<div class="dedsum"><table><thead><tr><th>Team member</th><th>Excuses</th><th>Late</th><th>Early leave</th><th>Day-off changes</th><th>Swaps &amp; changes</th><th>Bonuses</th><th>Deductions</th><th>Net</th></tr></thead><tbody>
+    ${ids.map((id) => row(`<b>${esc(memName(D, id))}</b>`, per[id])).join("")}${ids.length > 1 ? row("Total", T, "tot") : ""}</tbody></table></div>`;
+}
 function renderRequests() {
-  const D = V(), ws = viewWS();
-  const inWeek = (s) => { if (!s) return false; const i = dIdx(s); return i >= ws && i <= ws + 6; };
-  const list = (D.requests || []).filter((r) => inWeek(r.date) || inWeek(r.withDate)).sort((a, b) => a.date.localeCompare(b.date) || (a.createdAt || "").localeCompare(b.createdAt || ""));
-  $("#reqSub").textContent = `${dmy(ws)} – ${dmy(ws + 6, 1)} · ${list.length} record${list.length === 1 ? "" : "s"}`;
+  const D = V(), [a, b, label] = recRange();
+  const inR = (x) => { if (!x) return false; const i = dIdx(x); return i >= a && i <= b; };
+  let list = (D.requests || []).filter((r) => (inR(r.date) || inR(r.withDate)) && (inScope(r.member) || (r.withMember && inScope(r.withMember)))).sort((x, y) => x.date.localeCompare(y.date) || (x.createdAt || "").localeCompare(y.createdAt || ""));
+  const all = list;
+  if (REC.type) list = list.filter((r) => (REC.type === "money" ? isAdj(r) : REC.type === "shift" ? r.type === "swap" || r.type === "change" : !isAdj(r) && r.type !== "swap" && r.type !== "change"));
+  if (REC.mem) list = list.filter((r) => r.member === REC.mem || r.withMember === REC.mem);
+  $("#reqSub").textContent = `${label} · ${list.length} record${list.length === 1 ? "" : "s"}`;
+  const curM = REC.month || iDate(curIdx()).slice(0, 7);
+  $("#recCtl").innerHTML = `<select id="recMode"><option value="week" ${REC.mode === "week" ? "selected" : ""}>Week on screen</option><option value="month" ${REC.mode === "month" ? "selected" : ""}>Month</option><option value="range" ${REC.mode === "range" ? "selected" : ""}>Custom range</option></select>
+    ${REC.mode === "month" ? `<input type="month" id="recMonth" value="${curM}">` : REC.mode === "range" ? `<input type="date" id="recFrom" value="${iDate(a)}"><input type="date" id="recTo" value="${iDate(b)}">` : ""}
+    <select id="recType"><option value="">All types</option><option value="attend" ${REC.type === "attend" ? "selected" : ""}>Excuses &amp; attendance</option><option value="shift" ${REC.type === "shift" ? "selected" : ""}>Swaps &amp; desk changes</option><option value="money" ${REC.type === "money" ? "selected" : ""}>Bonuses &amp; deductions</option></select>
+    <select id="recMem"><option value="">Everyone</option>${D.members.filter((m) => inScope(m.id) && (!m.former || all.some((r) => r.member === m.id))).map((m) => `<option value="${esc(m.id)}" ${REC.mem === m.id ? "selected" : ""}>${esc(m.name)}</option>`).join("")}</select>`;
   const pend = (D.requests || []).filter((r) => r.status === "pending").length;
-  $("#reqList").innerHTML = (isOwner() && pend ? `<div class="banner warn" style="margin-bottom:12px"><b>${pend} record${pend === 1 ? "" : "s"} waiting for your approval.</b> <button class="btn sm primary" style="margin-left:8px" data-act="openApprovals">Review now</button></div>` : "") + adjSummaryHTML(D, ws) + (list.length ? `<div class="reqs">${list.map((r) => {
+  $("#reqList").innerHTML = (canApprove() && pend ? `<div class="banner warn" style="margin-bottom:12px"><b>${pend} record${pend === 1 ? "" : "s"} waiting for your approval.</b> <button class="btn sm primary" style="margin-left:8px" data-act="openApprovals">Review now</button></div>` : "") + recSummaryHTML(D, list) + (list.length ? `<div class="reqs">${list.map((r) => {
     const d = dIdx(r.date), adj = isAdj(r);
     return `<div class="req"><div class="dt"><b>${new Date(d * 864e5).getUTCDate()}</b><span>${DY[wdOf(d)]} · ${MON[new Date(d * 864e5).getUTCMonth()]}</span></div>
-      <div><div class="tt"><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span>${esc(reqTitle(D, r))}${r.ref ? `<span class="ref">${esc(r.ref)}</span>` : ""}${r.type === "swap" && r.applied ? ` <span class="chip-s pub">Applied to schedule</span>` : ""}${(r.attachments || []).length ? `<span class="ref">📎 ${r.attachments.length}</span>` : ""}</div>
-        ${adj ? `<div class="dd"><b>Reason:</b> ${esc(r.reason || "—")}${r.details ? " — " + esc(r.details) : ""}</div>` : r.details ? `<div class="dd">${esc(r.details)}</div>` : ""}
-        ${attThumbs(r)}${r.createdBy ? `<div class="ref" style="margin-top:4px">Logged by ${esc(r.createdBy)}</div>` : ""}</div>
+      <div><div class="tt"><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span>${esc(reqTitle(D, r))}${r.ref ? `<span class="ref">${esc(r.ref)}</span>` : ""}${(r.type === "swap" || r.type === "change") && r.applied ? ` <span class="chip-s pub">Applied to schedule</span>` : ""}${(r.attachments || []).length ? `<span class="ref">📎 ${r.attachments.length}</span>` : ""}</div>
+        ${adj ? `<div class="dd"><b>Reason:</b> ${esc(r.reason || "—")}${r.details ? " — " + esc(r.details) : ""}</div>` : r.details ? `<div class="dd" dir="auto">${esc(r.details)}</div>` : ""}
+        ${attThumbs(r)}${r.createdBy ? `<div class="ref" style="margin-top:4px">Logged by ${esc(r.createdBy)}${r.decidedBy ? ` · ${r.status === "approved" ? "approved" : r.status === "rejected" ? "rejected" : "reviewed"} by ${esc(r.decidedBy)}` : ""}</div>` : ""}</div>
       <div class="st2 row" style="gap:14px">${adj ? `<span class="amt ${r.type}">${ADJ[r.type].sign} ${esc(dedText(r))}</span>` : ""}<span class="ss ${stClass(r)}">${stLabel(r)}</span></div></div>`;
-  }).join("")}</div>` : `<div class="empty">No excuses, shift changes, deductions or bonuses for this week.</div>`);
+  }).join("")}</div>` : `<div class="empty">No excuses, shift changes, deductions or bonuses in this period.</div>`);
 }
 function monthRange(i) { const d = new Date(i * 864e5), y = d.getUTCFullYear(), m = d.getUTCMonth(); return [Math.round(Date.UTC(y, m, 1) / 864e5), Math.round(Date.UTC(y, m + 1, 0) / 864e5), MON[m] + " " + y]; }
 function adjSummaryHTML(D, ws) {
@@ -1992,7 +2102,7 @@ function agg(rows, a, b, shift = RS.shift) {
 // Times come from the Apps Script edit trigger. Reports written before it was installed count as "time not recorded",
 // and the on-time rate only covers days due after recording started (so months of history don't read as 0%).
 function compliance(D, p, a, b, t, shift = RS.shift) {
-  const out = { expected: 0, done: 0, missing: [], offLogged: [], excused: [], schedDays: 0, onTime: 0, late: [], unknown: 0, pending: 0, delays: [], buckets: [0, 0, 0, 0], edited: 0, median: null, known: 0, missTimed: 0, timed: 0, rate: null };
+  const out = { expected: 0, done: 0, missing: [], offLogged: [], excused: [], schedDays: 0, onTime: 0, early: [], late: [], unknown: 0, pending: 0, delays: [], buckets: [0, 0, 0, 0], edited: 0, median: null, known: 0, missTimed: 0, timed: 0, rate: null };
   if (!p.m) return out;
   const byI = Object.fromEntries(p.rows.map((r) => [r.i, r]));
   const exc = new Set((D.requests || []).filter((r) => r.member === p.m.id && EXCUSED.has(r.type) && r.status !== "rejected").map((r) => dIdx(r.date)));
@@ -2012,6 +2122,7 @@ function compliance(D, p, a, b, t, shift = RS.shift) {
     if (!st) { out.unknown++; continue; }
     const delay = st.f - end;
     out.known++; out.delays.push(delay);
+    if (delay < 0) out.early.push({ i, d: -delay }); // written before her shift ended
     if (st.f <= due) out.onTime++; else out.late.push({ i, d: delay });
     out.buckets[delay <= g ? 0 : delay <= 120 ? 1 : delay <= 1440 ? 2 : 3]++;
     if (st.l != null && st.l - st.f > 360) out.edited++;
@@ -2110,7 +2221,7 @@ function renderReports() {
     return `<tr><td><div class="who"><div class="av" style="--c:${esc(p.color)}">${esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><small>${p.first != null ? "Sheet since " + dmy(p.first, 1) : "No reports yet"}${c.pending ? ` · ${c.pending} due soon` : ""}</small></div></div></td>
       <td style="min-width:170px"><div class="row" style="gap:10px;flex-wrap:nowrap;justify-content:flex-end"><div class="cbar" style="width:110px" title="On time ${c.onTime} · late ${c.late.length} · time not recorded ${c.unknown} · missing ${c.missing.length}">${tot ? `<i style="width:${w(c.onTime)}%"></i><i class="unk" style="width:${w(c.unknown)}%"></i><i class="late" style="width:${w(c.late.length)}%"></i><i class="miss" style="width:${w(c.missing.length)}%"></i>` : ""}</div><b class="cpc2 ${pc == null ? "" : pc >= 0.95 ? "ok" : pc >= 0.8 ? "warn" : "bad"}">${pc == null ? "—" : Math.round(pc * 100) + "%"}</b></div></td>
       <td><b class="cpc2 ${c.rate == null ? "" : c.rate >= 0.95 ? "ok" : c.rate >= 0.8 ? "warn" : "bad"}" style="font-size:16px">${c.rate == null ? "—" : Math.round(c.rate * 100) + "%"}</b></td>
-      <td>${c.expected}</td><td>${c.onTime}${c.unknown ? `<small class="muted" title="Written before time tracking started"> +${c.unknown} n/r</small>` : ""}</td><td>${c.late.length ? `<b style="color:var(--warn)">${c.late.length}</b>` : "0"}</td><td>${c.missing.length ? `<b style="color:var(--bad)">${c.missing.length}</b>` : "0"}</td>
+      <td>${c.expected}</td><td>${c.onTime}${c.unknown ? `<small class="muted" title="Written before time tracking started"> +${c.unknown} n/r</small>` : ""}${c.early.length ? `<small class="muted" style="display:block" title="${esc(c.early.slice(-6).map((x) => `${DY[wdOf(x.i)]} ${dmy(x.i)}: ${fmtDelay(-x.d)}`).join(" · "))}">${c.early.length} before shift end</small>` : ""}</td><td>${c.late.length ? `<b style="color:var(--warn)">${c.late.length}</b>` : "0"}</td><td>${c.missing.length ? `<b style="color:var(--bad)">${c.missing.length}</b>` : "0"}</td>
       <td>${c.median == null ? (c.unknown ? `<span class="muted" title="Written before time tracking started">not recorded</span>` : "—") : `<b>${fmtDelay(c.median)}</b>`}</td>
       <td>${bt ? `<div class="spd" title="≤ ${fmtDelay(G)}: ${bk[0]} · up to 2h: ${bk[1]} · same day: ${bk[2]} · 1 day+: ${bk[3]}">${bk.map((n, k) => (n ? `<i class="b${k}" style="flex:${n}"></i>` : "")).join("")}</div>` : `<span class="muted">—</span>`}</td>
       <td>${c.excused.length || "0"}</td>
@@ -2294,8 +2405,10 @@ function showView(v) {
   $("#opsView").classList.toggle("hidden", v !== "ops");
   $("#repView").classList.toggle("hidden", v !== "reports");
   $("#tkView").classList.toggle("hidden", v !== "tasks");
+  $("#apView").classList.toggle("hidden", v !== "approvals");
   document.querySelectorAll(".views button").forEach((b) => b.classList.toggle("active", b.dataset.v === v));
-  history.replaceState(null, "", v === "reports" || v === "tasks" ? "#" + v : location.pathname + location.search);
+  history.replaceState(null, "", v === "reports" || v === "tasks" || v === "approvals" ? "#" + v : location.pathname + location.search);
+  if (v === "approvals") { renderApprovals(); if (!TK.list && can("tasksReview")) loadTasks(true); }
   if (v === "reports") { renderReports(); if (!RS.raw && !RS.loading && can("reports")) loadReports(); if (!TK.list && can("tasks")) loadTasks(true); }
   if (v === "tasks") { renderTasks(); if (can("tasks") || can("tasksManage")) loadTasks(!!TK.list); }
   window.scrollTo({ top: 0 });
@@ -2377,6 +2490,73 @@ function memberProfile(D, m, a, b, t) {
 }
 const pct0 = (x) => (x == null || !isFinite(x) ? "—" : Math.round(x * 100) + "%");
 const mixBar = (segs, big) => { const tot = segs.reduce((x, s) => x + s.v, 0); return `<div class="mix ${big ? "big" : ""}">${tot ? segs.filter((s) => s.v).map((s) => `<i style="flex:${s.v};background:${esc(s.c)}" title="${esc(s.l)} · ${s.v}"></i>`).join("") : "<i style='flex:1;background:var(--line-2)'></i>"}</div>`; };
+// An executive read of one person for the period: four scored areas + plain-language strengths, watch-outs and a next step.
+// Conduct & attendance (records) · Report discipline (sheet vs schedule) · Sales vs the team · Task delivery.
+function assessMember(D, m, a, b, t, P) {
+  const parts = [], good = [], watch = [];
+  const clamp = (x) => Math.max(0, Math.min(100, Math.round(x)));
+  // conduct
+  const per30 = P.work ? (P.incidents / P.work) * 30 : 0;
+  const conduct = clamp(100 - per30 * 12 - P.ded.n * 6);
+  parts.push(["Conduct & attendance", conduct, 0.25, P.incidents ? `${P.incidents} incident${P.incidents === 1 ? "" : "s"} in ${P.work} work days` : `Clean record over ${P.work} work days`]);
+  if (!P.incidents && P.work >= 10) good.push(`Clean record — no excuses, lateness or deductions in ${P.work} work days.`);
+  if (P.ded.n) watch.push(`${P.ded.n} deduction${P.ded.n === 1 ? "" : "s"} (${dedText(P.ded)}) in this period.`);
+  if (P.rc.late + P.rc.early >= 2) watch.push(`${P.rc.late} late arrival${P.rc.late === 1 ? "" : "s"} and ${P.rc.early} early leave${P.rc.early === 1 ? "" : "s"}.`);
+  if (P.bonus.n) good.push(`Earned ${P.bonus.n} bonus${P.bonus.n === 1 ? "" : "es"} (${money(P.bonus.amount)}).`);
+  // reports & sales (need the team's sheets)
+  const rp = RS.raw && can("reports") ? repModel().find((x) => x.m && x.m.id === m.id) : null;
+  if (rp) {
+    const c = compliance(D, rp, a, b, t, "");
+    if (c.expected) {
+      const sub = c.done / c.expected, on = c.rate;
+      const sc = clamp(on == null ? sub * 100 : (sub * 0.55 + on * 0.45) * 100);
+      parts.push(["Report discipline", sc, 0.25, `${c.done}/${c.expected} reports${on == null ? "" : ` · ${Math.round(on * 100)}% on time`}${c.median != null ? ` · typically ${fmtDelay(c.median)}` : ""}`]);
+      if (sub >= 0.97) good.push(`Writes her report on ${Math.round(sub * 100)}% of scheduled days.`);
+      if (c.missing.length) watch.push(`${c.missing.length} missing report${c.missing.length === 1 ? "" : "s"} (last: ${c.missing.slice(-3).map((i) => `${DY[wdOf(i)]} ${dmy(i)}`).join(", ")}).`);
+      if (c.late.length >= 2) watch.push(`${c.late.length} reports written late — typically ${fmtDelay(c.median)}.`);
+      if (c.early.length >= 2) watch.push(`${c.early.length} reports written before her shift ended — check they include the whole shift.`);
+    }
+    if (rp.kind === "metrics") {
+      const me = agg(rp.rows, a, b, ""), TA = repModel().filter((x) => x.kind === "metrics" && x.loaded).map((x) => agg(x.rows, a, b, ""));
+      // the average team member (per person-day), not the whole team's daily total
+      const tS = TA.reduce((x, g) => x + g.sales, 0), tD = TA.reduce((x, g) => x + g.selling, 0), tO = TA.reduce((x, g) => x + g.orders, 0), tR = TA.reduce((x, g) => x + g.refunds, 0);
+      const team = { avgDaily: tD ? tS / tD : null, aov: tO ? tS / tO : null, refundRate: tO ? tR / tO : null };
+      if (me.selling && team.avgDaily) {
+        const ratio = me.avgDaily / team.avgDaily, sc = clamp(60 + (ratio - 1) * 80 + (me.refundRate != null && team.refundRate != null ? (team.refundRate - me.refundRate) * 150 : 0));
+        parts.push(["Sales performance", sc, 0.3, `EGP ${fN(me.avgDaily)} a selling day · ${ratio >= 1 ? "+" : ""}${Math.round((ratio - 1) * 100)}% vs team`]);
+        if (ratio >= 1.1) good.push(`Sells ${Math.round((ratio - 1) * 100)}% more per day than the team average (EGP ${fN(me.avgDaily)} vs ${fN(team.avgDaily)}).`);
+        if (ratio <= 0.85) watch.push(`Daily sales ${Math.round((1 - ratio) * 100)}% below the team average (EGP ${fN(me.avgDaily)} vs ${fN(team.avgDaily)}).`);
+        if (me.aov && team.aov && me.aov >= team.aov * 1.1) good.push(`High order value — AOV EGP ${fN(me.aov)} vs team ${fN(team.aov)}.`);
+        if (me.refundRate != null && team.refundRate != null && me.refundRate > team.refundRate * 1.3 && me.refunds >= 3) watch.push(`Refund rate ${fPct(me.refundRate)} vs team ${fPct(team.refundRate)}.`);
+      }
+    }
+  }
+  // tasks
+  if (TK.list && (can("tasks") || can("tasksReview"))) {
+    const k = tkStats(TK.list.filter((x) => x.member === m.id && tDay(x) >= a && tDay(x) <= b), cairoNow().abs);
+    if (k.n && k.score != null) {
+      parts.push(["Task delivery", k.score, 0.2, `${k.closed}/${k.n} done${k.onTime != null ? ` · ${Math.round(k.onTime * 100)}% on time` : ""}${k.quality != null ? ` · ${nf2.format(k.quality)}★` : ""}`]);
+      if (k.quality != null && k.quality >= 4.3) good.push(`Task quality rated ${nf2.format(k.quality)} / 5.`);
+      if (k.overdue) watch.push(`${k.overdue} overdue task${k.overdue === 1 ? "" : "s"}.`);
+    }
+  }
+  // flexibility
+  const wt = Object.entries(P.byType).filter(([id]) => (typeById(D, id) || {}).kind === "work");
+  if (wt.length >= 2 && P.work >= 10 && Math.min(...wt.map(([, v]) => v.days)) / P.work >= 0.25) good.push(`Flexible — works ${wt.map(([id, v]) => `${typeById(D, id).name} ${pct0(v.days / P.work)}`).join(" / ")}.`);
+  const w = parts.reduce((x, p) => x + p[2], 0), score = w ? Math.round(parts.reduce((x, p) => x + p[1] * p[2], 0) / w) : null;
+  const weakest = parts.slice().sort((x, y) => x[1] - y[1])[0];
+  const NEXT = { "Conduct & attendance": "Talk through the attendance record with her and agree clear rules for lateness and excuses; recheck next month.", "Report discipline": "Ask for the report within the hour after every shift — a phone reminder at shift end helps; review missing days weekly.", "Sales performance": "Review a sample of her chats against the top seller's, and pair her on the strongest desk for a week.", "Task delivery": "Give smaller tasks with clear deadlines and check in half-way." };
+  const next = weakest && weakest[1] < 75 ? NEXT[weakest[0]] : score != null && score >= 85 ? "Keep her on high-impact desks and consider her for a bonus or a lead role." : "Steady — keep the current setup and review again next month.";
+  return { score, parts, good, watch, next, partial: !rp && can("reports") };
+}
+function assessHTML(A, img) {
+  if (A.score == null) return "";
+  const [g, c] = grade(A.score);
+  return `<div class="asm"><div class="asm-h"><div><span>Executive assessment</span><b class="${c}">${A.score}<small>/100</small></b><em class="${c}">${g}</em></div>
+    <div class="asm-p">${A.parts.map(([l, v, , d]) => { const [, cc] = grade(v); return `<div><span>${l}</span><div class="bar"><i class="${cc}" style="width:${v}%"></i></div><b>${v}</b><small>${esc(d)}</small></div>`; }).join("")}</div></div>
+    <div class="asm-b">${A.good.length ? `<div><h5>Strengths</h5><ul>${A.good.slice(0, 4).map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}${A.watch.length ? `<div><h5 class="w">Watch</h5><ul>${A.watch.slice(0, 4).map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}<div><h5 class="n">Next step</h5><p>${esc(A.next)}</p></div></div>
+    ${A.partial && !img ? `<div class="muted" style="font-size:11.5px;margin-top:8px">Loading report data for the full picture…</div>` : ""}</div>`;
+}
 function profileBody(D, m, a, b, t, img) {
   const P = memberProfile(D, m, a, b, t);
   const types = D.shiftTypes.filter((x) => P.byType[x.id]), work = types.filter((x) => x.kind === "work");
@@ -2397,6 +2577,7 @@ function profileBody(D, m, a, b, t, img) {
     ${night ? `<div><span>${esc(night.name)}</span><b>${(P.byType[night.id] || {}).days || 0}</b><small>${pct0(((P.byType[night.id] || {}).days || 0) / (P.work || 1))} of work days</small></div>` : ""}
     <div><span>Longest run</span><b>${P.streak}</b><small>work days in a row</small></div>
     <div><span>Records</span><b>${P.recs.length}</b><small>${P.incidents} incident${P.incidents === 1 ? "" : "s"} · ${P.work ? nf2.format((P.incidents / P.work) * 30) : "0"} per 30 days</small></div></div>`;
+  h += assessHTML(assessMember(D, m, a, b, t, P), img);
   // shift mix
   h += `<div class="pf2c"><div class="panel"><h4>Shift mix</h4>${mixBar(types.map((x) => ({ v: P.byType[x.id].days, c: x.color, l: x.name })), 1)}
     <table class="stbl pft"><thead><tr><th>Shift</th><th>Days</th><th>Share of all days</th><th>Share of work days</th><th>Hours</th></tr></thead><tbody>${types.map((x) => { const v = P.byType[x.id]; return `<tr><td><span class="dot" style="--c:${esc(x.color)}"></span>${esc(x.name)}</td><td><b>${v.days}</b></td><td>${pct0(v.days / P.sched)}</td><td>${x.kind === "work" ? pct0(v.days / (P.work || 1)) : "—"}</td><td>${x.kind === "work" ? hrs(v.min) : "—"}</td></tr>`; }).join("")}</tbody></table></div>`;
@@ -2435,7 +2616,7 @@ function renderProfiles() {
   const D = V(), [a, b, t] = pfRange(), el = $("#profiles"); if (!el) return;
   $("#pfSub").innerHTML = `${PF.period === "all" ? "All time" : rngTxt(a, b)} · counted up to today. Click a name for the full profile.`;
   $("#pfCtl").innerHTML = `${profileSel()}${PF.period === "custom" ? `<input type="date" id="pfFrom" value="${iDate(a)}"><input type="date" id="pfTo" value="${iDate(b)}">` : ""}`;
-  const mems = D.members.filter((m) => !m.former || memberProfile(D, m, a, b, t).sched);
+  const mems = D.members.filter((m) => inScope(m.id) && (!m.former || memberProfile(D, m, a, b, t).sched));
   const work = D.shiftTypes.filter((x) => x.kind === "work");
   el.innerHTML = mems.map((m) => {
     const P = memberProfile(D, m, a, b, t), types = D.shiftTypes.filter((x) => P.byType[x.id]);
@@ -2448,7 +2629,9 @@ function renderProfiles() {
   }).join("") || `<div class="empty" style="grid-column:1/-1">No team members.</div>`;
 }
 function openProfile(id) {
-  const D = V(), m = memById(D, id); if (!m) return;
+  const D = V(), m = memById(D, id); if (!m || !inScope(id)) return;
+  if (can("reports") && !RS.raw && !RS.loading) loadReports().then(() => { if (PF.sel === id && $("#modalRoot .pfm")) openProfile(id); });
+  if ((can("tasks") || can("tasksReview")) && !TK.list && !TK.loading) loadTasks(true).then(() => { if (PF.sel === id && $("#modalRoot .pfm")) openProfile(id); });
   PF.sel = id;
   const [a, b, t] = pfRange();
   const sc = $(".overlay .pfm .m-body")?.scrollTop;
@@ -2491,12 +2674,190 @@ async function pfAction(act, el, ev) {
     case "pfLoadRep": await loadReports(); return openProfile(PF.sel);
     case "pfLoadTk": await loadTasks(true); return openProfile(PF.sel);
     case "recImg": {
-      const ws = viewWS(); let a, b, label;
-      if (el.dataset.v === "month") { [a, b, label] = monthRange(ws + 3); } else { a = ws; b = ws + 6; label = rangeTxt(ws); }
+      const [a, b, label] = recRange();
       toast("Preparing image…");
-      return exportImage(recordsImageHTML(D, a, b, label), `Vendoor_Records_${el.dataset.v === "month" ? label.replace(" ", "-") : rangeName(ws)}.png`);
+      return exportImage(recordsImageHTML(D, a, b, label), `Vendoor_Records_${iDate(a)}_${iDate(b)}.png`);
     }
   }
+}
+
+/* ============================ export: every section (and the whole page) as Image · PDF · CSV ============================ */
+const XP = { menu: null };
+const xTitle = (node) => (node.querySelector(".sh h2")?.textContent || node.querySelector("h2,h3")?.textContent || "Dashboard").trim();
+const xSlug = (t) => t.replace(/[^\w؀-ۿ]+/g, "_").replace(/^_|_$/g, "").slice(0, 60) || "Section";
+const xView = () => ({ ops: "#opsView", reports: "#repView", tasks: "#tkView", approvals: "#apView" }[RS.view] || "#opsView");
+const xViewName = () => ({ ops: "Operations", reports: "Team Reports", tasks: "Tasks", approvals: "Approvals" }[RS.view] || "Dashboard");
+// a button on every card
+function decorateExports() {
+  document.querySelectorAll("main section.card").forEach((sec) => {
+    if (sec.querySelector(":scope > .xbtn") || sec.closest(".modal")) return;
+    if (sec.classList.contains("rfilter") || sec.querySelector(".rsetup") || (sec.querySelector(":scope > .empty") && sec.children.length <= 1)) return;
+    const b = document.createElement("button");
+    b.className = "xbtn"; b.type = "button"; b.dataset.act = "xMenu"; b.title = "Download this section"; b.innerHTML = "⤓";
+    sec.appendChild(b);
+  });
+}
+new MutationObserver(() => { clearTimeout(XP.t); XP.t = setTimeout(decorateExports, 80); }).observe(document.body, { childList: true, subtree: true });
+function xMenu(btn, target) {
+  closeXMenu();
+  const m = document.createElement("div"); m.className = "xmenu";
+  const csv = !!csvOf(target).length;
+  m.innerHTML = `<div class="xm-t">${esc(target === "all" ? xViewName() + " · whole page" : xTitle(target))}</div><button data-act="xGo" data-v="png">🖼 Image (PNG)</button><button data-act="xGo" data-v="pdf">📄 PDF</button><button data-act="xGo" data-v="csv" ${csv ? "" : "disabled title='No table in this section'"}>📊 CSV (Excel)</button>`;
+  document.body.appendChild(m);
+  const r = btn.getBoundingClientRect();
+  m.style.top = window.scrollY + r.bottom + 6 + "px";
+  m.style.left = Math.max(8, Math.min(window.scrollX + r.right - m.offsetWidth, window.scrollX + document.documentElement.clientWidth - m.offsetWidth - 8)) + "px";
+  XP.menu = m; XP.target = target;
+}
+function closeXMenu() { if (XP.menu) { XP.menu.remove(); XP.menu = null; } }
+document.addEventListener("click", (e) => { if (XP.menu && !e.target.closest(".xmenu") && !e.target.closest("[data-act=xMenu],[data-act=xAll]")) closeXMenu(); }, true);
+// clone the node into an off-screen, desktop-width frame with the brand header, so exports look the same from a phone
+async function xCanvas(target) {
+  const nodes = target === "all" ? [...$(xView()).children].filter((n) => !n.classList.contains("hidden") && n.offsetParent !== null) : [target];
+  const box = document.createElement("div");
+  box.className = "xcap";
+  box.innerHTML = `<div class="xcap-h"><img src="assets/logo-color.png" alt=""><div><b>${esc(target === "all" ? xViewName() : xTitle(target))}</b><span>Marketing Team · Operations Management</span></div><em>${esc(logFmt.format(new Date()))} · ${esc(logTime.format(new Date()))}</em></div>`;
+  for (const n of nodes) { const c = n.cloneNode(true); c.querySelectorAll(".xbtn,.xall,input[type=file]").forEach((x) => x.remove()); c.querySelectorAll("select").forEach((x, k) => { const o = n.querySelectorAll("select")[k]; const sp = document.createElement("span"); sp.className = "xsel"; sp.textContent = o && o.selectedOptions[0] ? o.selectedOptions[0].textContent : ""; x.replaceWith(sp); }); c.querySelectorAll("input").forEach((x, k) => { const o = n.querySelectorAll("input")[k]; const sp = document.createElement("span"); sp.className = "xsel"; sp.textContent = o ? o.value : ""; x.replaceWith(sp); }); box.appendChild(c); }
+  $("#exportStage").appendChild(box);
+  try {
+    await document.fonts.ready;
+    await Promise.all([...box.querySelectorAll("img")].map((im) => (im.complete ? 0 : new Promise((r) => (im.onload = im.onerror = r)))));
+    const ratio = box.scrollHeight > 9000 ? 1.25 : 2;
+    const o = { pixelRatio: ratio, backgroundColor: "#F6F4EF", width: box.scrollWidth, height: box.scrollHeight };
+    try { return await htmlToImage.toCanvas(box, o); } catch { return await htmlToImage.toCanvas(box, { ...o, skipFonts: true }); }
+  } finally { box.remove(); }
+}
+const xSave = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); };
+let jspdfReady = null;
+const loadJsPdf = () => (jspdfReady = jspdfReady || new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = "assets/jspdf.umd.min.js"; sc.onload = () => ok(window.jspdf.jsPDF); sc.onerror = no; document.head.appendChild(sc); }));
+async function xPdf(canvas, name) {
+  const jsPDF = await loadJsPdf();
+  const land = canvas.width > canvas.height * 1.1;
+  const pdf = new jsPDF({ orientation: land ? "landscape" : "portrait", unit: "pt", format: "a4", compress: true });
+  const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight(), m = 18;
+  const scale = (pw - m * 2) / canvas.width, sliceH = Math.floor((ph - m * 2) / scale);
+  for (let y = 0, k = 0; y < canvas.height; y += sliceH, k++) {
+    const h = Math.min(sliceH, canvas.height - y), part = document.createElement("canvas");
+    part.width = canvas.width; part.height = h;
+    const ctx = part.getContext("2d"); ctx.fillStyle = "#F6F4EF"; ctx.fillRect(0, 0, part.width, h); ctx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
+    if (k) pdf.addPage();
+    pdf.addImage(part.toDataURL("image/jpeg", 0.92), "JPEG", m, m, canvas.width * scale, h * scale);
+  }
+  xSave(pdf.output("blob"), name);
+}
+// CSV: every table in the section (records and the activity log come straight from the data)
+function csvOf(target) {
+  const nodes = target === "all" ? [...$(xView()).querySelectorAll("section.card")] : [target];
+  const out = [];
+  for (const n of nodes) {
+    const title = xTitle(n);
+    if (n.id === "recSec") { out.push([title], ...recordsCSV(), []); continue; }
+    if (n.id === "logSec") { out.push([title], ...logCSV(), []); continue; }
+    const tables = n.querySelectorAll("table");
+    if (tables.length) { for (const t of tables) { out.push([title]); for (const tr of t.querySelectorAll("tr")) { const cells = [...tr.children].map((c) => c.innerText.replace(/\s+/g, " ").trim()); if (cells.some(Boolean)) out.push(cells); } out.push([]); } continue; }
+    const kv = [...n.querySelectorAll(".kpi, .pfk>div, .mk>div, .hls>div")].map((k) => [k.querySelector(".l, span")?.innerText.trim() || "", k.querySelector(".v, b")?.innerText.replace(/\s+/g, " ").trim() || "", k.querySelector(".s, small, .dl")?.innerText.replace(/\s+/g, " ").trim() || ""]);
+    if (kv.length) out.push([title], ["Metric", "Value", "Note"], ...kv, []);
+    const pr = [...n.querySelectorAll(".pft2")].map((x) => [x.querySelector("b")?.innerText || "", x.querySelector("small")?.innerText || "", [...x.querySelectorAll(".ln span")].map((y) => y.innerText.trim()).join(" · ")]);
+    if (pr.length) out.push([title], ["Team member", "Days", "Mix"], ...pr, []);
+    const tk = [...n.querySelectorAll(".tkr")].map((x) => [x.querySelector(".code")?.innerText || "", x.querySelector(".tt b")?.innerText || "", x.querySelector(".who b")?.innerText || "", x.querySelector(".td")?.innerText.replace(/\s+/g, " ") || "", x.querySelector(".tks")?.innerText || ""]);
+    if (tk.length) out.push([title], ["Code", "Task", "Assigned to", "Due", "Status"], ...tk, []);
+  }
+  while (out.length && !out[out.length - 1].length) out.pop();
+  return out;
+}
+function recordsCSV() {
+  const D = V(), [a, b] = recRange();
+  const inR = (x) => { if (!x) return false; const i = dIdx(x); return i >= a && i <= b; };
+  const L = (D.requests || []).filter((r) => (inR(r.date) || inR(r.withDate)) && (inScope(r.member) || (r.withMember && inScope(r.withMember)))).sort((x, y) => x.date.localeCompare(y.date));
+  return [["Date", "Type", "Ref", "Team member", "With", "Details", "Reason", "Amount (EGP)", "Days", "Status", "Logged by", "Decided by"], ...L.map((r) => [r.date, REQ_TYPES[r.type] || r.type, r.ref || "", memName(D, r.member), r.withMember ? memName(D, r.withMember) : "", r.type === "change" ? `${r.before || ""} → ${r.after || ""}` + (r.details ? " · " + r.details : "") : r.details || "", r.reason || "", isAdj(r) ? (r.type === "deduction" ? -(+r.amount || 0) : +r.amount || 0) : "", r.days || "", stLabel(r), r.createdBy || "", r.decidedBy || ""])];
+}
+function logCSV() { return [["Date", "Time", "By", "Change"], ...(V().log || []).flatMap((e) => (e.changes || []).map((c) => [logFmt.format(new Date(e.at)), logTime.format(new Date(e.at)), (e.by && e.by.name) || "", c]))]; }
+const toCSV = (rows) => "﻿" + rows.map((r) => r.map((v) => { const t = String(v ?? ""); return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; }).join(",")).join("\n");
+async function xGo(kind) {
+  const target = XP.target; closeXMenu();
+  if (!target) return;
+  const name = `Vendoor_${xSlug(target === "all" ? xViewName() : xTitle(target))}_${cairoNow().date}`;
+  try {
+    if (kind === "csv") { const rows = csvOf(target); if (!rows.length) return toast("Nothing to export as CSV here", true); return xSave(new Blob([toCSV(rows)], { type: "text/csv;charset=utf-8" }), name + ".csv"); }
+    toast(kind === "pdf" ? "Preparing PDF…" : "Preparing image…");
+    const cv = await xCanvas(target);
+    if (kind === "png") return cv.toBlob((bl) => xSave(bl, name + ".png"), "image/png");
+    await xPdf(cv, name + ".pdf");
+  } catch (e) { toast("Couldn't export: " + (e.message || e), true); }
+}
+
+/* ============================ approvals hub ============================ */
+// Everything waiting for a decision in one place: excuses, swaps, desk changes, bonuses, deductions (approve / reject)
+// and finished tasks (review & rate). Decisions are saved straight away.
+const AP = { tab: "pending", busy: false };
+const AP_GROUPS = [["Shift swaps & desk changes", (r) => r.type === "swap" || r.type === "change"], ["Excuses & attendance", (r) => ["excuse", "late", "early", "dayoff", "other"].includes(r.type)], ["Bonuses & deductions", (r) => r.type === "bonus" || r.type === "deduction"]];
+function apCounts() {
+  const D = V(), recs = (D.requests || []).filter((r) => r.status === "pending");
+  const tasks = can("tasksReview") && TK.list ? TK.list.filter((t) => t.status === "done") : [];
+  return { recs, tasks, n: recs.length + tasks.length };
+}
+// show / hide parts of the page this account isn't allowed to see
+function renderAccess() {
+  const ap = $("#apNav"); if (!ap) return;
+  ap.classList.toggle("hidden", !(can("approve") || can("tasksReview")));
+  const n = S.me ? apCounts().n : 0, b = $("#apBadge");
+  b.textContent = n; b.classList.toggle("hidden", !n);
+  $("#logSec")?.classList.toggle("hidden", !can("log"));
+  $("#recSec")?.classList.toggle("hidden", !S.me);
+  $("#pfSec")?.classList.toggle("hidden", !S.me);
+}
+function apRow(D, r) {
+  const d = dIdx(r.date), adj = isAdj(r);
+  const what = r.type === "change" ? (() => { const pv = r.after ? null : recPreview(D, { ...r, type: "change" }); return `${esc(r.before || cellText(D, r.member, d))} → <b>${esc(r.after || (pv && pv.ok ? pv.rows[0].after : "—"))}</b>`; })() : r.type === "swap" ? (() => { const pv = recPreview(D, { ...r, withDate: r.withDate || "" }); return pv.ok ? pv.rows.map((x) => `${esc(x.name)}: ${esc(x.before)} → <b>${esc(x.after)}</b>`).join("<br>") : ""; })() : "";
+  return `<div class="apr2"><div class="dt"><b>${new Date(d * 864e5).getUTCDate()}</b><span>${DY[wdOf(d)]} · ${MON[new Date(d * 864e5).getUTCMonth()]}</span></div>
+    <div style="min-width:0"><div class="tt"><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span>${esc(reqTitle(D, r))}${r.ref ? `<span class="ref">${esc(r.ref)}</span>` : ""}</div>
+      ${adj ? `<div class="dd"><b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "—")}${r.details ? " — " + esc(r.details) : ""}</div>` : r.details ? `<div class="dd" dir="auto">${esc(r.details)}</div>` : ""}
+      ${what ? `<div class="dd apw">${what}</div>` : ""}${attThumbs(r, true)}
+      <div class="ref" style="margin-top:4px">Added by ${esc(r.createdBy || "—")}${r.createdAt ? " · " + logFmt.format(new Date(r.createdAt)) + " " + logTime.format(new Date(r.createdAt)) : ""}${r.decidedBy ? ` · ${r.status === "approved" ? "approved" : "rejected"} by ${esc(r.decidedBy)}${r.decidedAt ? " · " + logFmt.format(new Date(r.decidedAt)) : ""}` : ""}</div></div>
+    <div class="apb">${r.status === "pending" ? `<button class="btn sm" data-act="apDecide" data-id="${esc(r.id)}" data-v="rejected">Reject</button><button class="btn sm primary" data-act="apDecide" data-id="${esc(r.id)}" data-v="approved">Approve</button>` : `<span class="ss ${stClass(r)}">${stLabel(r)}</span>${canApprove() ? `<button class="btn sm ghost" data-act="apDecide" data-id="${esc(r.id)}" data-v="pending">Back to review</button>` : ""}`}</div></div>`;
+}
+function renderApprovals() {
+  if (RS.view !== "approvals") return;
+  const root = $("#apView"), D = V();
+  if (!S.me) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>Sign in to see approvals</h3><button class="btn primary" data-act="apLogin">Sign in</button></div></section>`; return; }
+  if (!(can("approve") || can("tasksReview"))) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>No access to approvals</h3><p class="muted">Ask the owner to give you <b>Approve / reject</b> in Manage → Users.</p></div></section>`; return; }
+  const { recs, tasks } = apCounts();
+  const sum = (t) => recs.filter((r) => r.type === t).reduce((x, r) => x + (+r.amount || 0), 0);
+  const decided = (D.requests || []).filter((r) => r.status !== "pending").sort((a, b) => (b.decidedAt || b.createdAt || "").localeCompare(a.decidedAt || a.createdAt || "")).slice(0, 40);
+  let h = `<div class="kpis">
+    <div class="kpi"><div class="l">Waiting for a decision</div><div class="v ${recs.length + tasks.length ? "warn" : "ok"}">${recs.length + tasks.length}</div><div class="s">${recs.length} record${recs.length === 1 ? "" : "s"} · ${tasks.length} task${tasks.length === 1 ? "" : "s"}</div></div>
+    <div class="kpi"><div class="l">Swaps &amp; desk changes</div><div class="v">${recs.filter(AP_GROUPS[0][1]).length}</div><div class="s">Reach the schedule once approved</div></div>
+    <div class="kpi"><div class="l">Bonuses pending</div><div class="v"><span class="cur">EGP</span>${fN(sum("bonus"))}</div><div class="s">${recs.filter((r) => r.type === "bonus").length} record(s)</div></div>
+    <div class="kpi"><div class="l">Deductions pending</div><div class="v"><span class="cur">EGP</span>${fN(sum("deduction"))}</div><div class="s">${recs.filter((r) => r.type === "deduction").length} record(s)</div></div></div>`;
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Decisions</div><h2>Approvals</h2><div class="sub">Approving a swap or desk change puts it on the schedule right away. Every decision is saved and logged.</div></div>
+    <div class="seg"><button class="${AP.tab === "pending" ? "active" : ""}" data-act="apTab" data-v="pending">Waiting · ${recs.length + tasks.length}</button><button class="${AP.tab === "done" ? "active" : ""}" data-act="apTab" data-v="done">Decided</button></div></div>`;
+  if (AP.tab === "pending") {
+    if (!canApprove()) h += `<div class="banner info">Your account reviews tasks only — records need <b>Approve / reject</b>.</div>`;
+    else for (const [title, f] of AP_GROUPS) {
+      const L = recs.filter(f).sort((a, b) => a.date.localeCompare(b.date));
+      h += `<div class="apg"><div class="aph"><h3>${title} <span>${L.length}</span></h3>${L.length > 1 ? `<button class="btn sm ghost" data-act="apAll" data-g="${AP_GROUPS.findIndex((g) => g[0] === title)}">Approve all ${L.length}</button>` : ""}</div>${L.map((r) => apRow(D, r)).join("") || `<div class="muted" style="font-size:12.8px;padding:6px 0 10px">Nothing waiting.</div>`}</div>`;
+    }
+    if (can("tasksReview")) h += `<div class="apg"><div class="aph"><h3>Tasks to review &amp; rate <span>${tasks.length}</span></h3></div>${!TK.list ? `<div class="muted" style="font-size:12.8px">Loading tasks…</div>` : tasks.map((t) => `<div class="apr2"><div class="dt"><b>${esc(t.code.replace("TSK-", ""))}</b><span>Task</span></div><div style="min-width:0"><div class="tt"><b dir="auto">${esc(t.title)}</b></div><div class="dd">${esc(tName(t))} · delivered ${t.doneAt ? logFmt.format(new Date(t.doneAt)) + " " + logTime.format(new Date(t.doneAt)) : "—"}${tOnTime(t) == null ? "" : tOnTime(t) ? ` · <b style="color:var(--ok)">on time</b>` : ` · <b style="color:var(--bad)">late</b>`}${(t.proof || []).length ? ` · 📎 ${t.proof.length} proof` : ""}</div></div><div class="apb"><button class="btn sm primary" data-act="apTask" data-k="${esc(t.id)}">Review &amp; rate</button></div></div>`).join("") || `<div class="muted" style="font-size:12.8px;padding:6px 0 10px">No finished tasks waiting.</div>`}</div>`;
+  } else h += decided.map((r) => apRow(D, r)).join("") || `<div class="empty">No decisions yet.</div>`;
+  root.innerHTML = h + `</section>`;
+}
+async function decideRecords(ids, v) {
+  if (!canApprove() || AP.busy) return;
+  if (dirty()) return toast("You have unsaved changes in Manage — save or discard them first", true);
+  AP.busy = true;
+  const keepOpen = S.admin.open;
+  S.draft = clone(S.data);
+  let applied = 0, missed = 0;
+  for (const id of ids) {
+    const r = S.draft.requests.find((x) => x.id === id); if (!r) continue;
+    r.status = v; r.decidedBy = S.me.name; r.decidedAt = new Date().toISOString();
+    if (v === "approved" && !r.applied && (r.type === "swap" || r.type === "change")) { (r.type === "change" ? applyChange(S.draft, r) : applySwap(S.draft, r)) ? applied++ : missed++; }
+  }
+  await save();
+  if (!keepOpen && !dirty()) S.draft = null;
+  AP.busy = false;
+  toast(`${ids.length > 1 ? ids.length + " records" : "Record"} ${v === "approved" ? "approved" : v === "rejected" ? "rejected" : "sent back to review"}${applied ? ` · ${applied} applied to the schedule` : ""}${missed ? ` · ${missed} had nothing to change` : ""}`, !!missed);
+  renderAll();
 }
 
 /* ============================ tasks (assign → send as image → proof → review & rating) ============================ */
@@ -2572,7 +2933,7 @@ async function loadTasks(quiet) {
   if (!quiet) { TK.loading = true; renderTasks(); }
   try { const j = await call("/api/tasks", "GET"); TK.list = j.tasks || []; TK.error = ""; }
   catch (e) { if (e.status === 401) { TK.loading = false; return signedOut("Please sign in again."); } TK.error = e.message; }
-  TK.loading = false; renderTasks();
+  TK.loading = false; renderTasks(); renderApprovals(); renderAccess();
   if (TK.sel && $("#modalRoot .tkm")) openTask(TK.sel);
 }
 async function tkOp(body, okMsg) {
@@ -2594,7 +2955,7 @@ function renderTasks() {
   const S0 = tkStats(inP, now), live = tkStats(all, now);
   const dueToday = all.filter((t) => OPEN.has(t.status) && t.due && dIdx(t.due) === cairoNow().idx).length;
   const [gl, gc] = grade(S0.score);
-  const mems = D.members.filter((m) => !m.former || TK.list.some((t) => t.member === m.id));
+  const mems = D.members.filter((m) => inScope(m.id) && (!m.former || TK.list.some((t) => t.member === m.id)));
   let h = `<section class="card rfilter"><div class="rctl">
     ${can("tasksManage") ? `<button class="btn primary" data-act="tkNew"><b style="font-size:16px;line-height:0">+</b>&nbsp;New task</button>` : ""}
     <label class="field">Performance period<select id="tkPeriod">${TPER.map(([k, l]) => `<option value="${k}" ${TK.period === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
@@ -2654,7 +3015,7 @@ function openTaskForm(t) {
 const attTile = (x, act, j, extra) => `<span class="attx"><button class="att" data-act="${act}" data-j="${j}"${extra || ""} title="${esc(x.name)}">${x.kind === "video" ? `<span class="vid">▶</span><span class="an">${esc(x.name)}</span>` : `<img src="${esc(fileUrl(x))}" alt="" loading="lazy">`}</button>`;
 function renderTaskForm(focus) {
   const D = V(), f = TK.form, t = f.id ? TK.list.find((x) => x.id === f.id) : null;
-  const mems = D.members.filter((m) => !m.former);
+  const mems = D.members.filter((m) => !m.former && inScope(m.id));
   $("#modalRoot").innerHTML = `<div class="overlay"><div class="modal tkf"><div class="m-head"><h3>${t ? `Edit ${esc(t.code)}` : "New task"}</h3><button class="btn ghost" data-act="closeModal">✕</button></div>
     <div class="m-body">
       <div class="field">Assign to${t ? "" : ` <span style="text-transform:none;letter-spacing:0;font-weight:500">— pick several to give each one her own copy</span>`}</div>
@@ -2917,12 +3278,14 @@ function openLogin(tab, msg) {
       const j = await call("/api/auth", "POST", { username: $("#liUser").value.trim(), password: $("#liPass").value });
       S.token = j.token; S.me = j.user; localStorage.setItem("vmo_token", S.token);
       toast(`Welcome, ${S.me.name}`); renderHeader();
-      if (tab === "__reports") { $("#modalRoot").innerHTML = ""; RS.raw = null; showView("reports"); } else if (tab === "__tasks") { $("#modalRoot").innerHTML = ""; TK.list = null; showView("tasks"); } else openAdmin(tab);
+      if (!dirty()) { S.draft = null; await load(true); } // records, report sheets and the activity log come with sign-in
+      if (tab === "__reports") { $("#modalRoot").innerHTML = ""; RS.raw = null; showView("reports"); } else if (tab === "__tasks") { $("#modalRoot").innerHTML = ""; TK.list = null; showView("tasks"); } else if (tab === "__approvals") { $("#modalRoot").innerHTML = ""; showView("approvals"); } else openAdmin(tab);
     } catch (err) { toast(err.status === 401 ? "Wrong username or password" : err.message, true); }
   };
 }
 function signedOut(msg) {
-  S.token = ""; S.me = null; S.users = null; localStorage.removeItem("vmo_token");
+  S.token = ""; S.me = null; S.users = null; localStorage.removeItem("vmo_token"); S.recAuth = false;
+  if (!dirty()) { S.draft = null; setTimeout(() => load(true), 0); }
   RS.raw = null; RS.error = ""; renderReports(); TK.list = null; TK.sel = null; renderTasks();
   const keep = S.admin.open; S.admin.open = false;
   renderHeader();
@@ -2934,13 +3297,14 @@ async function checkSession() {
   renderAll();
   if (location.hash === "#reports") showView("reports");
   if (location.hash === "#tasks") showView("tasks");
+  if (location.hash === "#approvals") showView("approvals");
 }
 async function loadUsers() {
-  try { S.users = (await call("/api/users", "GET")).users; } catch (e) { S.users = []; if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
+  try { const j = await call("/api/users", "GET"); S.users = j.users; S.ownerInfo = j.owner; } catch (e) { S.users = []; if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
   if (S.admin.open && S.admin.tab === "users") renderAdmin();
 }
 async function userAction(method, body, okMsg) {
-  try { S.users = (await call("/api/users", method, body)).users; toast(okMsg); load(true); }
+  try { const j = await call("/api/users", method, body); S.users = j.users; S.ownerInfo = j.owner; toast(okMsg); load(true); }
   catch (e) { if (e.status === 401) return signedOut("Please sign in again."); toast(e.message, true); }
   if (S.admin.open) renderAdmin();
 }
@@ -3032,20 +3396,20 @@ function requestsEditor(D) {
   const solo = f.type === "swap" && f.withMember === f.member; // same person picked twice = change her own desk / shift
   if (solo && (f.toDesk == null || f.toDesk === "keep") && f.deskA && f.deskA !== "auto") f.toDesk = f.deskA;
   f.mode = f.mode || "full"; if (f.deskA == null) f.deskA = "auto"; if (f.deskB == null) f.deskB = "auto"; if (f.toDesk == null) f.toDesk = "keep";
-  const mopts = (sel) => D.members.map((m) => `<option value="${esc(m.id)}" ${m.id === sel ? "selected" : ""}>${esc(m.name)}</option>`).join("");
+  const mopts = (sel) => D.members.filter((m) => inScope(m.id)).map((m) => `<option value="${esc(m.id)}" ${m.id === sel ? "selected" : ""}>${esc(m.name)}</option>`).join("");
   if (!canRecType(f.type)) f.type = Object.keys(REQ_TYPES).find(canRecType) || f.type;
-  if (!isOwner()) f.status = "pending";
+  if (!canApprove()) f.status = "pending";
   const adj = ADJ[f.type];
   if (adj && !adj.reasons.includes(f.reason)) f.reason = adj.reasons[0];
   const ph = { swap: "e.g. Basant asked to swap her night shift with Habiba", change: "e.g. Two on Modex-Porto Friday night — Roaa moved to WhatsApp-Styllano", deduction: "e.g. Arrived 45 min late without notice", bonus: "e.g. Covered Habiba's night shift on short notice" }[f.type] || "e.g. Family emergency — leaving at 3 PM";
   const pend = D.requests.map((r, k) => ({ r, k })).filter(({ r }) => r.status === "pending");
-  let body = isOwner() && pend.length ? `<div class="panel apq"><h4>Waiting for your approval · ${pend.length}</h4>${pend.map(({ r, k }) => `<div class="apr"><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span><div><b>${esc(reqTitle(D, r))}</b>${isAdj(r) ? ` · <b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "")}` : ""}<small>${r.details ? esc(r.details) + " · " : ""}added by ${esc(r.createdBy || "—")}${(r.attachments || []).length ? ` · 📎 ${r.attachments.length}` : ""}</small></div><div class="row"><button class="btn sm" data-act="reqDecide" data-i="${k}" data-v="rejected">Reject</button><button class="btn sm primary" data-act="reqDecide" data-i="${k}" data-v="approved">Approve</button></div></div>`).join("")}</div>` : "";
-  if (!isOwner() && pend.length) body += `<div class="banner info" style="margin-bottom:12px">${pend.length} record${pend.length === 1 ? " is" : "s are"} waiting for the owner's approval. Records you add go there too — swaps and desk changes reach the schedule once she / he approves them.</div>`;
+  let body = canApprove() && pend.length ? `<div class="panel apq"><h4>Waiting for your approval · ${pend.length}</h4>${pend.map(({ r, k }) => `<div class="apr"><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span><div><b>${esc(reqTitle(D, r))}</b>${isAdj(r) ? ` · <b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "")}` : ""}<small>${r.details ? esc(r.details) + " · " : ""}added by ${esc(r.createdBy || "—")}${(r.attachments || []).length ? ` · 📎 ${r.attachments.length}` : ""}</small></div><div class="row"><button class="btn sm" data-act="reqDecide" data-i="${k}" data-v="rejected">Reject</button><button class="btn sm primary" data-act="reqDecide" data-i="${k}" data-v="approved">Approve</button></div></div>`).join("")}</div>` : "";
+  if (!canApprove() && pend.length) body += `<div class="banner info" style="margin-bottom:12px">${pend.length} record${pend.length === 1 ? " is" : "s are"} waiting for approval. Records you add go there too — swaps and desk changes reach the schedule once they're approved.</div>`;
   body += `<div class="panel"><h4>New record</h4><div class="rqform">
     <label class="field">Type<select id="rqType">${Object.entries(REQ_TYPES).filter(([k]) => canRecType(k)).map(([k, v]) => `<option value="${k}" ${k === f.type ? "selected" : ""}>${v}</option>`).join("")}</select></label>
     <label class="field">Date<input type="date" id="rqDate" value="${esc(f.date)}"></label>
     <label class="field">Team member<select id="rqMember">${mopts(f.member)}</select></label>
-    ${isOwner() ? `<label class="field">Status<select id="rqStatus">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === f.status ? "selected" : ""}>${stLabel({ type: f.type, status: x })}</option>`).join("")}</select></label>` : `<div class="field">Status<div class="rvwnote">${stLabel({ type: f.type, status: "pending" })} — the owner approves</div></div>`}
+    ${canApprove() ? `<label class="field">Status<select id="rqStatus">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === f.status ? "selected" : ""}>${stLabel({ type: f.type, status: x })}</option>`).join("")}</select></label>` : `<div class="field">Status<div class="rvwnote">${stLabel({ type: f.type, status: "pending" })} — waiting for approval</div></div>`}
     ${f.type === "swap" ? `<label class="field">Swap with<select id="rqWith">${mopts(f.withMember)}</select></label>
     <label class="field">Their shift date (if different)<input type="date" id="rqWithDate" value="${esc(f.withDate)}"></label>` : ""}
     ${f.type === "change" || solo ? (() => { const work = D.shiftTypes.filter((x) => x.kind === "work"); return `<label class="field">New shift<select id="rqToShift"><option value="">Keep her shift</option>${D.shiftTypes.map((x) => `<option value="${esc(x.id)}" ${f.toShift === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
@@ -3064,7 +3428,7 @@ function requestsEditor(D) {
     <div style="flex:1"><div class="field" style="margin-bottom:6px">Attachments (photos or videos)</div>
       <div class="row">${(f.attachments || []).map((x, j) => `<span class="attx"><span class="att" style="width:52px;height:52px">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="">`}</span><button class="rm" data-act="rqAttDel" data-j="${j}" title="Remove">✕</button></span>`).join("")}
       <label class="btn sm">📎 Attach photo / video<input type="file" id="rqFiles" accept="image/*,video/*" multiple class="hidden"></label></div></div>
-    <div class="row" style="justify-content:flex-end">${(f.type === "swap" || f.type === "change") && isOwner() ? `<label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="rqApply" checked> Apply ${f.type === "swap" && !solo ? "the swap" : "the change"} to the schedule</label>` : ""}<button class="btn primary" data-act="reqCreate">Add record</button></div></div>
+    <div class="row" style="justify-content:flex-end">${(f.type === "swap" || f.type === "change") && canApprove() ? `<label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="rqApply" checked> Apply ${f.type === "swap" && !solo ? "the swap" : "the change"} to the schedule</label>` : ""}<button class="btn primary" data-act="reqCreate">Add record</button></div></div>
   <div id="upStatus" class="upbar ${A.upMsg ? "" : "hidden"}" style="margin-top:10px">${esc(A.upMsg || "")}</div></div>`;
   const list = D.requests.map((r, k) => ({ r, k })).sort((a, b) => (b.r.date + (b.r.createdAt || "")).localeCompare(a.r.date + (a.r.createdAt || "")));
   body += `<div class="panel"><h4>All records (${list.length})</h4>` + (list.length ? list.map(({ r, k }) => {
@@ -3075,8 +3439,8 @@ function requestsEditor(D) {
       ${A2 ? `<div class="row" style="gap:6px;margin-top:4px"><select data-path="requests.${k}.reason">${A2.reasons.map((x) => `<option ${x === r.reason ? "selected" : ""}>${x}</option>`).join("")}</select><input type="number" min="0" step="5" style="width:96px" data-path="requests.${k}.amount" data-num="1" value="${esc(r.amount || 0)}"> EGP${A2.days ? ` <input type="number" min="0" step="0.25" style="width:72px" data-path="requests.${k}.days" data-num="1" value="${esc(r.days || 0)}"> days` : ""}</div>` : ""}
       <input type="text" data-path="requests.${k}.details" value="${esc(r.details || "")}" placeholder="Details" style="width:100%;margin-top:4px">
       <div class="row" style="margin-top:6px">${(r.attachments || []).map((x, j) => `<span class="attx"><button class="att" style="width:46px;height:46px" data-act="viewAtt" data-r="${esc(r.id)}" data-j="${j}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="">`}</button><button class="rm" data-act="recAttDel" data-i="${k}" data-j="${j}" title="Remove">✕</button></span>`).join("")}<label class="btn sm ghost">📎 Attach<input type="file" class="hidden attIn" data-k="${k}" accept="image/*,video/*" multiple></label></div></div>
-    ${isOwner() ? `<select data-path="requests.${k}.status">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === r.status ? "selected" : ""}>${stLabel({ type: r.type, status: x })}</option>`).join("")}</select>` : `<span class="ss ${stClass(r)}" style="justify-self:start">${stLabel(r)}</span>`}
-    <div class="row" style="justify-content:flex-end">${r.type === "swap" || r.type === "change" ? (r.applied ? `<span class="chip-s pub">✓ Applied</span>` : isOwner() ? `<button class="btn sm" data-act="reqApply" data-i="${k}">Apply ${r.type === "swap" ? "swap" : "change"}</button>` : "") : ""}${isOwner() || (r.status === "pending" && canRecType(r.type)) ? `<button class="btn sm danger" data-act="delItem" data-path="requests" data-i="${k}">Delete</button>` : ""}</div></div>`;
+    ${canApprove() ? `<select data-path="requests.${k}.status">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === r.status ? "selected" : ""}>${stLabel({ type: r.type, status: x })}</option>`).join("")}</select>` : `<span class="ss ${stClass(r)}" style="justify-self:start">${stLabel(r)}</span>`}
+    <div class="row" style="justify-content:flex-end">${r.type === "swap" || r.type === "change" ? (r.applied ? `<span class="chip-s pub">✓ Applied</span>` : canApprove() ? `<button class="btn sm" data-act="reqApply" data-i="${k}">Apply ${r.type === "swap" ? "swap" : "change"}</button>` : "") : ""}${canApprove() || (r.status === "pending" && canRecType(r.type)) ? `<button class="btn sm danger" data-act="delItem" data-path="requests" data-i="${k}">Delete</button>` : ""}</div></div>`;
   }).join("") : `<div class="muted">No records yet.</div>`) + `</div>`;
   return body;
 }
@@ -3118,6 +3482,8 @@ function renderAdmin() {
       const ago = (t) => { if (!t) return "Never"; const d = new Date(t); return logFmt.format(d) + " · " + logTime.format(d); };
       const nu = A.nu || (A.nu = { perms: PERM_PRESETS.editor.filter(can) });
       const grid = (perms, attr, lockAll) => `<div class="pgrid">${PERM_INFO.map(([k, l, d]) => { const mine = can(k); return `<label class="${perms.includes(k) ? "on" : ""} ${mine && !lockAll ? "" : "dis"}" title="${mine ? "" : "You can't give a permission you don't have"}"><input type="checkbox" ${attr}="${k}" ${perms.includes(k) ? "checked" : ""} ${mine && !lockAll ? "" : "disabled"}><b>${l}</b><small>${d}</small></label>`; }).join("")}</div>`;
+      const mems = S.draft.members.filter((m) => !m.former && inScope(m.id));
+      const scopeBox = (scope, attr) => `<div class="field" style="margin-top:14px">Team members they can see <span style="text-transform:none;letter-spacing:0;font-weight:500">— in Reports, Tasks, Profiles and Records. Leave all off = the whole team.</span></div><div class="tkmem">${mems.map((m) => `<label class="${scope.includes(m.id) ? "on" : ""}"><input type="checkbox" ${attr}="${esc(m.id)}" ${scope.includes(m.id) ? "checked" : ""}><span class="av" style="--c:${esc(m.color)}">${esc(initials(m.name))}</span>${esc(m.name)}</label>`).join("")}</div>`;
       const presetBtns = (attr) => `<div class="row" style="gap:6px;margin:8px 0 4px"><span class="muted" style="font-size:12px">Quick set:</span>${Object.keys(PERM_PRESETS).map((k) => `<button class="btn sm ghost" data-act="permPreset" data-v="${k}" ${attr}>${roleLabel({ role: k })}</button>`).join("")}<button class="btn sm ghost" data-act="permPreset" data-v="none" ${attr}>None</button></div>`;
       body += `<div class="panel"><h4>Add user</h4><div class="rqform">
         <label class="field">Full name<input type="text" id="nuName" placeholder="e.g. Mai Ahmed" value="${esc(nu.name || "")}"></label>
@@ -3125,15 +3491,20 @@ function renderAdmin() {
         <label class="field">Password<input type="text" id="nuPass" placeholder="At least 6 characters" autocomplete="new-password" value="${esc(nu.pass || "")}"></label>
       </div>
       <div class="field" style="margin-top:14px">What this person can do</div>${presetBtns('data-u=""')}${grid(nu.perms, "data-nperm")}
-      <div class="pnote">Approving or rejecting excuses, swaps, bonuses and deductions is always the <b>owner's</b> — everyone else's records wait for your approval.</div>
+      ${scopeBox(nu.scope || [], "data-nscope")}
+      <div class="pnote">Records added by someone without <b>Approve / reject</b> wait in <b>Approvals</b> until you (or someone with that permission) decide.</div>
       <div class="row" style="justify-content:space-between;margin-top:12px"><span class="muted" style="font-size:12px">Share the username and password with the person. They sign in from the Manage button.</span><button class="btn primary" data-act="userCreate">Create user</button></div></div>
       <div class="panel"><h4>Users (${S.users.length + 1})</h4>
-        <div class="urow"><div class="uh"><div><b>${esc(S.me.username === "owner" ? S.me.name : "Owner")}</b> <span class="rb admin">Owner</span><small>@owner · built-in account · password is your PIN · everything, including approvals</small></div></div></div>
+        <div class="urow"><div class="uh"><div><b>${esc(S.ownerInfo ? S.ownerInfo.name : "Owner")}</b> <span class="rb admin">Owner</span><small>@${esc(S.ownerInfo ? S.ownerInfo.login : "owner")} · built-in account · ${S.ownerInfo && S.ownerInfo.custom ? "own password" : "password is the PIN"} · everything</small></div>
+          ${isOwner() ? `<div class="row" style="justify-content:flex-end"><button class="btn sm ${A.ownEdit ? "primary" : ""}" data-act="ownerEdit">${A.ownEdit ? "Close" : "Change sign-in"}</button></div>` : ""}</div>
+          ${isOwner() && A.ownEdit ? `<div class="uperm"><div class="rqform" style="margin-top:8px"><label class="field">Display name<input type="text" id="owName" value="${esc(S.ownerInfo ? S.ownerInfo.name : S.me.name)}"></label><label class="field">Username<input type="text" id="owLogin" autocapitalize="none" spellcheck="false" value="${esc(S.ownerInfo ? S.ownerInfo.login : "owner")}"></label><label class="field">New password<input type="password" id="owPass" placeholder="Leave empty to keep it" autocomplete="new-password"></label><label class="field">Repeat password<input type="password" id="owPass2" autocomplete="new-password"></label></div>
+            <div class="pnote">Once you set your own password the old PIN stops working, and every other device signed in as owner is signed out. Keep it somewhere safe.</div>
+            <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm primary" data-act="ownerSave">Save owner sign-in</button></div></div>` : ""}</div>
         ${S.users.map((u) => { const me = u.username === S.me.username, open = A.uOpen === u.username; return `<div class="urow" style="${u.disabled ? "opacity:.6" : ""}"><div class="uh"><div><b>${esc(u.name)}</b> <span class="rb ${u.role}">${roleLabel(u)}</span>${u.disabled ? ` <span class="rb off">Disabled</span>` : ""}
             <small>@${esc(u.username)} · ${u.perms.length} permission${u.perms.length === 1 ? "" : "s"} · last sign-in ${esc(ago(u.lastLogin))} · added ${esc(ago(u.createdAt))}${u.createdBy ? " by " + esc(u.createdBy) : ""}</small>
-            <div class="ptags">${PERM_INFO.filter(([k]) => u.perms.includes(k)).map(([, l]) => `<span>${l}</span>`).join("") || `<span class="none">No access — can only see the public dashboard</span>`}</div></div>
+            <div class="ptags">${PERM_INFO.filter(([k]) => u.perms.includes(k)).map(([, l]) => `<span>${l}</span>`).join("") || `<span class="none">No access — can only see the public dashboard</span>`}${(u.scope || []).length ? `<span class="sc2">Sees: ${u.scope.map((id) => esc(memName(S.draft, id))).join(", ")}</span>` : ""}</div></div>
           <div class="row" style="justify-content:flex-end;gap:6px">${me ? `<span class="muted" style="font-size:12px">You</span>` : `<button class="btn sm ${open ? "primary" : ""}" data-act="userPerms" data-u="${esc(u.username)}">${open ? "Close" : "Permissions"}</button><button class="btn sm" data-act="userPass" data-u="${esc(u.username)}">Reset password</button><button class="btn sm" data-act="userToggle" data-u="${esc(u.username)}">${u.disabled ? "Enable" : "Disable"}</button><button class="btn sm danger" data-act="userDelete" data-u="${esc(u.username)}">Delete</button>`}</div></div>
-          ${open && !me ? `<div class="uperm">${presetBtns(`data-u="${esc(u.username)}"`)}${grid(A.uPerms || u.perms, "data-uperm")}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm ghost" data-act="userPerms" data-u="${esc(u.username)}">Cancel</button><button class="btn sm primary" data-act="userPermSave" data-u="${esc(u.username)}">Save permissions</button></div></div>` : ""}</div>`; }).join("")}
+          ${open && !me ? `<div class="uperm">${presetBtns(`data-u="${esc(u.username)}"`)}${grid(A.uPerms || u.perms, "data-uperm")}${scopeBox(A.uScope || u.scope || [], "data-uscope")}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm ghost" data-act="userPerms" data-u="${esc(u.username)}">Cancel</button><button class="btn sm primary" data-act="userPermSave" data-u="${esc(u.username)}">Save permissions</button></div></div>` : ""}</div>`; }).join("")}
       </div>`;
     }
   } else if (A.tab === "settings") {
@@ -3188,6 +3559,9 @@ function keepNu() { const A = S.admin, nu = A.nu || (A.nu = { perms: [] }); if (
 document.addEventListener("change", (e) => {
   const np = e.target.closest("[data-nperm]"), up = e.target.closest("[data-uperm]");
   if (np) { const nu = keepNu(), k = np.dataset.nperm; nu.perms = np.checked ? [...new Set([...nu.perms, k])] : nu.perms.filter((x) => x !== k); return renderAdmin(); }
+  const ns = e.target.closest("[data-nscope]"), us = e.target.closest("[data-uscope]");
+  if (ns) { const nu = keepNu(), k = ns.dataset.nscope, cur = nu.scope || []; nu.scope = ns.checked ? [...new Set([...cur, k])] : cur.filter((x) => x !== k); return renderAdmin(); }
+  if (us) { const u = S.users.find((x) => x.username === S.admin.uOpen), k = us.dataset.uscope, cur = S.admin.uScope || (u.scope || []).slice(); S.admin.uScope = us.checked ? [...new Set([...cur, k])] : cur.filter((x) => x !== k); return renderAdmin(); }
   if (up) { const u = S.users.find((x) => x.username === S.admin.uOpen), k = up.dataset.uperm, cur = S.admin.uPerms || u.perms.slice(); S.admin.uPerms = up.checked ? [...new Set([...cur, k])] : cur.filter((x) => x !== k); return renderAdmin(); }
   const lf = e.target.closest("#logUser");
   if (lf) { S.logUser = lf.value; renderLog(); }
@@ -3222,6 +3596,11 @@ document.addEventListener("input", (e) => {
 document.addEventListener("change", (e) => {
   if (e.target.id === "repFrom" || e.target.id === "repTo") { RS.from = $("#repFrom").value; RS.to = $("#repTo").value; RS.preset = "custom"; return renderReports(); }
   if (e.target.id === "repPreset") { RS.preset = e.target.value; if (RS.preset === "custom") { const r = repRange(); RS.from = RS.from || iDate(r.a); RS.to = RS.to || iDate(r.b); } return renderReports(); }
+  if (["recMode", "recMonth", "recFrom", "recTo", "recType", "recMem"].includes(e.target.id)) {
+    const v = e.target.value;
+    if (e.target.id === "recMode") REC.mode = v; else if (e.target.id === "recMonth") REC.month = v; else if (e.target.id === "recFrom") REC.from = v; else if (e.target.id === "recTo") REC.to = v; else if (e.target.id === "recType") REC.type = v; else REC.mem = v;
+    return renderRequests();
+  }
   if (e.target.id === "pfPeriod" || e.target.id === "pfFrom" || e.target.id === "pfTo") {
     if (e.target.id === "pfPeriod") { PF.period = e.target.value; if (PF.period === "custom" && !PF.from) { const r = pfRange(); PF.from = iDate(r[0]); PF.to = iDate(r[1]); } }
     else { PF[e.target.id === "pfFrom" ? "from" : "to"] = e.target.value; PF.period = "custom"; }
@@ -3265,11 +3644,14 @@ document.addEventListener("click", async (e) => {
   const act = el.dataset.act, D = S.draft, p = el.dataset.path, i = +el.dataset.i;
   const R = () => renderAll();
   const wkKey = () => iDate(viewWS());
+  if (act === "xMenu") return xMenu(el, el.closest("section.card"));
+  if (act === "xAll") return xMenu(el, "all");
+  if (act === "xGo") return xGo(el.dataset.v);
   if (act.startsWith("tk")) return tkAction(act, el, e);
   if (act.startsWith("pf") || act === "recImg") return pfAction(act, el, e);
   switch (act) {
     case "overlay": if (e.target === el) closeAdmin(); return;
-    case "view": if ((el.dataset.v === "reports" || el.dataset.v === "tasks") && !S.me) return openLogin("__" + el.dataset.v); return showView(el.dataset.v);
+    case "view": if (["reports", "tasks", "approvals"].includes(el.dataset.v) && !S.me) return openLogin("__" + el.dataset.v); return showView(el.dataset.v);
     case "repLogin": return openLogin("__reports");
     case "repReset": Object.assign(RS, { preset: "thisMonth", cmp: "prev", mem: "", shift: "", from: "", to: "", fmem: "", fq: "" }); return renderReports();
     case "repRefresh": return loadReports(true);
@@ -3385,7 +3767,7 @@ document.addEventListener("click", async (e) => {
       const f = S.admin.rq;
       if (!f.date) return toast("Pick a date", true);
       if (!canRecType(f.type)) return toast("Your account can't add this type of record", true);
-      if (!isOwner()) f.status = "pending";
+      if (!canApprove()) f.status = "pending";
       const solo = f.type === "swap" && f.member === f.withMember;
       const r = { id: uid("r"), type: solo ? "change" : f.type, date: f.date, member: f.member, details: f.details.trim(), status: f.status, createdAt: new Date().toISOString(), createdBy: S.me ? S.me.name : "" };
       if (f.type === "swap" && !solo) { r.withMember = f.withMember; if (f.withDate && f.withDate !== f.date) r.withDate = f.withDate; if (f.mode && f.mode !== "full") r.mode = f.mode; if (f.deskA !== "auto") r.deskA = f.deskA; if (f.deskB !== "auto") r.deskB = f.deskB; }
@@ -3403,32 +3785,45 @@ document.addEventListener("click", async (e) => {
       if (S.admin.upMsg) return toast("Wait for the upload to finish", true);
       if ((f.attachments || []).length) r.attachments = clone(f.attachments);
       D.requests.push(r);
-      if (r.type === "swap" && isOwner() && $("#rqApply")?.checked) { const ok = applySwap(D, r); toast(ok ? "Swap applied to the schedule" : "Record added — no shifts to swap on that date (is the week created?)", !ok); }
-      if (r.type === "change") { if (isOwner() && $("#rqApply")?.checked) { const ok = applyChange(D, r); toast(ok ? "Change applied to the schedule" : "Record added — she has no shift that day to change (is the week created?)", !ok); } else { const T = clone({ ...D, requests: [] }), x = clone(r); applyChange(T, x); r.after = x.after; } }
+      if (r.type === "swap" && canApprove() && $("#rqApply")?.checked) { const ok = applySwap(D, r); toast(ok ? "Swap applied to the schedule" : "Record added — no shifts to swap on that date (is the week created?)", !ok); }
+      if (r.type === "change") { if (canApprove() && $("#rqApply")?.checked) { const ok = applyChange(D, r); toast(ok ? "Change applied to the schedule" : "Record added — she has no shift that day to change (is the week created?)", !ok); } else { const T = clone({ ...D, requests: [] }), x = clone(r); applyChange(T, x); r.after = x.after; } }
       S.admin.rq = null; return R();
     }
     case "rqAttDel": S.admin.rq.attachments.splice(+el.dataset.j, 1); return R();
     case "recAttDel": if (confirm("Remove this attachment from the record?")) D.requests[i].attachments.splice(+el.dataset.j, 1); return R();
-    case "openApprovals": return openAdmin("requests");
+    case "openApprovals": return showView("approvals");
+    case "apLogin": return openLogin("__approvals");
+    case "apTab": AP.tab = el.dataset.v; return renderApprovals();
+    case "apDecide": return decideRecords([el.dataset.id], el.dataset.v);
+    case "apAll": { const g = AP_GROUPS[+el.dataset.g], L = (V().requests || []).filter((r) => r.status === "pending" && g[1](r)); if (L.length && confirm(`Approve all ${L.length} — ${g[0].toLowerCase()}?`)) return decideRecords(L.map((r) => r.id), "approved"); return; }
+    case "apTask": TK.rate = 0; return openTask(el.dataset.k);
     case "reqDecide": {
-      if (!isOwner()) return;
-      const r = D.requests[i]; r.status = el.dataset.v;
+      if (!canApprove()) return;
+      const r = D.requests[i]; r.status = el.dataset.v; r.decidedBy = S.me.name; r.decidedAt = new Date().toISOString();
       if (r.status === "approved" && !r.applied && (r.type === "swap" || r.type === "change")) { const ok = r.type === "change" ? applyChange(D, r) : applySwap(D, r); toast(ok ? "Approved and applied to the schedule — Save changes" : "Approved — nothing to change on that date", !ok); }
       else toast(`${r.status === "approved" ? "Approved" : "Rejected"} — Save changes to confirm`);
       return R();
     }
     case "reqApply": {
-      if (!isOwner()) return; const r = D.requests[i], ok = r.type === "change" ? applyChange(D, r) : applySwap(D, r); toast(ok ? (r.type === "change" ? "Change applied to the schedule" : "Swap applied to the schedule") : "Nothing to change on that date", !ok); return R(); }
+      if (!canApprove()) return; const r = D.requests[i], ok = r.type === "change" ? applyChange(D, r) : applySwap(D, r); toast(ok ? (r.type === "change" ? "Change applied to the schedule" : "Swap applied to the schedule") : "Nothing to change on that date", !ok); return R(); }
     case "logout": e.preventDefault(); if (dirty() && !confirm("Sign out and discard unsaved changes?")) return; S.draft = null; S.admin.open = false; $("#modalRoot").innerHTML = ""; signedOut(); toast("Signed out"); return renderAll();
     case "userCreate": {
       const nu = S.admin.nu || { perms: [] };
-      const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), perms: nu.perms, password: $("#nuPass").value };
+      const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), perms: nu.perms, scope: nu.scope || [], password: $("#nuPass").value };
       if (!body.name || !body.username || !body.password) return toast("Fill in name, username and password", true);
       S.admin.nu = null;
       return userAction("POST", body, `User @${body.username} created`);
     }
-    case "userPerms": { const u = el.dataset.u; S.admin.uOpen = S.admin.uOpen === u ? null : u; S.admin.uPerms = null; return renderAdmin(); }
-    case "userPermSave": { const u = S.users.find((x) => x.username === el.dataset.u); const perms = S.admin.uPerms || u.perms; S.admin.uOpen = null; S.admin.uPerms = null; return userAction("PATCH", { username: u.username, perms }, `Permissions saved for ${u.name}`); }
+    case "userPerms": { const u = el.dataset.u; S.admin.uOpen = S.admin.uOpen === u ? null : u; S.admin.uPerms = null; S.admin.uScope = null; return renderAdmin(); }
+    case "userPermSave": { const u = S.users.find((x) => x.username === el.dataset.u); const perms = S.admin.uPerms || u.perms, scope = S.admin.uScope || u.scope || []; S.admin.uOpen = null; S.admin.uPerms = null; S.admin.uScope = null; return userAction("PATCH", { username: u.username, perms, scope }, `Access saved for ${u.name}`); }
+    case "ownerEdit": S.admin.ownEdit = !S.admin.ownEdit; return renderAdmin();
+    case "ownerSave": {
+      const body = { owner: true, name: $("#owName").value.trim(), login: $("#owLogin").value.trim().toLowerCase() }, pw = $("#owPass").value;
+      if (pw || $("#owPass2").value) { if (pw.length < 8) return toast("The owner password must be at least 8 characters", true); if (pw !== $("#owPass2").value) return toast("The two passwords don't match", true); body.password = pw; }
+      try { const j = await call("/api/users", "PATCH", body); S.users = j.users; S.ownerInfo = j.owner; if (j.token) { S.token = j.token; localStorage.setItem("vmo_token", S.token); } S.me.name = j.owner.name; S.admin.ownEdit = false; toast(body.password ? "Owner sign-in saved — use the new password from now on" : "Owner sign-in saved"); load(true); }
+      catch (e) { toast(e.message, true); }
+      return renderAdmin();
+    }
     case "permPreset": {
       const v = el.dataset.v, list = v === "none" ? [] : PERM_PRESETS[v].filter(can);
       if (el.dataset.u) S.admin.uPerms = list; else { keepNu(); S.admin.nu.perms = list; }
@@ -3451,6 +3846,7 @@ $("#dayToday").onclick = () => { S.dayView = null; renderDay(); };
 $("#dayCopy").onclick = async () => { try { await navigator.clipboard.writeText(dayText(V(), S.dayView ?? curIdx())); toast("Copied — paste it in the team group"); } catch { toast("Couldn't copy", true); } };
 $("#wkPrev").onclick = () => { setOffset(S.weekOffset - 1); renderAll(); };
 $("#wkNext").onclick = () => { S.weekOffset++; renderAll(); };
+$("#wkToday").onclick = () => { S.weekOffset = 0; renderAll(); };
 $("#wkSelect").onchange = (e) => { setOffset((dIdx(e.target.value) - wkStart(V(), curIdx())) / 7); renderAll(); };
 $("#wkExport").onclick = async () => {
   const D = V(), ws = viewWS(); if (!weekAt(D, ws)) return toast("Create this week first", true); toast("Preparing image…");
@@ -3467,6 +3863,7 @@ setInterval(() => { if (!S.admin.open) load(true); }, 120000);
 setInterval(() => { if (RS.view === "reports" && S.me && !RS.loading && (!RS.raw || !RS.raw.fetchedAt || Date.now() - new Date(RS.raw.fetchedAt) > 10 * 60e3)) loadReports(); }, 60000);
 if (location.hash === "#reports" && !S.token) showView("reports");
 if (location.hash === "#tasks" && !S.token) showView("tasks");
+if (location.hash === "#approvals" && !S.token) showView("approvals");
 setInterval(() => { if (RS.view === "tasks" && S.me && !TK.busy && !$("#modalRoot .tkf")) loadTasks(true); }, 120000);
 renderAll();
 load();

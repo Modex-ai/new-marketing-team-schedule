@@ -8,17 +8,20 @@ export const USERS = 'marketing-ops/users';
 export const ROLES = ['admin', 'editor', 'viewer', 'custom'];
 // What each signed-in account may do. The built-in "owner" account has everything, plus approving / rejecting records
 // (that one is owner-only and can't be given to anyone else).
-export const PERMS = ['schedule', 'setup', 'settings', 'records', 'money', 'reports', 'sources', 'tasks', 'tasksManage', 'tasksReview', 'users'];
+export const PERMS = ['schedule', 'setup', 'settings', 'records', 'money', 'approve', 'reports', 'sources', 'tasks', 'tasksManage', 'tasksReview', 'log', 'users'];
 export const PRESETS = {
   admin: PERMS,
-  editor: PERMS.filter((p) => !['users', 'sources', 'settings', 'setup'].includes(p)),
+  editor: PERMS.filter((p) => !['users', 'sources', 'settings', 'setup', 'approve'].includes(p)),
   viewer: ['reports', 'tasks'],
 };
 // accounts made before permissions existed keep what they could do then (admin = everything, editor = all but users & sheets)
-const LEGACY = { admin: PERMS, editor: PERMS.filter((p) => !['users', 'sources'].includes(p)) };
+const LEGACY = { admin: PERMS, editor: PERMS.filter((p) => !['users', 'sources', 'approve'].includes(p)) };
 export const permsOf = (u) => (Array.isArray(u.perms) ? u.perms.filter((p) => PERMS.includes(p)) : LEGACY[u.role] || PRESETS.viewer);
 export const can = (me, p) => !!me && (me.owner || (me.perms || []).includes(p));
-export const sessionUser = (u) => ({ username: u.username, name: u.name, role: u.role, perms: permsOf(u), owner: false });
+// scope = the team members this account may see in Reports, Tasks and Profiles (empty = everyone)
+export const scopeOf = (u) => (Array.isArray(u.scope) ? u.scope.filter((x) => typeof x === 'string' && x).slice(0, 100) : []);
+export const inScope = (me, memberId) => !me || me.owner || !(me.scope || []).length || me.scope.includes(memberId);
+export const sessionUser = (u) => ({ username: u.username, name: u.name, role: u.role, perms: permsOf(u), scope: scopeOf(u), owner: false });
 const SESSION_HOURS = 24;
 
 /* ---------- JSON documents in Blob (each save is a new version; old versions are trimmed) ---------- */
@@ -69,13 +72,15 @@ export const ownerName = () => process.env.OWNER_NAME || 'Owner';
 export async function userFromToken(token) {
   const p = verifyToken(token);
   if (!p) return null;
-  if (p.u === 'owner') return ownerUser();
-  const users = (await readJSON(USERS))?.users || [];
+  const doc = (await readJSON(USERS)) || {};
+  if (p.u === 'owner') { const o = doc.owner || {}; if (o.pwChangedAt && p.iat < o.pwChangedAt) return null; return ownerUser(o); }
+  const users = doc.users || [];
   const u = users.find((x) => x.username === p.u);
   if (!u || u.disabled || (u.pwChangedAt && p.iat < u.pwChangedAt)) return null; // disabled or password reset → session ends
   return sessionUser(u);
 }
-export const ownerUser = () => ({ username: 'owner', name: ownerName(), role: 'owner', perms: [...PERMS, 'approve'], owner: true });
+// The built-in owner account. Its sign-in name and password can be changed from Manage → Users (stored in the users doc).
+export const ownerUser = (o = {}) => ({ username: 'owner', login: o.username || 'owner', name: o.name || ownerName(), role: 'owner', perms: [...PERMS], scope: [], owner: true });
 export function bearer(req) {
   const h = String(req.headers.authorization || '');
   return h.startsWith('Bearer ') ? h.slice(7) : '';

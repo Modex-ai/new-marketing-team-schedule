@@ -18,12 +18,14 @@ export default async function handler(req, res) {
     const uname = String(username).trim().toLowerCase();
     const now = Date.now();
 
-    if (uname === 'owner') {
-      if (process.env.ADMIN_PIN && String(password) === String(process.env.ADMIN_PIN)) {
-        return res.status(200).json({ token: signToken({ u: 'owner', iat: now }), user: ownerUser() });
-      }
+    const doc = (await readJSON(USERS)) || { users: [] };
+    const o = doc.owner || {}, ownerLogin = o.username || 'owner';
+    if (uname === ownerLogin) {
+      // the owner's own password once set; until then the ADMIN_PIN
+      const ok = o.hash ? checkPassword(password, o.salt, o.hash) : !!process.env.ADMIN_PIN && String(password) === String(process.env.ADMIN_PIN);
+      if (ok) return res.status(200).json({ token: signToken({ u: 'owner', iat: now }), user: ownerUser(o) });
     } else {
-      const doc = (await readJSON(USERS)) || { users: [] };
+      doc.users = doc.users || [];
       const u = doc.users.find((x) => x.username === uname);
       if (u && !u.disabled && checkPassword(password, u.salt, u.hash)) {
         u.lastLogin = new Date(now).toISOString();
