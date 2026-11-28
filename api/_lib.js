@@ -39,7 +39,7 @@ const SESSION_HOURS = 24;
 const MEM = new Map(); // name → { at, data, etag }
 const copy = (x) => (x == null ? x : JSON.parse(JSON.stringify(x)));
 const paused = (e) => /\b403\b|suspend|blocked|limit/i.test(String((e && e.message) || e));
-const storeErr = (e) => (paused(e) ? Object.assign(new Error("The dashboard's storage is paused — the Vercel Blob usage limit was reached. The owner needs to upgrade the Vercel plan (or wait for the monthly reset)."), { status: 503 }) : e);
+const storeErr = (e) => (paused(e) ? Object.assign(new Error('Temporarily unavailable — please try again later.'), { status: 503 }) : e);
 let legacyDone = false;
 async function migrateLegacy() { // one list() for everything, the first time a fixed-path document is missing
   if (legacyDone) return; legacyDone = true;
