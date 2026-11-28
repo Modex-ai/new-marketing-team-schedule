@@ -605,6 +605,25 @@ tr.cdays .offl{text-decoration:underline dotted var(--bad);text-underline-offset
 .rqpv>div:last-child{border-bottom:none}.rqpv span{color:var(--muted)}.rqpv .b4{text-decoration:line-through;text-decoration-color:#C9B9A6}.rqpv i{font-style:normal;color:var(--gold);font-weight:800}
 .rqpv .af{color:var(--deep);font-weight:700}.rqpv .af.same{color:var(--muted);font-weight:500}
 @media (max-width:640px){.swm{grid-template-columns:1fr}.rqpv>div{grid-template-columns:1fr 1fr}.rqpv i{display:none}}
+.rvwnote{font-size:12.5px;font-weight:600;color:var(--warn);background:var(--warn-bg);border-radius:9px;padding:9px 11px;text-transform:none;letter-spacing:0;margin-top:4px}
+.apq{border-color:#E9D3A4!important;background:linear-gradient(180deg,#FFFBF2,#fff)!important}
+.apr{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line-2)}
+.apr:last-child{border-bottom:none}.apr b{font-size:13px}.apr small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+@media (max-width:640px){.apr{grid-template-columns:1fr}}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.pgrid label{display:block;border:1px solid var(--line);border-radius:12px;padding:9px 11px 9px 34px;position:relative;cursor:pointer;background:#fff;transition:all .12s}
+.pgrid label input{position:absolute;left:11px;top:11px;accent-color:var(--brand);width:15px;height:15px}
+.pgrid label.on{border-color:var(--brand);background:var(--pale-2)}
+.pgrid label.dis{opacity:.5;cursor:not-allowed}
+.pgrid b{display:block;font-size:13px;color:var(--deep)}.pgrid small{display:block;font-size:11.3px;color:var(--muted);line-height:1.4;margin-top:2px}
+.pnote{margin-top:10px;font-size:12px;color:var(--ink-2);background:var(--pale-3);border-radius:10px;padding:8px 12px}
+.urow{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;background:#fff}
+.uh{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.uh small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
+.ptags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.ptags span{font-size:11px;font-weight:700;background:var(--pale-2);color:var(--brand);border-radius:999px;padding:3px 9px}.ptags span.none{background:var(--line-2);color:var(--muted)}
+.uperm{border-top:1px dashed var(--line);margin-top:12px;padding-top:6px}
+.rb.viewer,.rb.custom{background:var(--line-2);color:var(--ink-2)}
+@media (max-width:900px){.pgrid{grid-template-columns:1fr 1fr}}@media (max-width:560px){.pgrid{grid-template-columns:1fr}}
 /* ---------- team profiles ---------- */
 .pfctl select,.pfctl input{font-size:13px;padding:7px 10px}
 .pfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
@@ -1205,7 +1224,7 @@ function renderHeader() {
   $("#clockDate").textContent = `${DAYS[wdOf(n.idx)]}, ${dmy(n.idx, 1)} · Cairo`;
   const uc = $("#userChip");
   uc.classList.toggle("hidden", !S.me);
-  if (S.me) uc.innerHTML = `<div class="uav">${esc(initials(S.me.name))}</div><div><b>${esc(S.me.name)}</b><small>${S.me.role === "admin" ? "Admin" : "Editor"} · <a href="#" data-act="logout" style="color:inherit">Sign out</a></small></div>`;
+  if (S.me) uc.innerHTML = `<div class="uav">${esc(initials(S.me.name))}</div><div><b>${esc(S.me.name)}</b><small>${roleLabel(S.me)} · <a href="#" data-act="logout" style="color:inherit">Sign out</a></small></div>`;
 }
 function renderKpis() {
   const D = V(), n = cairoNow(), ci = opIdx(D, n), st = weekStats(D, wkStart(D, ci)), mem = st.mem;
@@ -1280,7 +1299,7 @@ function renderDay() {
   $("#timeline").innerHTML = h;
 }
 function weekTableHTML(D, ws) {
-  const st = weekStats(D, ws), ci = curIdx(), edit = !!S.me;
+  const st = weekStats(D, ws), ci = curIdx(), edit = can("schedule");
   let h = `<thead><tr><th>Team member</th>`;
   for (let k = 0; k < 7; k++) { const i = ws + k; h += `<th class="${i === ci ? "today" : ""}">${DY[wdOf(i)]}<span class="dd">${dmy(i)}</span></th>`; }
   h += `<th>Hours</th></tr></thead><tbody>`;
@@ -1306,7 +1325,7 @@ function renderWeek() {
   const D = V(), ws = viewWS(), created = !!weekAt(D, ws);
   $("#wkTitle").textContent = `${dmy(ws)} – ${dmy(ws + 6, 1)}`;
   $("#wkSub").innerHTML = (S.weekOffset === 0 ? "This week · " : S.weekOffset === 1 ? "Next week · " : S.weekOffset === -1 ? "Last week · " : "") +
-    (created ? `<span class="chip-s pub">● Published week</span>${S.me ? ` <span class="muted" style="font-size:12px">· click any cell to edit</span>` : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
+    (created ? `<span class="chip-s pub">● Published week</span>${can("schedule") ? ` <span class="muted" style="font-size:12px">· click any cell to edit</span>` : ""}` : `<span class="chip-s tpl">Not created yet</span>`);
   $("#wkBody").innerHTML = created ? `<div class="tblw"><table class="wk">${weekTableHTML(D, ws)}</table></div>` : `<div class="empty">This week hasn't been created yet.<br><button class="btn sm primary" style="margin-top:10px" data-act="openCreate">Create this week</button></div>`;
   $("#wkPrev").disabled = S.weekOffset <= minOffset();
   $("#wkExport").disabled = !created;
@@ -1375,6 +1394,28 @@ function dayText(D, i) {
   const note = dayNote(D, i); if (note) t += `\nNote: ${note}\n`;
   return t.trim();
 }
+
+/* ============================ permissions ============================ */
+// The built-in "owner" account can do everything, and is the only one who approves / rejects records.
+// Other accounts get the permissions the owner (or a user manager) ticks for them in Manage → Users.
+const PERM_INFO = [
+  ["schedule", "Edit the schedule", "Week editor, new weeks, editing cells"],
+  ["setup", "Team & setup", "Team members, shift types, desks, time slots"],
+  ["settings", "Settings", "Week start, day switch time, report rules"],
+  ["records", "Excuses & shift changes", "Add excuses, late / early, swaps, desk changes — sent for the owner's approval"],
+  ["money", "Bonuses & deductions", "Add bonuses and deductions — sent for the owner's approval"],
+  ["reports", "View team reports", "Sales, feedback, report discipline"],
+  ["sources", "Manage report sheets", "Add or change the team's Google Sheets"],
+  ["tasks", "View tasks", "See the task board and task scores"],
+  ["tasksManage", "Assign & manage tasks", "Create, edit, attach proof, mark done, cancel"],
+  ["tasksReview", "Review & rate tasks", "Approve, return for rework, rate"],
+  ["users", "Manage users", "Add users and set their permissions"],
+];
+const PERM_PRESETS = { admin: PERM_INFO.map((x) => x[0]), editor: ["schedule", "records", "money", "reports", "tasks", "tasksManage", "tasksReview"], viewer: ["reports", "tasks"] };
+const isOwner = () => !!(S.me && S.me.owner);
+const can = (p) => !!(S.me && (S.me.owner || (S.me.perms || []).includes(p)));
+const roleLabel = (u) => (u.owner || u.role === "owner" ? "Owner" : { admin: "Admin", editor: "Editor", viewer: "Viewer" }[u.role] || "Custom access");
+const canRecType = (t) => can(t === "bonus" || t === "deduction" ? "money" : "records");
 
 /* ============================ excuses, swaps, deductions & bonuses ============================ */
 const REQ_TYPES = { swap: "Shift swap", change: "Shift / desk change", excuse: "Excuse / absence", late: "Late arrival", early: "Early leave", dayoff: "Day-off change", deduction: "Deduction", bonus: "Bonus", other: "Other" };
@@ -1539,7 +1580,8 @@ function renderRequests() {
   const inWeek = (s) => { if (!s) return false; const i = dIdx(s); return i >= ws && i <= ws + 6; };
   const list = (D.requests || []).filter((r) => inWeek(r.date) || inWeek(r.withDate)).sort((a, b) => a.date.localeCompare(b.date) || (a.createdAt || "").localeCompare(b.createdAt || ""));
   $("#reqSub").textContent = `${dmy(ws)} – ${dmy(ws + 6, 1)} · ${list.length} record${list.length === 1 ? "" : "s"}`;
-  $("#reqList").innerHTML = adjSummaryHTML(D, ws) + (list.length ? `<div class="reqs">${list.map((r) => {
+  const pend = (D.requests || []).filter((r) => r.status === "pending").length;
+  $("#reqList").innerHTML = (isOwner() && pend ? `<div class="banner warn" style="margin-bottom:12px"><b>${pend} record${pend === 1 ? "" : "s"} waiting for your approval.</b> <button class="btn sm primary" style="margin-left:8px" data-act="openApprovals">Review now</button></div>` : "") + adjSummaryHTML(D, ws) + (list.length ? `<div class="reqs">${list.map((r) => {
     const d = dIdx(r.date), adj = isAdj(r);
     return `<div class="req"><div class="dt"><b>${new Date(d * 864e5).getUTCDate()}</b><span>${DY[wdOf(d)]} · ${MON[new Date(d * 864e5).getUTCMonth()]}</span></div>
       <div><div class="tt"><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span>${esc(reqTitle(D, r))}${r.ref ? `<span class="ref">${esc(r.ref)}</span>` : ""}${r.type === "swap" && r.applied ? ` <span class="chip-s pub">Applied to schedule</span>` : ""}${(r.attachments || []).length ? `<span class="ref">📎 ${r.attachments.length}</span>` : ""}</div>
@@ -1993,6 +2035,7 @@ function renderReports() {
   if (RS.view !== "reports") return;
   const D = V(), root = $("#repView");
   if (!S.me) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>Sign in to view team reports</h3><p class="muted">Reports show sales and feedback from the team's Google Sheets, so they're for signed-in managers only.</p><button class="btn primary" data-act="repLogin">Sign in</button></div></section>`; return; }
+  if (!can("reports")) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>No access to Team Reports</h3><p class="muted">Your account doesn't include viewing reports. Ask the owner to give you <b>View team reports</b> in Manage → Users.</p></div></section>`; return; }
   const raw = RS.raw;
   if (!raw && RS.loading) { root.innerHTML = `<section class="card"><div class="empty">Loading the team's sheets…</div></section>`; return; }
   if (raw && raw.configured === false) {
@@ -2099,7 +2142,7 @@ function renderReports() {
       <div><p class="fbt ${open ? "open" : ""}" dir="auto" data-act="repFbOpen" data-id="${esc(id)}">${hilite(r.fb, RS.fq)}</p>${!open && (r.fb.length > 260 || r.fb.split("\n").length > 5) ? `<button class="more" data-act="repFbOpen" data-id="${esc(id)}">Read more</button>` : ""}</div></div>`; }).join("") || `<div class="empty">No feedback ${RS.fq || RS.fmem ? "matches this filter" : "in this period"}.</div>`}
     ${fb.length > 12 ? `<button class="btn sm" style="margin-top:12px" data-act="repFbAll">${RS.feedAll ? "Show less" : `Show all ${fb.length}`}</button>` : ""}</section>`;
   // sources
-  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Sources</div><h2>Team Sheets</h2><div class="sub">Each girl's own Google Sheet. Add or change sheets from Manage → Reports.</div></div>${S.me.role === "admin" ? `<button class="btn sm" data-act="repSources">Manage sheets</button>` : ""}</div>
+  h += `<section class="card"><div class="sh"><div><div class="eyebrow">Sources</div><h2>Team Sheets</h2><div class="sub">Each girl's own Google Sheet. Add or change sheets from Manage → Reports.</div></div>${can("sources") ? `<button class="btn sm" data-act="repSources">Manage sheets</button>` : ""}</div>
     <table class="stbl"><thead><tr><th>Sheet</th><th>Linked to</th><th>Rows</th><th>Last edited</th><th>Status</th><th></th></tr></thead><tbody>${all.map((p) => `<tr><td style="white-space:normal">${esc(p.title || "—")}</td><td><span class="row" style="gap:7px;flex-wrap:nowrap"><span class="dot" style="--c:${esc(p.color)}"></span>${esc(p.name)}${p.m ? "" : ` <span class="muted">(not on the schedule)</span>`}</span></td><td>${p.loaded ? p.rows.length : "—"}</td><td>${p.updated ? logFmt.format(new Date(p.updated)) : "—"}</td><td>${p.error ? `<span class="stale bad" title="${esc(p.error)}">Error</span>` : p.loaded ? `<span class="stale ok">Connected</span>` : `<span class="stale warn">Waiting</span>`}</td><td><a class="btn sm ghost" href="${esc(p.url)}" target="_blank" rel="noopener">Open ↗</a></td></tr>`).join("")}</tbody></table></section>`;
   const fq = document.activeElement && document.activeElement.id === "repFq" ? [document.activeElement.selectionStart] : null;
   root.innerHTML = h;
@@ -2240,7 +2283,7 @@ function repDetail(key, tab) {
 }
 
 async function loadReports(force) {
-  if (!S.me) return renderReports();
+  if (!S.me || !can("reports")) return renderReports();
   RS.loading = true; renderReports();
   try { const j = await call("/api/reports" + (force ? "?force=1" : ""), "GET"); RS.raw = j; RS.error = j.error || ""; }
   catch (e) { if (e.status === 401) { RS.loading = false; return signedOut("Please sign in again."); } RS.error = e.message; }
@@ -2253,14 +2296,14 @@ function showView(v) {
   $("#tkView").classList.toggle("hidden", v !== "tasks");
   document.querySelectorAll(".views button").forEach((b) => b.classList.toggle("active", b.dataset.v === v));
   history.replaceState(null, "", v === "reports" || v === "tasks" ? "#" + v : location.pathname + location.search);
-  if (v === "reports") { renderReports(); if (!RS.raw && !RS.loading) loadReports(); if (!TK.list && S.me) loadTasks(true); }
-  if (v === "tasks") { renderTasks(); if (S.me) loadTasks(!!TK.list); }
+  if (v === "reports") { renderReports(); if (!RS.raw && !RS.loading && can("reports")) loadReports(); if (!TK.list && can("tasks")) loadTasks(true); }
+  if (v === "tasks") { renderTasks(); if (can("tasks") || can("tasksManage")) loadTasks(!!TK.list); }
   window.scrollTo({ top: 0 });
 }
 function sourcesEditor(D) {
-  const admin = S.me && S.me.role === "admin", people = repModel();
-  let h = `<div class="panel"><div class="row" style="align-items:end"><label class="field">Report due after shift ends (minutes)<input type="number" min="0" step="15" data-num="1" data-path="settings.reportGrace" value="${esc(D.settings.reportGrace ?? 60)}" ${admin ? "" : "disabled"}></label><span class="muted" style="font-size:12px;padding-bottom:9px">Written within this time = on time. After it = late. Nothing by then = missing.</span></div></div>
-  <p class="muted" style="margin-top:0">Each team member's Google Sheet with a <b>Daily Log</b> tab (Date · Moderator · Shift · Total Sales · Orders · Items · … · Feedback). A sheet with just <b>Date · Feedback</b> also works — it shows in Team Feedback. ${admin ? "" : "<b>Only admins can change this list.</b>"}</p>`;
+  const admin = can("sources"), people = repModel();
+  let h = `<div class="panel"><div class="row" style="align-items:end"><label class="field">Report due after shift ends (minutes)<input type="number" min="0" step="15" data-num="1" data-path="settings.reportGrace" value="${esc(D.settings.reportGrace ?? 60)}" ${can("settings") ? "" : "disabled"}></label><span class="muted" style="font-size:12px;padding-bottom:9px">Written within this time = on time. After it = late. Nothing by then = missing.</span></div></div>
+  <p class="muted" style="margin-top:0">Each team member's Google Sheet with a <b>Daily Log</b> tab (Date · Moderator · Shift · Total Sales · Orders · Items · … · Feedback). A sheet with just <b>Date · Feedback</b> also works — it shows in Team Feedback. ${admin ? "" : "<b>Only accounts with “Manage report sheets” can change this list.</b>"}</p>`;
   (D.reportSources || []).forEach((s, k) => {
     const p = people.find((x) => x.key === s.id);
     h += `<div class="srcrow"><label class="field">Team member<select data-path="reportSources.${k}.memberId" ${admin ? "" : "disabled"}><option value="">— Not on the schedule —</option>${D.members.map((m) => `<option value="${esc(m.id)}" ${m.id === s.memberId ? "selected" : ""}>${esc(m.name)}</option>`).join("")}</select></label>
@@ -2378,7 +2421,7 @@ function profileBody(D, m, a, b, t, img) {
     <div><span>Net</span><b class="${net < 0 ? "neg" : net > 0 ? "pos" : ""}">${net < 0 ? "− " : net > 0 ? "+ " : ""}${money(Math.abs(net))}</b><small>${P.ded.days ? `and − ${dayStr(P.ded.days)}` : P.rc.pending ? `${P.rc.pending} pending` : "&nbsp;"}</small></div></div>
     ${P.recs.length ? `<table class="stbl pft pfrl"><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th><th>Status</th></tr></thead><tbody>${P.recs.slice(img ? -14 : 0).reverse().map((r) => { const d = dIdx(r.date); return `<tr><td>${DY[wdOf(d)]} ${dmy(d, 1)}</td><td><span class="tp ${r.type}">${esc(REQ_TYPES[r.type] || r.type)}</span></td><td style="white-space:normal">${r.type === "swap" ? esc(reqBadge(D, r, m.id, true)) + " · " : ""}${esc(isAdj(r) ? (r.reason || "") + (r.details ? " — " + r.details : "") : r.details || "")}${!img && (r.attachments || []).length ? ` <button class="ref" data-act="viewAtt" data-r="${esc(r.id)}" data-j="0" style="border:none;background:none;cursor:pointer">📎 ${r.attachments.length}</button>` : ""}</td><td>${isAdj(r) ? `<b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b>` : "—"}</td><td><span class="ss ${stClass(r)}">${stLabel(r)}</span></td></tr>`; }).join("")}</tbody></table>` : `<div class="muted" style="font-size:12.8px;margin-top:10px">No excuses, swaps, bonuses or deductions in this period — a clean record.</div>`}</div>`;
   // links to reports and tasks (signed-in, when loaded)
-  if (!img && S.me) {
+  if (!img && (can("reports") || can("tasks"))) {
     const rp = RS.raw ? repModel().find((x) => x.m && x.m.id === m.id) : null, cp = rp ? compliance(D, rp, a, b, t, "") : null, ag = rp && rp.kind === "metrics" ? agg(rp.rows, a, b, "") : null;
     const L = TK.list ? TK.list.filter((x) => x.member === m.id && tDay(x) >= a && tDay(x) <= b) : null, k = L ? tkStats(L, cairoNow().abs) : null, [g, gc] = grade(k ? k.score : null);
     h += `<div class="pf2c"><div class="panel"><h4>Daily reports</h4>${rp ? `<table class="stbl"><tbody><tr><td>Report discipline</td><td><b>${cp.expected ? pct0(cp.done / cp.expected) : "—"}</b> <span class="muted">${cp.done}/${cp.expected} work days${cp.missing.length ? ` · <b style="color:var(--bad)">${cp.missing.length} missing</b>` : ""}</span></td></tr>${ag ? `<tr><td>Sales</td><td><b>EGP ${fN(ag.sales)}</b> <span class="muted">${fN(ag.orders)} orders · AOV ${fN(ag.aov)}</span></td></tr><tr><td>Avg per selling day</td><td><b>EGP ${fN(ag.avgDaily)}</b></td></tr>` : ""}</tbody></table><button class="btn sm ghost" style="margin-top:8px" data-act="pfRep" data-k="${esc(rp.key)}">Full report profile →</button>` : `<div class="muted" style="font-size:12.8px">${RS.raw ? "No report sheet linked to her." : `<button class="btn sm" data-act="pfLoadRep">Load report data</button>`}</div>`}</div>
@@ -2525,7 +2568,7 @@ function tkStats(list, now) {
 }
 const grade = (sc) => (sc == null ? ["", ""] : sc >= 90 ? ["Excellent", "ok"] : sc >= 80 ? ["Very good", "ok"] : sc >= 70 ? ["Good", "warn"] : sc >= 60 ? ["Needs improvement", "warn"] : ["Below standard", "bad"]);
 async function loadTasks(quiet) {
-  if (!S.me) return;
+  if (!S.me || !(can("tasks") || can("tasksManage") || can("tasksReview"))) return;
   if (!quiet) { TK.loading = true; renderTasks(); }
   try { const j = await call("/api/tasks", "GET"); TK.list = j.tasks || []; TK.error = ""; }
   catch (e) { if (e.status === 401) { TK.loading = false; return signedOut("Please sign in again."); } TK.error = e.message; }
@@ -2543,6 +2586,7 @@ function renderTasks() {
   if (RS.view !== "tasks") return;
   const D = V(), root = $("#tkView");
   if (!S.me) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>Sign in to manage tasks</h3><p class="muted">Tasks are for managers — assign work, send it to the team as an image, and close it with proof and a rating.</p><button class="btn primary" data-act="tkLogin">Sign in</button></div></section>`; return; }
+  if (!(can("tasks") || can("tasksManage") || can("tasksReview"))) { root.innerHTML = `<section class="card"><div class="rsetup"><h3>No access to Tasks</h3><p class="muted">Ask the owner to give you <b>View tasks</b> in Manage → Users.</p></div></section>`; return; }
   if (!TK.list) { root.innerHTML = `<section class="card"><div class="empty">${TK.error ? esc(TK.error) : "Loading tasks…"}</div></section>`; if (!TK.loading && !TK.error) loadTasks(); return; }
   const now = cairoNow().abs, [a, b] = tkRange();
   const all = TK.list.filter((t) => !TK.mem || t.member === TK.mem);
@@ -2552,7 +2596,7 @@ function renderTasks() {
   const [gl, gc] = grade(S0.score);
   const mems = D.members.filter((m) => !m.former || TK.list.some((t) => t.member === m.id));
   let h = `<section class="card rfilter"><div class="rctl">
-    <button class="btn primary" data-act="tkNew"><b style="font-size:16px;line-height:0">+</b>&nbsp;New task</button>
+    ${can("tasksManage") ? `<button class="btn primary" data-act="tkNew"><b style="font-size:16px;line-height:0">+</b>&nbsp;New task</button>` : ""}
     <label class="field">Performance period<select id="tkPeriod">${TPER.map(([k, l]) => `<option value="${k}" ${TK.period === k ? "selected" : ""}>${l}</option>`).join("")}</select></label>
     <label class="field">Team member<select id="tkMem"><option value="">Everyone</option>${mems.map((m) => `<option value="${esc(m.id)}" ${TK.mem === m.id ? "selected" : ""}>${esc(m.name)}</option>`).join("")}</select></label>
     <label class="field" style="flex:1;min-width:200px;max-width:340px">Search<input type="text" id="tkQ" placeholder="Code, title or details…" value="${esc(TK.q)}"></label>
@@ -2730,19 +2774,19 @@ const EVL = { created: "Task created", edited: "Edited", checklist: "Checklist u
 function openTask(id, fresh) {
   const t = (TK.list || []).find((x) => x.id === id); if (!t) return;
   TK.sel = id;
-  const D = V(), now = cairoNow().abs, [sl, sc] = TST[t.status], ot = tOnTime(t), admin = S.me && S.me.role === "admin";
+  const D = V(), now = cairoNow().abs, [sl, sc] = TST[t.status], ot = tOnTime(t), admin = isOwner() || can("users"), mg = can("tasksManage"), rv = can("tasksReview");
   const sc0 = $(".overlay .tkm .m-body")?.scrollTop;
   const nowLocal = (() => { const c = cairoNow(); return `${c.date}T${pad(Math.floor(c.min / 60))}:${pad(Math.floor(c.min % 60))}`; })();
   let act = "";
-  if (OPEN.has(t.status)) act = `<div class="panel"><h4>Record completion</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">When she replies that it's done, attach her reply / proof below, then mark it done.</p>
+  if (OPEN.has(t.status) && mg) act = `<div class="panel"><h4>Record completion</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">When she replies that it's done, attach her reply / proof below, then mark it done.</p>
       <div class="tkgrid" style="grid-template-columns:1fr 2fr"><label class="field">Completed at<input type="datetime-local" id="tkDoneAt" value="${nowLocal}"></label><label class="field">Her note<input type="text" id="tkDoneNote" dir="auto" placeholder="e.g. Done — link in the drive"></label></div>
       <div class="row" style="justify-content:flex-end;margin-top:12px">${t.status === "assigned" ? `<button class="btn" data-act="tkSt" data-v="progress">Mark in progress</button>` : ""}<button class="btn primary" data-act="tkDone">✓ Mark as done</button></div></div>`;
-  else if (t.status === "done") act = `<div class="panel rvw"><h4>Review &amp; rate</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">Delivered ${t.doneAt ? logFmt.format(new Date(t.doneAt)) + " " + logTime.format(new Date(t.doneAt)) : ""}${ot == null ? "" : ot ? ` · <b style="color:var(--ok)">on time</b>` : ` · <b style="color:var(--bad)">late</b>`}. How good is the work?</p>
+  else if (t.status === "done" && rv) act = `<div class="panel rvw"><h4>Review &amp; rate</h4><p class="muted" style="margin:0 0 10px;font-size:12.8px">Delivered ${t.doneAt ? logFmt.format(new Date(t.doneAt)) + " " + logTime.format(new Date(t.doneAt)) : ""}${ot == null ? "" : ot ? ` · <b style="color:var(--ok)">on time</b>` : ` · <b style="color:var(--bad)">late</b>`}. How good is the work?</p>
       <div class="rate" id="tkRate">${[1, 2, 3, 4, 5].map((k) => `<button type="button" data-act="tkStar" data-v="${k}" class="${k <= TK.rate ? "on" : ""}">★</button>`).join("")}<span>${["Choose a rating", "Poor", "Below expectations", "Meets expectations", "Very good", "Outstanding"][TK.rate]}</span></div>
       <label class="field" style="margin-top:10px">Review note<input type="text" id="tkRevNote" dir="auto" placeholder="Optional — what was good, what to improve"></label>
       <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" data-act="tkReturn">↩ Return for rework</button><button class="btn primary" data-act="tkApprove">Approve</button></div></div>`;
   else if (t.status === "approved") act = `<div class="panel rvw"><h4>Approved</h4><div class="row" style="gap:12px">${stars(t.rating, 1)}<b>${["", "Poor", "Below expectations", "Meets expectations", "Very good", "Outstanding"][t.rating]}</b><span class="muted" style="font-size:12.5px">by ${esc((t.ratedBy || {}).name || "")}${t.reviewNote ? ` — “${esc(t.reviewNote)}”` : ""}</span></div>
-      <div class="row" style="margin-top:10px"><span class="muted" style="font-size:12px">Change rating:</span>${[1, 2, 3, 4, 5].map((k) => `<button class="btn sm ghost" data-act="tkRerate" data-v="${k}">${k}★</button>`).join("")}</div></div>`;
+      ${rv ? `<div class="row" style="margin-top:10px"><span class="muted" style="font-size:12px">Change rating:</span>${[1, 2, 3, 4, 5].map((k) => `<button class="btn sm ghost" data-act="tkRerate" data-v="${k}">${k}★</button>`).join("")}</div>` : ""}</div>`;
   const meta = [["Assigned to", `<span class="who"><span class="av" style="--c:${esc(tColor(t))}">${esc(initials(tName(t)))}</span>${esc(tName(t))}</span>`], ["Deadline", t.due ? `${tDueTxt(t, 1)}` : "No deadline"], ["Priority", `<span class="pri ${t.priority}">${TPRI[t.priority]}</span>`], ["Desk / page", t.desk && respById(D, t.desk) ? esc(respById(D, t.desk).name) : "—"], ["Given", `${logFmt.format(new Date(t.createdAt))} · ${esc((t.createdBy || {}).name || "")}`],
     ["Delivered", t.doneAt ? `${logFmt.format(new Date(t.doneAt))} ${logTime.format(new Date(t.doneAt))}${ot == null ? "" : ot ? ` <span class="stale ok">On time</span>` : ` <span class="stale bad">Late ${durTxt(cairoAt(t.doneAt) - tDueAbs(t))}</span>`}` : tOverdue(t, now) ? `<span class="stale bad">Overdue ${durTxt(now - tDueAbs(t))}</span>` : "—"], ["Turnaround", t.doneAt ? durTxt(cairoAt(t.doneAt) - cairoAt(t.createdAt)) : "—"], ["Returned", t.returns ? `${t.returns}×` : "Never"]];
   $("#modalRoot").innerHTML = `<div class="overlay" data-act="tkClose"><div class="modal tkm"><div class="m-head"><h3><span class="code">${esc(t.code)}</span> ${esc(sl)}</h3><div class="row">
@@ -2755,31 +2799,31 @@ function openTask(id, fresh) {
           <div class="tkh"><span class="tks ${sc}">${sl}</span><h2 dir="auto">${esc(t.title)}</h2></div>
           <div class="tkmeta">${meta.map(([l, v]) => `<div><span>${l}</span><b>${v}</b></div>`).join("")}</div>
           ${t.details ? `<div class="panel"><h4>Brief</h4><p class="tkp" dir="auto">${esc(t.details)}</p></div>` : ""}
-          ${(t.checklist || []).length ? `<div class="panel"><h4>Deliverables · ${t.checklist.filter((c) => c.d).length}/${t.checklist.length}</h4>${t.checklist.map((c, j) => `<label class="tkck ${c.d ? "d" : ""}"><input type="checkbox" data-tkck="${j}" ${c.d ? "checked" : ""} ${t.status === "cancelled" ? "disabled" : ""}><span dir="auto">${esc(c.t)}</span></label>`).join("")}</div>` : ""}
+          ${(t.checklist || []).length ? `<div class="panel"><h4>Deliverables · ${t.checklist.filter((c) => c.d).length}/${t.checklist.length}</h4>${t.checklist.map((c, j) => `<label class="tkck ${c.d ? "d" : ""}"><input type="checkbox" data-tkck="${j}" ${c.d ? "checked" : ""} ${t.status === "cancelled" || !mg ? "disabled" : ""}><span dir="auto">${esc(c.t)}</span></label>`).join("")}</div>` : ""}
           <div class="panel"><h4>Attachments for her · ${(t.files || []).length}</h4>
-            <div class="row">${(t.files || []).map((x, j) => attTile(x, "tkAtt", j, ` data-k="${esc(t.id)}" data-l="files"`) + `<button class="rm" data-act="tkAttDel" data-l="files" data-j="${j}" title="Remove">✕</button></span>`).join("")}
-            ${t.status !== "cancelled" ? `<label class="btn sm">📎 Add photos / videos<input type="file" id="tkBriefFiles" accept="image/*,video/*" multiple class="hidden"></label>` : ""}</div>
+            <div class="row">${(t.files || []).map((x, j) => attTile(x, "tkAtt", j, ` data-k="${esc(t.id)}" data-l="files"`) + (mg ? `<button class="rm" data-act="tkAttDel" data-l="files" data-j="${j}" title="Remove">✕</button>` : "") + `</span>`).join("")}
+            ${t.status !== "cancelled" && mg ? `<label class="btn sm">📎 Add photos / videos<input type="file" id="tkBriefFiles" accept="image/*,video/*" multiple class="hidden"></label>` : ""}</div>
             ${(t.files || []).length ? `<div class="muted" style="font-size:11.5px;margin-top:8px">Photos show on the task image. <b>Share</b> sends the image together with all attachments${canShareFiles() ? "" : " (on a phone)"}.</div>` : ""}</div>
           ${act}
           ${t.doneNote ? `<div class="panel"><h4>Her note</h4><p class="tkp" dir="auto">${esc(t.doneNote)}</p></div>` : ""}
           <div class="panel"><h4>Proof &amp; replies (${(t.proof || []).length})</h4>
-            <div class="row">${(t.proof || []).map((x, j) => `<span class="attx"><button class="att" data-act="tkAtt" data-l="proof" data-k="${esc(t.id)}" data-j="${j}" title="${esc(x.name)}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="" loading="lazy">`}</button><button class="rm" data-act="tkAttDel" data-l="proof" data-j="${j}" title="Remove">✕</button></span>`).join("")}
-            <label class="btn sm">📎 Attach her reply / screenshot<input type="file" id="tkFiles" accept="image/*,video/*" multiple class="hidden"></label></div>
+            <div class="row">${(t.proof || []).map((x, j) => `<span class="attx"><button class="att" data-act="tkAtt" data-l="proof" data-k="${esc(t.id)}" data-j="${j}" title="${esc(x.name)}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="" loading="lazy">`}</button>${mg ? `<button class="rm" data-act="tkAttDel" data-l="proof" data-j="${j}" title="Remove">✕</button>` : ""}</span>`).join("")}
+            ${mg ? `<label class="btn sm">📎 Attach her reply / screenshot<input type="file" id="tkFiles" accept="image/*,video/*" multiple class="hidden"></label>` : ""}</div>
             <div id="upStatus" class="upbar hidden" style="margin-top:10px"></div></div>
         </div>
         <div>
           <div class="panel"><h4>Image she receives</h4><div class="tkprev"><div class="tkprev-in">${taskImageHTML(t)}</div></div></div>
           <div class="panel"><h4>Timeline</h4><div class="tl">${(t.events || []).slice().reverse().map((e) => `<div><i class="${e.type}"></i><div><b>${EVL[e.type] || e.type}${e.rating ? ` · ${e.rating}★` : ""}</b>${e.note ? `<span dir="auto">${esc(e.note)}</span>` : ""}${e.fields ? `<span>${esc(e.fields.join(", "))}</span>` : ""}<small>${logFmt.format(new Date(e.at))} · ${logTime.format(new Date(e.at))} · ${esc((e.by || {}).name || "")}</small></div></div>`).join("")}</div></div>
           <div class="row" style="justify-content:flex-end;flex-wrap:wrap">
-            ${t.status !== "cancelled" ? `<button class="btn sm" data-act="tkEdit">Edit</button>` : ""}
-            ${["approved", "done", "cancelled"].includes(t.status) ? `<button class="btn sm" data-act="tkSt" data-v="assigned">Reopen</button>` : ""}
-            ${OPEN.has(t.status) ? `<button class="btn sm ghost" data-act="tkSt" data-v="cancelled">Cancel task</button>` : ""}
+            ${t.status !== "cancelled" && mg ? `<button class="btn sm" data-act="tkEdit">Edit</button>` : ""}
+            ${["approved", "done", "cancelled"].includes(t.status) && mg ? `<button class="btn sm" data-act="tkSt" data-v="assigned">Reopen</button>` : ""}
+            ${OPEN.has(t.status) && mg ? `<button class="btn sm ghost" data-act="tkSt" data-v="cancelled">Cancel task</button>` : ""}
             ${admin ? `<button class="btn sm danger" data-act="tkDel">Delete</button>` : ""}</div>
         </div>
       </div></div></div></div>`;
   const pv = $(".tkprev"); if (pv) { const k = pv.clientWidth / 1080; pv.firstElementChild.style.setProperty("--k", k); pv.style.height = pv.firstElementChild.firstElementChild.offsetHeight * k + "px"; }
   if (sc0) $(".overlay .tkm .m-body").scrollTop = sc0;
-  $("#tkFiles").onchange = (e) => uploadFiles([...e.target.files], async (att) => { await tkOp({ op: "addProof", id: t.id, att }); openTask(t.id); });
+  if ($("#tkFiles")) $("#tkFiles").onchange = (e) => uploadFiles([...e.target.files], async (att) => { await tkOp({ op: "addProof", id: t.id, att }); openTask(t.id); });
   if (canShareFiles() && t.status !== "cancelled") setTimeout(() => { if (TK.sel === t.id) tkPrep(t).catch(() => {}); }, 300);
   const bf = $("#tkBriefFiles"); if (bf) bf.onchange = (e) => uploadFiles([...e.target.files], async (att) => { await tkOp({ op: "addProof", id: t.id, att, list: "files" }); openTask(t.id); });
 }
@@ -2846,8 +2890,14 @@ function cairoOffsetMin(local) {
 }
 
 /* ============================ admin ============================ */
+// Manage tabs this account may open
+function adminTabs() {
+  const T = [["week", "Week editor", "schedule"], ["new", "New week", "schedule"], ["requests", "Excuses & records", "records|money"], ["reports", "Reports", "sources|settings"], ["team", "Team", "setup"], ["shifts", "Shift types", "setup"], ["desks", "Responsible of", "setup"], ["times", "Time slots", "setup"], ["settings", "Settings", "settings"], ["users", "Users", "users"]];
+  return T.filter(([, , p]) => p.split("|").some(can));
+}
 function openAdmin(tab) {
   if (!S.token || !S.me) return openLogin(tab);
+  if (!adminTabs().length) return toast("Your account can view the dashboard but has no editing permissions", true);
   if (!S.draft) S.draft = clone(S.data);
   S.admin.open = true; if (tab) S.admin.tab = tab;
   renderAll();
@@ -2983,14 +3033,19 @@ function requestsEditor(D) {
   if (solo && (f.toDesk == null || f.toDesk === "keep") && f.deskA && f.deskA !== "auto") f.toDesk = f.deskA;
   f.mode = f.mode || "full"; if (f.deskA == null) f.deskA = "auto"; if (f.deskB == null) f.deskB = "auto"; if (f.toDesk == null) f.toDesk = "keep";
   const mopts = (sel) => D.members.map((m) => `<option value="${esc(m.id)}" ${m.id === sel ? "selected" : ""}>${esc(m.name)}</option>`).join("");
+  if (!canRecType(f.type)) f.type = Object.keys(REQ_TYPES).find(canRecType) || f.type;
+  if (!isOwner()) f.status = "pending";
   const adj = ADJ[f.type];
   if (adj && !adj.reasons.includes(f.reason)) f.reason = adj.reasons[0];
   const ph = { swap: "e.g. Basant asked to swap her night shift with Habiba", change: "e.g. Two on Modex-Porto Friday night — Roaa moved to WhatsApp-Styllano", deduction: "e.g. Arrived 45 min late without notice", bonus: "e.g. Covered Habiba's night shift on short notice" }[f.type] || "e.g. Family emergency — leaving at 3 PM";
-  let body = `<div class="panel"><h4>New record</h4><div class="rqform">
-    <label class="field">Type<select id="rqType">${Object.entries(REQ_TYPES).map(([k, v]) => `<option value="${k}" ${k === f.type ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+  const pend = D.requests.map((r, k) => ({ r, k })).filter(({ r }) => r.status === "pending");
+  let body = isOwner() && pend.length ? `<div class="panel apq"><h4>Waiting for your approval · ${pend.length}</h4>${pend.map(({ r, k }) => `<div class="apr"><span class="tp ${r.type}">${REQ_TYPES[r.type] || r.type}</span><div><b>${esc(reqTitle(D, r))}</b>${isAdj(r) ? ` · <b class="${r.type === "bonus" ? "pos" : "neg"}">${ADJ[r.type].sign} ${esc(dedText(r))}</b> · ${esc(r.reason || "")}` : ""}<small>${r.details ? esc(r.details) + " · " : ""}added by ${esc(r.createdBy || "—")}${(r.attachments || []).length ? ` · 📎 ${r.attachments.length}` : ""}</small></div><div class="row"><button class="btn sm" data-act="reqDecide" data-i="${k}" data-v="rejected">Reject</button><button class="btn sm primary" data-act="reqDecide" data-i="${k}" data-v="approved">Approve</button></div></div>`).join("")}</div>` : "";
+  if (!isOwner() && pend.length) body += `<div class="banner info" style="margin-bottom:12px">${pend.length} record${pend.length === 1 ? " is" : "s are"} waiting for the owner's approval. Records you add go there too — swaps and desk changes reach the schedule once she / he approves them.</div>`;
+  body += `<div class="panel"><h4>New record</h4><div class="rqform">
+    <label class="field">Type<select id="rqType">${Object.entries(REQ_TYPES).filter(([k]) => canRecType(k)).map(([k, v]) => `<option value="${k}" ${k === f.type ? "selected" : ""}>${v}</option>`).join("")}</select></label>
     <label class="field">Date<input type="date" id="rqDate" value="${esc(f.date)}"></label>
     <label class="field">Team member<select id="rqMember">${mopts(f.member)}</select></label>
-    <label class="field">Status<select id="rqStatus">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === f.status ? "selected" : ""}>${stLabel({ type: f.type, status: x })}</option>`).join("")}</select></label>
+    ${isOwner() ? `<label class="field">Status<select id="rqStatus">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === f.status ? "selected" : ""}>${stLabel({ type: f.type, status: x })}</option>`).join("")}</select></label>` : `<div class="field">Status<div class="rvwnote">${stLabel({ type: f.type, status: "pending" })} — the owner approves</div></div>`}
     ${f.type === "swap" ? `<label class="field">Swap with<select id="rqWith">${mopts(f.withMember)}</select></label>
     <label class="field">Their shift date (if different)<input type="date" id="rqWithDate" value="${esc(f.withDate)}"></label>` : ""}
     ${f.type === "change" || solo ? (() => { const work = D.shiftTypes.filter((x) => x.kind === "work"); return `<label class="field">New shift<select id="rqToShift"><option value="">Keep her shift</option>${D.shiftTypes.map((x) => `<option value="${esc(x.id)}" ${f.toShift === x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
@@ -3009,7 +3064,7 @@ function requestsEditor(D) {
     <div style="flex:1"><div class="field" style="margin-bottom:6px">Attachments (photos or videos)</div>
       <div class="row">${(f.attachments || []).map((x, j) => `<span class="attx"><span class="att" style="width:52px;height:52px">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="">`}</span><button class="rm" data-act="rqAttDel" data-j="${j}" title="Remove">✕</button></span>`).join("")}
       <label class="btn sm">📎 Attach photo / video<input type="file" id="rqFiles" accept="image/*,video/*" multiple class="hidden"></label></div></div>
-    <div class="row" style="justify-content:flex-end">${f.type === "swap" || f.type === "change" ? `<label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="rqApply" checked> Apply ${f.type === "swap" && !solo ? "the swap" : "the change"} to the schedule</label>` : ""}<button class="btn primary" data-act="reqCreate">Add record</button></div></div>
+    <div class="row" style="justify-content:flex-end">${(f.type === "swap" || f.type === "change") && isOwner() ? `<label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="rqApply" checked> Apply ${f.type === "swap" && !solo ? "the swap" : "the change"} to the schedule</label>` : ""}<button class="btn primary" data-act="reqCreate">Add record</button></div></div>
   <div id="upStatus" class="upbar ${A.upMsg ? "" : "hidden"}" style="margin-top:10px">${esc(A.upMsg || "")}</div></div>`;
   const list = D.requests.map((r, k) => ({ r, k })).sort((a, b) => (b.r.date + (b.r.createdAt || "")).localeCompare(a.r.date + (a.r.createdAt || "")));
   body += `<div class="panel"><h4>All records (${list.length})</h4>` + (list.length ? list.map(({ r, k }) => {
@@ -3020,14 +3075,15 @@ function requestsEditor(D) {
       ${A2 ? `<div class="row" style="gap:6px;margin-top:4px"><select data-path="requests.${k}.reason">${A2.reasons.map((x) => `<option ${x === r.reason ? "selected" : ""}>${x}</option>`).join("")}</select><input type="number" min="0" step="5" style="width:96px" data-path="requests.${k}.amount" data-num="1" value="${esc(r.amount || 0)}"> EGP${A2.days ? ` <input type="number" min="0" step="0.25" style="width:72px" data-path="requests.${k}.days" data-num="1" value="${esc(r.days || 0)}"> days` : ""}</div>` : ""}
       <input type="text" data-path="requests.${k}.details" value="${esc(r.details || "")}" placeholder="Details" style="width:100%;margin-top:4px">
       <div class="row" style="margin-top:6px">${(r.attachments || []).map((x, j) => `<span class="attx"><button class="att" style="width:46px;height:46px" data-act="viewAtt" data-r="${esc(r.id)}" data-j="${j}">${x.kind === "video" ? `<span class="vid">▶</span>` : `<img src="${esc(fileUrl(x))}" alt="">`}</button><button class="rm" data-act="recAttDel" data-i="${k}" data-j="${j}" title="Remove">✕</button></span>`).join("")}<label class="btn sm ghost">📎 Attach<input type="file" class="hidden attIn" data-k="${k}" accept="image/*,video/*" multiple></label></div></div>
-    <select data-path="requests.${k}.status">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === r.status ? "selected" : ""}>${stLabel({ type: r.type, status: x })}</option>`).join("")}</select>
-    <div class="row" style="justify-content:flex-end">${r.type === "swap" || r.type === "change" ? (r.applied ? `<span class="chip-s pub">✓ Applied</span>` : `<button class="btn sm" data-act="reqApply" data-i="${k}">Apply ${r.type === "swap" ? "swap" : "change"}</button>`) : ""}<button class="btn sm danger" data-act="delItem" data-path="requests" data-i="${k}">Delete</button></div></div>`;
+    ${isOwner() ? `<select data-path="requests.${k}.status">${["pending", "approved", "rejected"].map((x) => `<option value="${x}" ${x === r.status ? "selected" : ""}>${stLabel({ type: r.type, status: x })}</option>`).join("")}</select>` : `<span class="ss ${stClass(r)}" style="justify-self:start">${stLabel(r)}</span>`}
+    <div class="row" style="justify-content:flex-end">${r.type === "swap" || r.type === "change" ? (r.applied ? `<span class="chip-s pub">✓ Applied</span>` : isOwner() ? `<button class="btn sm" data-act="reqApply" data-i="${k}">Apply ${r.type === "swap" ? "swap" : "change"}</button>` : "") : ""}${isOwner() || (r.status === "pending" && canRecType(r.type)) ? `<button class="btn sm danger" data-act="delItem" data-path="requests" data-i="${k}">Delete</button>` : ""}</div></div>`;
   }).join("") : `<div class="muted">No records yet.</div>`) + `</div>`;
   return body;
 }
 function renderAdmin() {
   const D = S.draft, A = S.admin;
-  const tabs = [["week", "Week editor"], ["new", "New week"], ["requests", "Excuses & records"], ["reports", "Reports"], ["team", "Team"], ["shifts", "Shift types"], ["desks", "Responsible of"], ["times", "Time slots"], ["settings", "Settings"]].concat(S.me && S.me.role === "admin" ? [["users", "Users"]] : []);
+  const tabs = adminTabs();
+  if (!tabs.some(([k]) => k === A.tab)) A.tab = tabs[0][0];
   let body = "";
   if (A.tab === "week") body = weekEditor(D);
   else if (A.tab === "requests") body = requestsEditor(D);
@@ -3060,19 +3116,25 @@ function renderAdmin() {
     if (!S.users) { body += `<div class="muted">Loading users…</div>`; loadUsers(); }
     else {
       const ago = (t) => { if (!t) return "Never"; const d = new Date(t); return logFmt.format(d) + " · " + logTime.format(d); };
+      const nu = A.nu || (A.nu = { perms: PERM_PRESETS.editor.filter(can) });
+      const grid = (perms, attr, lockAll) => `<div class="pgrid">${PERM_INFO.map(([k, l, d]) => { const mine = can(k); return `<label class="${perms.includes(k) ? "on" : ""} ${mine && !lockAll ? "" : "dis"}" title="${mine ? "" : "You can't give a permission you don't have"}"><input type="checkbox" ${attr}="${k}" ${perms.includes(k) ? "checked" : ""} ${mine && !lockAll ? "" : "disabled"}><b>${l}</b><small>${d}</small></label>`; }).join("")}</div>`;
+      const presetBtns = (attr) => `<div class="row" style="gap:6px;margin:8px 0 4px"><span class="muted" style="font-size:12px">Quick set:</span>${Object.keys(PERM_PRESETS).map((k) => `<button class="btn sm ghost" data-act="permPreset" data-v="${k}" ${attr}>${roleLabel({ role: k })}</button>`).join("")}<button class="btn sm ghost" data-act="permPreset" data-v="none" ${attr}>None</button></div>`;
       body += `<div class="panel"><h4>Add user</h4><div class="rqform">
-        <label class="field">Full name<input type="text" id="nuName" placeholder="e.g. Mai Ahmed"></label>
-        <label class="field">Username<input type="text" id="nuUser" placeholder="e.g. mai" autocapitalize="none" spellcheck="false"></label>
-        <label class="field">Role<select id="nuRole"><option value="editor">Editor — edit schedule &amp; records</option><option value="admin">Admin — everything + users</option></select></label>
-        <label class="field">Password<input type="text" id="nuPass" placeholder="At least 6 characters" autocomplete="new-password"></label>
-      </div><div class="row" style="justify-content:space-between;margin-top:12px"><span class="muted" style="font-size:12px">Share the username and password with the person. They sign in from the Manage button.</span><button class="btn primary" data-act="userCreate">Create user</button></div></div>
-      <div class="panel"><h4>Users (${S.users.length + 1})</h4><div style="overflow-x:auto"><table class="utbl"><thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Last sign-in</th><th>Created</th><th></th></tr></thead><tbody>
-        <tr><td><b>${esc(S.me.username === "owner" ? S.me.name : "Owner")}</b></td><td>owner</td><td><span class="rb admin">Owner</span></td><td colspan="2" class="muted" style="font-size:12px">Built-in account · password is your PIN</td><td></td></tr>
-        ${S.users.map((u) => `<tr style="${u.disabled ? "opacity:.6" : ""}"><td><b>${esc(u.name)}</b></td><td>@${esc(u.username)}</td>
-          <td>${u.username === S.me.username ? `<span class="rb ${u.role}">${u.role}</span>` : `<select data-act2="userRole" data-u="${esc(u.username)}" style="padding:4px 6px;font-size:12px"><option value="editor" ${u.role === "editor" ? "selected" : ""}>Editor</option><option value="admin" ${u.role === "admin" ? "selected" : ""}>Admin</option></select>`}${u.disabled ? ` <span class="rb off">Disabled</span>` : ""}</td>
-          <td style="font-size:12px">${esc(ago(u.lastLogin))}</td><td style="font-size:12px">${esc(ago(u.createdAt))}${u.createdBy ? `<br><span class="muted">by ${esc(u.createdBy)}</span>` : ""}</td>
-          <td><div class="row" style="justify-content:flex-end;gap:6px">${u.username === S.me.username ? `<span class="muted" style="font-size:12px">You</span>` : `<button class="btn sm" data-act="userPass" data-u="${esc(u.username)}">Reset password</button><button class="btn sm" data-act="userToggle" data-u="${esc(u.username)}">${u.disabled ? "Enable" : "Disable"}</button><button class="btn sm danger" data-act="userDelete" data-u="${esc(u.username)}">Delete</button>`}</div></td></tr>`).join("")}
-      </tbody></table></div></div>`;
+        <label class="field">Full name<input type="text" id="nuName" placeholder="e.g. Mai Ahmed" value="${esc(nu.name || "")}"></label>
+        <label class="field">Username<input type="text" id="nuUser" placeholder="e.g. mai" autocapitalize="none" spellcheck="false" value="${esc(nu.user || "")}"></label>
+        <label class="field">Password<input type="text" id="nuPass" placeholder="At least 6 characters" autocomplete="new-password" value="${esc(nu.pass || "")}"></label>
+      </div>
+      <div class="field" style="margin-top:14px">What this person can do</div>${presetBtns('data-u=""')}${grid(nu.perms, "data-nperm")}
+      <div class="pnote">Approving or rejecting excuses, swaps, bonuses and deductions is always the <b>owner's</b> — everyone else's records wait for your approval.</div>
+      <div class="row" style="justify-content:space-between;margin-top:12px"><span class="muted" style="font-size:12px">Share the username and password with the person. They sign in from the Manage button.</span><button class="btn primary" data-act="userCreate">Create user</button></div></div>
+      <div class="panel"><h4>Users (${S.users.length + 1})</h4>
+        <div class="urow"><div class="uh"><div><b>${esc(S.me.username === "owner" ? S.me.name : "Owner")}</b> <span class="rb admin">Owner</span><small>@owner · built-in account · password is your PIN · everything, including approvals</small></div></div></div>
+        ${S.users.map((u) => { const me = u.username === S.me.username, open = A.uOpen === u.username; return `<div class="urow" style="${u.disabled ? "opacity:.6" : ""}"><div class="uh"><div><b>${esc(u.name)}</b> <span class="rb ${u.role}">${roleLabel(u)}</span>${u.disabled ? ` <span class="rb off">Disabled</span>` : ""}
+            <small>@${esc(u.username)} · ${u.perms.length} permission${u.perms.length === 1 ? "" : "s"} · last sign-in ${esc(ago(u.lastLogin))} · added ${esc(ago(u.createdAt))}${u.createdBy ? " by " + esc(u.createdBy) : ""}</small>
+            <div class="ptags">${PERM_INFO.filter(([k]) => u.perms.includes(k)).map(([, l]) => `<span>${l}</span>`).join("") || `<span class="none">No access — can only see the public dashboard</span>`}</div></div>
+          <div class="row" style="justify-content:flex-end;gap:6px">${me ? `<span class="muted" style="font-size:12px">You</span>` : `<button class="btn sm ${open ? "primary" : ""}" data-act="userPerms" data-u="${esc(u.username)}">${open ? "Close" : "Permissions"}</button><button class="btn sm" data-act="userPass" data-u="${esc(u.username)}">Reset password</button><button class="btn sm" data-act="userToggle" data-u="${esc(u.username)}">${u.disabled ? "Enable" : "Disable"}</button><button class="btn sm danger" data-act="userDelete" data-u="${esc(u.username)}">Delete</button>`}</div></div>
+          ${open && !me ? `<div class="uperm">${presetBtns(`data-u="${esc(u.username)}"`)}${grid(A.uPerms || u.perms, "data-uperm")}<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn sm ghost" data-act="userPerms" data-u="${esc(u.username)}">Cancel</button><button class="btn sm primary" data-act="userPermSave" data-u="${esc(u.username)}">Save permissions</button></div></div>` : ""}</div>`; }).join("")}
+      </div>`;
     }
   } else if (A.tab === "settings") {
     body += `<div class="row" style="gap:20px;align-items:end">
@@ -3094,7 +3156,7 @@ function renderAdmin() {
   if (nd) { const upd = () => { if (!nd.value) return; const ws = wkStart(D, dIdx(nd.value)); $("#newDateInfo").innerHTML = `Week: <b>${dmy(ws)} – ${dmy(ws + 6, 1)}</b>${D.weeks[iDate(ws)] ? ' <span class="chip-s pub">already created — will open it</span>' : ""}`; A.newDate = nd.value; }; nd.oninput = upd; upd(); }
   document.querySelectorAll("input[name=src]").forEach((r) => (r.onchange = () => (A.newSrc = r.value)));
   if ($("#rqType")) {
-    const keep = () => { const f = A.rq; f.type = $("#rqType").value; f.date = $("#rqDate").value; f.member = $("#rqMember").value; f.status = $("#rqStatus").value; f.details = $("#rqDetails").value; if ($("#rqWith")) { f.withMember = $("#rqWith").value; f.withDate = $("#rqWithDate").value; } const v = (q) => $(q)?.value; const md = document.querySelector("input[name=rqMode]:checked"); if (md) f.mode = md.value; if ($("#rqDeskA")) { f.deskA = v("#rqDeskA"); f.deskB = v("#rqDeskB"); } if ($("#rqToShift")) { f.toShift = v("#rqToShift"); f.toTime = v("#rqToTime"); f.toDesk = v("#rqToDesk"); } if ($("#rqAmount")) { f.amount = v("#rqAmount"); f.days = v("#rqDays") ?? ""; f.reason = v("#rqReason"); } };
+    const keep = () => { const f = A.rq; f.type = $("#rqType").value; f.date = $("#rqDate").value; f.member = $("#rqMember").value; f.status = $("#rqStatus") ? $("#rqStatus").value : "pending"; f.details = $("#rqDetails").value; if ($("#rqWith")) { f.withMember = $("#rqWith").value; f.withDate = $("#rqWithDate").value; } const v = (q) => $(q)?.value; const md = document.querySelector("input[name=rqMode]:checked"); if (md) f.mode = md.value; if ($("#rqDeskA")) { f.deskA = v("#rqDeskA"); f.deskB = v("#rqDeskB"); } if ($("#rqToShift")) { f.toShift = v("#rqToShift"); f.toTime = v("#rqToTime"); f.toDesk = v("#rqToDesk"); } if ($("#rqAmount")) { f.amount = v("#rqAmount"); f.days = v("#rqDays") ?? ""; f.reason = v("#rqReason"); } };
     ["#rqDate", "#rqMember", "#rqStatus", "#rqDetails", "#rqWith", "#rqWithDate", "#rqAmount", "#rqDays", "#rqReason"].forEach((q) => { const el = $(q); if (el) el.addEventListener("input", keep); });
     ["#rqDate", "#rqMember", "#rqWith", "#rqWithDate", "#rqDeskA", "#rqDeskB", "#rqToShift", "#rqToTime", "#rqToDesk"].forEach((q) => { const el = $(q); if (el) el.addEventListener("change", () => { keep(); renderAdmin(); }); });
     document.querySelectorAll("input[name=rqMode]").forEach((x) => (x.onchange = () => { keep(); renderAdmin(); }));
@@ -3122,9 +3184,11 @@ const getPath = (o, p) => p.split(".").reduce((x, k) => (x == null ? x : x[k]), 
 function setPath(o, p, v) { const ks = p.split("."), last = ks.pop(); let x = o; for (const k of ks) { if (x[k] == null || typeof x[k] !== "object") x[k] = {}; x = x[k]; } if (v === "" || v == null) delete x[last]; else x[last] = v; }
 const afterEdit = (full) => { renderKpis(); renderLive(); renderDay(); renderWeek(); renderInsights(); renderPeople(); renderRequests(); renderSaveBar(); $("#modalRoot [data-act=save]")?.toggleAttribute("disabled", !dirty()); if (full) renderAdmin(); };
 
+function keepNu() { const A = S.admin, nu = A.nu || (A.nu = { perms: [] }); if ($("#nuName")) { nu.name = $("#nuName").value; nu.user = $("#nuUser").value; nu.pass = $("#nuPass").value; } return nu; }
 document.addEventListener("change", (e) => {
-  const el = e.target.closest("[data-act2=userRole]");
-  if (el) userAction("PATCH", { username: el.dataset.u, role: el.value }, "Role updated");
+  const np = e.target.closest("[data-nperm]"), up = e.target.closest("[data-uperm]");
+  if (np) { const nu = keepNu(), k = np.dataset.nperm; nu.perms = np.checked ? [...new Set([...nu.perms, k])] : nu.perms.filter((x) => x !== k); return renderAdmin(); }
+  if (up) { const u = S.users.find((x) => x.username === S.admin.uOpen), k = up.dataset.uperm, cur = S.admin.uPerms || u.perms.slice(); S.admin.uPerms = up.checked ? [...new Set([...cur, k])] : cur.filter((x) => x !== k); return renderAdmin(); }
   const lf = e.target.closest("#logUser");
   if (lf) { S.logUser = lf.value; renderLog(); }
   if (!S.draft) return;
@@ -3190,6 +3254,8 @@ function onEdit(e) {
     if (c && nt && nt.kind === "work" && nt.time && (!c.t || (ot && c.t === ot.time) || (ot && ot.kind === "off"))) { c.t = nt.time; const q = p.split("."); delete S.admin.custom[`${q[1]}.${q[3]}.${q[4]}`]; }
   }
   if (/^shiftTypes\.\d+\.kind$/.test(p) && v === "off") getPath(S.draft, p.replace(/\.kind$/, "")).track = false;
+  // the owner approving a swap / desk change puts it on the schedule
+  if (/^requests\.\d+\.status$/.test(p) && v === "approved") { const r = getPath(S.draft, p.replace(/\.status$/, "")); if (r && !r.applied && (r.type === "swap" || r.type === "change")) { const ok = r.type === "change" ? applyChange(S.draft, r) : applySwap(S.draft, r); toast(ok ? "Approved and applied to the schedule" : "Approved — nothing to change on that date", !ok); } }
   afterEdit(e.type === "change" && el.type !== "text" && el.type !== "number");
 }
 
@@ -3218,6 +3284,7 @@ document.addEventListener("click", async (e) => {
     case "repSources": return openAdmin("reports");
     case "importHistory": {
       if (!S.me) return openLogin("settings");
+      if (!can("schedule")) return toast("Your account can't edit the schedule", true);
       if (!S.admin.open) openAdmin("settings");
       const X = S.draft;
       let H; try { H = await (await fetch("assets/schedule-history.json", { cache: "no-store" })).json(); } catch { return toast("Couldn't load the history file", true); }
@@ -3248,7 +3315,7 @@ document.addEventListener("click", async (e) => {
     case "day": S.admin.day = i; return R();
     case "wkShift": setOffset(S.weekOffset + i); S.admin.hl = null; return R();
     case "cellEdit": {
-      if (!S.me) return;
+      if (!can("schedule")) return;
       S.admin.mode = "person"; S.admin.member = el.dataset.m; S.admin.hl = +el.dataset.k; S.admin.day = +el.dataset.k;
       return openAdmin("week");
     }
@@ -3317,6 +3384,8 @@ document.addEventListener("click", async (e) => {
     case "reqCreate": {
       const f = S.admin.rq;
       if (!f.date) return toast("Pick a date", true);
+      if (!canRecType(f.type)) return toast("Your account can't add this type of record", true);
+      if (!isOwner()) f.status = "pending";
       const solo = f.type === "swap" && f.member === f.withMember;
       const r = { id: uid("r"), type: solo ? "change" : f.type, date: f.date, member: f.member, details: f.details.trim(), status: f.status, createdAt: new Date().toISOString(), createdBy: S.me ? S.me.name : "" };
       if (f.type === "swap" && !solo) { r.withMember = f.withMember; if (f.withDate && f.withDate !== f.date) r.withDate = f.withDate; if (f.mode && f.mode !== "full") r.mode = f.mode; if (f.deskA !== "auto") r.deskA = f.deskA; if (f.deskB !== "auto") r.deskB = f.deskB; }
@@ -3334,18 +3403,36 @@ document.addEventListener("click", async (e) => {
       if (S.admin.upMsg) return toast("Wait for the upload to finish", true);
       if ((f.attachments || []).length) r.attachments = clone(f.attachments);
       D.requests.push(r);
-      if (r.type === "swap" && $("#rqApply")?.checked) { const ok = applySwap(D, r); toast(ok ? "Swap applied to the schedule" : "Record added — no shifts to swap on that date (is the week created?)", !ok); }
-      if (r.type === "change") { if ($("#rqApply")?.checked) { const ok = applyChange(D, r); toast(ok ? "Change applied to the schedule" : "Record added — she has no shift that day to change (is the week created?)", !ok); } else { const T = clone({ ...D, requests: [] }), x = clone(r); applyChange(T, x); r.after = x.after; } }
+      if (r.type === "swap" && isOwner() && $("#rqApply")?.checked) { const ok = applySwap(D, r); toast(ok ? "Swap applied to the schedule" : "Record added — no shifts to swap on that date (is the week created?)", !ok); }
+      if (r.type === "change") { if (isOwner() && $("#rqApply")?.checked) { const ok = applyChange(D, r); toast(ok ? "Change applied to the schedule" : "Record added — she has no shift that day to change (is the week created?)", !ok); } else { const T = clone({ ...D, requests: [] }), x = clone(r); applyChange(T, x); r.after = x.after; } }
       S.admin.rq = null; return R();
     }
     case "rqAttDel": S.admin.rq.attachments.splice(+el.dataset.j, 1); return R();
     case "recAttDel": if (confirm("Remove this attachment from the record?")) D.requests[i].attachments.splice(+el.dataset.j, 1); return R();
-    case "reqApply": { const r = D.requests[i], ok = r.type === "change" ? applyChange(D, r) : applySwap(D, r); toast(ok ? (r.type === "change" ? "Change applied to the schedule" : "Swap applied to the schedule") : "Nothing to change on that date", !ok); return R(); }
+    case "openApprovals": return openAdmin("requests");
+    case "reqDecide": {
+      if (!isOwner()) return;
+      const r = D.requests[i]; r.status = el.dataset.v;
+      if (r.status === "approved" && !r.applied && (r.type === "swap" || r.type === "change")) { const ok = r.type === "change" ? applyChange(D, r) : applySwap(D, r); toast(ok ? "Approved and applied to the schedule — Save changes" : "Approved — nothing to change on that date", !ok); }
+      else toast(`${r.status === "approved" ? "Approved" : "Rejected"} — Save changes to confirm`);
+      return R();
+    }
+    case "reqApply": {
+      if (!isOwner()) return; const r = D.requests[i], ok = r.type === "change" ? applyChange(D, r) : applySwap(D, r); toast(ok ? (r.type === "change" ? "Change applied to the schedule" : "Swap applied to the schedule") : "Nothing to change on that date", !ok); return R(); }
     case "logout": e.preventDefault(); if (dirty() && !confirm("Sign out and discard unsaved changes?")) return; S.draft = null; S.admin.open = false; $("#modalRoot").innerHTML = ""; signedOut(); toast("Signed out"); return renderAll();
     case "userCreate": {
-      const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), role: $("#nuRole").value, password: $("#nuPass").value };
+      const nu = S.admin.nu || { perms: [] };
+      const body = { name: $("#nuName").value.trim(), username: $("#nuUser").value.trim().toLowerCase(), perms: nu.perms, password: $("#nuPass").value };
       if (!body.name || !body.username || !body.password) return toast("Fill in name, username and password", true);
+      S.admin.nu = null;
       return userAction("POST", body, `User @${body.username} created`);
+    }
+    case "userPerms": { const u = el.dataset.u; S.admin.uOpen = S.admin.uOpen === u ? null : u; S.admin.uPerms = null; return renderAdmin(); }
+    case "userPermSave": { const u = S.users.find((x) => x.username === el.dataset.u); const perms = S.admin.uPerms || u.perms; S.admin.uOpen = null; S.admin.uPerms = null; return userAction("PATCH", { username: u.username, perms }, `Permissions saved for ${u.name}`); }
+    case "permPreset": {
+      const v = el.dataset.v, list = v === "none" ? [] : PERM_PRESETS[v].filter(can);
+      if (el.dataset.u) S.admin.uPerms = list; else { keepNu(); S.admin.nu.perms = list; }
+      return renderAdmin();
     }
     case "userPass": { const pw = prompt(`New password for @${el.dataset.u} (at least 6 characters):`); if (pw) userAction("PATCH", { username: el.dataset.u, password: pw }, "Password reset — share it with them"); return; }
     case "userToggle": { const u = S.users.find((x) => x.username === el.dataset.u); return userAction("PATCH", { username: u.username, disabled: !u.disabled }, u.disabled ? "User enabled" : "User disabled — signed out everywhere"); }

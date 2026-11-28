@@ -7,7 +7,7 @@
 //   op "delProof" { id, j }
 //   op "delete"   { id }                   → admins only
 // Every change is stamped on the task's own timeline and in the dashboard's activity log.
-import { readJSON, writeJSON, userFromToken, bearer, parseBody, appendLog } from './_lib.js';
+import { readJSON, writeJSON, userFromToken, bearer, parseBody, appendLog, can } from './_lib.js';
 
 const TASKS = 'marketing-ops/tasks';
 const STATUS = ['assigned', 'progress', 'done', 'approved', 'returned', 'cancelled'];
@@ -38,12 +38,17 @@ export default async function handler(req, res) {
   try {
     const me = await userFromToken(bearer(req));
     if (!me) return res.status(401).json({ error: 'Please sign in again' });
+    if (!can(me, 'tasks') && !can(me, 'tasksManage') && !can(me, 'tasksReview')) return res.status(403).json({ error: "Your account doesn't have access to Tasks" });
     const by = { username: me.username, name: me.name };
     const doc = (await readJSON(TASKS)) || { tasks: [], seq: 0 };
     if (req.method === 'GET') return res.status(200).json(doc);
     if (req.method !== 'POST') { res.setHeader('Allow', 'GET, POST'); return res.status(405).json({ error: 'method not allowed' }); }
 
     const b = parseBody(req), now = new Date().toISOString();
+    // permissions: reviewing (approve / return / rating) needs "tasksReview", everything else "tasksManage"
+    const review = b.op === 'update' && b.patch && (['approved', 'returned'].includes(b.patch.status) || b.patch.rating != null);
+    if (review && !can(me, 'tasksReview')) return res.status(403).json({ error: "Your account can't review or rate tasks" });
+    if (!review && b.op !== 'delete' && !can(me, 'tasksManage')) return res.status(403).json({ error: "Your account can't assign or change tasks" });
     const find = () => doc.tasks.find((t) => t.id === b.id);
     const ev = (t, type, note, extra) => (t.events = [...(t.events || []), { at: now, by, type, ...(note ? { note: str(note, 1000) } : {}), ...(extra || {}) }].slice(-80));
     const who = (t) => t.memberName || t.member || 'someone';
@@ -99,7 +104,7 @@ export default async function handler(req, res) {
       const [x] = (task[L] || []).splice(+b.j, 1);
       if (x) { ev(task, L === 'files' ? 'fileRemoved' : 'proofRemoved', x.name); log.push(`Task ${task.code}: removed attachment ${x.name}`); }
     } else if (b.op === 'delete') {
-      if (me.role !== 'admin') return res.status(403).json({ error: 'Only admins can delete tasks — cancel it instead' });
+      if (!me.owner && !can(me, 'users')) return res.status(403).json({ error: 'Only the owner or a user manager can delete tasks — cancel it instead' });
       const k = doc.tasks.findIndex((t) => t.id === b.id); if (k < 0) return res.status(404).json({ error: 'Task not found' });
       const [t] = doc.tasks.splice(k, 1);
       log.push(`Task ${t.code} deleted (“${t.title}”, ${who(t)})`);

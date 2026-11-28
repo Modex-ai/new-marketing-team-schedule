@@ -5,7 +5,20 @@ import crypto from 'node:crypto';
 export const ACCESS = process.env.BLOB_ACCESS === 'public' ? 'public' : 'private';
 export const SCHEDULE = 'marketing-ops/schedule';
 export const USERS = 'marketing-ops/users';
-export const ROLES = ['admin', 'editor'];
+export const ROLES = ['admin', 'editor', 'viewer', 'custom'];
+// What each signed-in account may do. The built-in "owner" account has everything, plus approving / rejecting records
+// (that one is owner-only and can't be given to anyone else).
+export const PERMS = ['schedule', 'setup', 'settings', 'records', 'money', 'reports', 'sources', 'tasks', 'tasksManage', 'tasksReview', 'users'];
+export const PRESETS = {
+  admin: PERMS,
+  editor: PERMS.filter((p) => !['users', 'sources', 'settings', 'setup'].includes(p)),
+  viewer: ['reports', 'tasks'],
+};
+// accounts made before permissions existed keep what they could do then (admin = everything, editor = all but users & sheets)
+const LEGACY = { admin: PERMS, editor: PERMS.filter((p) => !['users', 'sources'].includes(p)) };
+export const permsOf = (u) => (Array.isArray(u.perms) ? u.perms.filter((p) => PERMS.includes(p)) : LEGACY[u.role] || PRESETS.viewer);
+export const can = (me, p) => !!me && (me.owner || (me.perms || []).includes(p));
+export const sessionUser = (u) => ({ username: u.username, name: u.name, role: u.role, perms: permsOf(u), owner: false });
 const SESSION_HOURS = 24;
 
 /* ---------- JSON documents in Blob (each save is a new version; old versions are trimmed) ---------- */
@@ -56,12 +69,13 @@ export const ownerName = () => process.env.OWNER_NAME || 'Owner';
 export async function userFromToken(token) {
   const p = verifyToken(token);
   if (!p) return null;
-  if (p.u === 'owner') return { username: 'owner', name: ownerName(), role: 'admin' };
+  if (p.u === 'owner') return ownerUser();
   const users = (await readJSON(USERS))?.users || [];
   const u = users.find((x) => x.username === p.u);
   if (!u || u.disabled || (u.pwChangedAt && p.iat < u.pwChangedAt)) return null; // disabled or password reset → session ends
-  return { username: u.username, name: u.name, role: u.role };
+  return sessionUser(u);
 }
+export const ownerUser = () => ({ username: 'owner', name: ownerName(), role: 'owner', perms: [...PERMS, 'approve'], owner: true });
 export function bearer(req) {
   const h = String(req.headers.authorization || '');
   return h.startsWith('Bearer ') ? h.slice(7) : '';

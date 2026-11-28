@@ -6,7 +6,7 @@
 // if Google is slow.
 //
 // Env vars:  REPORTS_URL — the Apps Script web app URL     REPORTS_KEY — must match KEY in Code.gs
-import { readJSON, writeJSON, SCHEDULE, userFromToken, bearer } from './_lib.js';
+import { readJSON, writeJSON, SCHEDULE, userFromToken, bearer, can } from './_lib.js';
 
 const CACHE = 'marketing-ops/reports-cache';
 const MAX_AGE_MS = 10 * 60 * 1000;
@@ -32,7 +32,11 @@ export default async function handler(req, res) {
   const q0 = req.query || Object.fromEntries(new URL(req.url, 'http://x').searchParams);
   // ?check=1&k=<REPORTS_KEY> → connection health only (titles, row counts, dates, errors — no sales or feedback)
   const check = q0.check === '1' && key && q0.k === key;
-  if (!check && !(await userFromToken(bearer(req)))) return res.status(401).json({ error: 'Please sign in again' });
+  if (!check) {
+    const me = await userFromToken(bearer(req));
+    if (!me) return res.status(401).json({ error: 'Please sign in again' });
+    if (!can(me, 'reports')) return res.status(403).json({ error: "Your account doesn't have access to Team Reports" });
+  }
 
   if (!url || !key) return res.status(200).json({ configured: false });
 

@@ -1,7 +1,7 @@
 // POST /api/auth {username, password} → { token, user }   (sign in)
 // GET  /api/auth  (Authorization: Bearer …)  → { user }   (who am I)
 // The owner can always sign in as "owner" with the ADMIN_PIN (break-glass account).
-import { readJSON, writeJSON, USERS, checkPassword, signToken, userFromToken, bearer, sleep, parseBody, ownerName } from './_lib.js';
+import { readJSON, writeJSON, USERS, checkPassword, signToken, userFromToken, bearer, sleep, parseBody, ownerUser, sessionUser } from './_lib.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
     if (uname === 'owner') {
       if (process.env.ADMIN_PIN && String(password) === String(process.env.ADMIN_PIN)) {
-        return res.status(200).json({ token: signToken({ u: 'owner', iat: now }), user: { username: 'owner', name: ownerName(), role: 'admin' } });
+        return res.status(200).json({ token: signToken({ u: 'owner', iat: now }), user: ownerUser() });
       }
     } else {
       const doc = (await readJSON(USERS)) || { users: [] };
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       if (u && !u.disabled && checkPassword(password, u.salt, u.hash)) {
         u.lastLogin = new Date(now).toISOString();
         await writeJSON(USERS, doc, 10);
-        return res.status(200).json({ token: signToken({ u: u.username, iat: now }), user: { username: u.username, name: u.name, role: u.role } });
+        return res.status(200).json({ token: signToken({ u: u.username, iat: now }), user: sessionUser(u) });
       }
     }
     await sleep(800); // slow down guessing
