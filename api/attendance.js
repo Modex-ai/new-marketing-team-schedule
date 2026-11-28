@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       const q = req.query || Object.fromEntries(new URL(req.url, 'http://x').searchParams);
       const today = Math.floor(cairoAbs(Date.now()) / 1440);
       const from = isDate(q.from) ? q.from : iDate(today - 45), to = isDate(q.to) ? q.to : iDate(today + 1);
-      const D = (await readJSON(SCHEDULE)) || {};
+      const D = (await readJSON(SCHEDULE, { ttl: 15000 })) || {};
       const see = (mid) => (manager(me) ? inScope(me, mid) : mid === me.member);
       const doc = await loadAll((D.members || []).map((m) => m.id).concat(me.member ? [me.member] : []).filter((m) => m && see(m)));
       const days = {};

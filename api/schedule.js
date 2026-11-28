@@ -200,7 +200,7 @@ export default async function handler(req, res) {
       // a personal account gets the weeks with her own row only
       const own = (weeks) => (me.self ? Object.fromEntries(Object.entries(weeks || {}).map(([k, w]) => [k, { ...w, memberIds: (w.memberIds || []).filter((x) => x === me.member), cells: { [me.member]: (w.cells || {})[me.member] || {} }, notes: {} }])) : weeks);
       if (String((req.query && req.query.history) || new URL(req.url, 'http://x').searchParams.get('history') || '') === '1') return res.status(200).json({ history: me.self ? { ...HISTORY, weeks: own(HISTORY.weeks) } : HISTORY });
-      const data = await readJSON(SCHEDULE);
+      const data = await readJSON(SCHEDULE, { ttl: 5000 });
       if (data && me.self) { data.weeks = own(data.weeks); data.reportSources = (data.reportSources || []).filter((x) => x.memberId === me.member); }
       if (data && !can(me, 'log')) delete data.log;
       // excuses / bonuses / deductions and the report sheet list are for signed-in accounts only;

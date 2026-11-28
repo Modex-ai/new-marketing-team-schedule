@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     if (!me) return res.status(401).json({ error: 'Please sign in again' });
     const origin = `https://${req.headers['x-forwarded-host'] || req.headers.host}`;
     if (req.method === 'GET') {
-      const doc = (await readJSON(MSGS)) || { threads: {} }, accounts = await allAccounts();
+      const doc = (await readJSON(MSGS, { ttl: 5000 })) || { threads: {} }, accounts = await allAccounts();
       const byU = Object.fromEntries(accounts.map((a) => [a.username, a]));
       const threads = Object.values(doc.threads || {}).filter((t) => t.users.includes(me.username)).map((t) => {
         const other = t.users.find((u) => u !== me.username), seen = (t.read || {})[me.username] || '';

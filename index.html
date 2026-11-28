@@ -1392,7 +1392,7 @@ async function load(silent) {
   } catch (e) { if (!silent) S.serverOK = false; }
   if (!S.histApplied && HIST && !dirty()) { withHistory(S.data); if (S.draft) S.draft = clone(S.data); S.histApplied = true; }
   renderAll();
-  if (S.me) { loadNotices(); loadMessages(true); loadAttendance(true); } else if (NT.list.length) { NT.list = []; NT.unread = 0; renderNotices(); }
+  if (S.me) { loadNotices(); loadMessages(true); if (S.me.member || RS.view === "attendance") loadAttendance(true); } else if (NT.list.length) { NT.list = []; NT.unread = 0; renderNotices(); }
 }
 async function call(url, method, body) {
   const r = await fetch(url, { method, headers: { "content-type": "application/json", ...(S.token ? { authorization: "Bearer " + S.token } : {}) }, body: body ? JSON.stringify(body) : undefined });
@@ -4715,7 +4715,8 @@ document.addEventListener("change", (e) => {
   if (t.id === "atFrom" || t.id === "atTo") { AT.from = $("#atFrom").value; AT.to = $("#atTo").value; loadAttendance(true); }
 });
 document.addEventListener("keydown", (e) => { if (e.target.id === "msText" && e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); msSend(); } });
-setInterval(() => { if (!S.token) return; if (!$("#msView").classList.contains("hidden")) loadMessages(true); else if (!$("#atView").classList.contains("hidden")) loadAttendance(true); else renderMyShift(); }, 20000);
+setInterval(() => { if (!S.token || document.visibilityState !== "visible") return; if (!$("#msView").classList.contains("hidden")) loadMessages(true); else if (!$("#atView").classList.contains("hidden")) loadAttendance(true); }, 45000);
+setInterval(() => { if (S.token) renderMyShift(); }, 30000);
 document.addEventListener("click", (e) => { const b = e.target.closest("#logMore"); if (b) { S.logAll = !S.logAll; renderLog(); } });
 $("#wkEdit").onclick = () => { S.admin.mode = "week"; openAdmin("week"); };
 $("#dayPrev").onclick = () => { S.dayView = (S.dayView ?? curIdx()) - 1; renderDay(); };
@@ -4737,15 +4738,17 @@ $("#saveAllCards").onclick = async () => {
 window.addEventListener("beforeunload", (e) => { if (dirty()) { e.preventDefault(); e.returnValue = ""; } });
 
 setInterval(() => { renderHeader(); renderKpis(); renderLive(); renderDay(); }, 20000);
-setInterval(() => { if (!S.admin.open) load(true); }, 120000);
+// refresh every 3 minutes, and only while the page is on screen (a hidden tab costs nothing)
+setInterval(() => { if (!S.admin.open && document.visibilityState === "visible") load(true); }, 180000);
 // back to a tab that sat in the background (phones keep old pages): check for fresh data and a new version right away
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.token && !S.admin.open) load(true); });
+let lastWake = 0;
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.token && !S.admin.open && Date.now() - lastWake > 60000) { lastWake = Date.now(); load(true); } });
 window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
 setInterval(() => { if (RS.view === "reports" && S.me && !RS.loading && (!RS.raw || !RS.raw.fetchedAt || Date.now() - new Date(RS.raw.fetchedAt) > 10 * 60e3)) loadReports(); }, 60000);
 if (location.hash === "#reports" && !S.token) showView("reports");
 if (location.hash === "#tasks" && !S.token) showView("tasks");
 if (location.hash === "#approvals" && !S.token) showView("approvals");
-setInterval(() => { if (RS.view === "tasks" && S.me && !TK.busy && !$("#modalRoot .tkf")) loadTasks(true); }, 120000);
+setInterval(() => { if (RS.view === "tasks" && S.me && !TK.busy && !$("#modalRoot .tkf") && document.visibilityState === "visible") loadTasks(true); }, 120000);
 renderAll();
 load();
 checkSession();

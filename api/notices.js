@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   try {
     const me = await userFromToken(bearer(req));
     if (!me) return res.status(401).json({ error: 'Please sign in again' });
-    const doc = (await readJSON(NOTICES)) || { list: [] };
+    const doc = (await readJSON(NOTICES, { ttl: req.method === 'GET' ? 5000 : 0 })) || { list: [] };
     if (req.method === 'GET') {
       const mine = doc.list.filter((n) => noticeFor(me, n)).slice(0, 40);
       const list = mine.map(({ seen, ...n }) => ({ ...n, read: !!(seen || {})[me.username] }));

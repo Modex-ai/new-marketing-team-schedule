@@ -31,36 +31,61 @@ export const newRecoveryCode = () => crypto.randomBytes(12).toString('hex').toUp
 const SESSION_HOURS = 24;
 
 /* ---------- JSON documents in Blob (each save is a new version; old versions are trimmed) ---------- */
-async function versions(prefix) {
-  const { blobs } = await list({ prefix, limit: 1000 });
-  return blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-}
-// Each save is a new blob; old copies are pruned later. When many people use the dashboard at once, the newest copy
-// in the listing can already be gone (or not readable yet) — so fall back to the next newest instead of failing.
-export async function readJSON(prefix) {
-  let err = null;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const v = await versions(prefix);
-    if (!v.length) return null;
-    for (const b of v.slice(0, 6)) {
-      try {
-        const r = await get(b.url, { access: ACCESS, useCache: false });
-        if (r && r.stream) return await new Response(r.stream).json();
-      } catch (e) { err = e; }
-    }
-    await sleep(250);
+/* ---------- storage: one JSON document per name, read with as few Blob operations as possible ----------
+   Each document lives at a fixed path (marketing-ops/schedule.json …) and is overwritten in place:
+   a read is one simple GET (no list()), a write one PUT. A warm function keeps what it read for a few
+   seconds, and re-checks with the ETag after that, so busy pages don't multiply storage operations.
+   Documents saved by the earlier version (random-suffix copies) are found once and moved to the fixed path. */
+const MEM = new Map(); // name → { at, data, etag }
+const copy = (x) => (x == null ? x : JSON.parse(JSON.stringify(x)));
+const paused = (e) => /\b403\b|suspend|blocked|limit/i.test(String((e && e.message) || e));
+const storeErr = (e) => (paused(e) ? Object.assign(new Error("The dashboard's storage is paused — the Vercel Blob usage limit was reached. The owner needs to upgrade the Vercel plan (or wait for the monthly reset)."), { status: 503 }) : e);
+let legacyDone = false;
+async function migrateLegacy() { // one list() for everything, the first time a fixed-path document is missing
+  if (legacyDone) return; legacyDone = true;
+  const { blobs } = await list({ prefix: 'marketing-ops/', limit: 1000 });
+  const latest = {};
+  for (const b of blobs) {
+    const m = /^(marketing-ops\/(?!backups\/)[\w~\/-]+?)-[A-Za-z0-9]{20,}\.json$/.exec(b.pathname); if (!m) continue;
+    if (!latest[m[1]] || new Date(b.uploadedAt) > new Date(latest[m[1]].uploadedAt)) latest[m[1]] = b;
   }
-  if (err) throw err;
-  return null;
+  const fixed = new Set(blobs.map((b) => b.pathname)), safe = new Set();
+  for (const [name, b] of Object.entries(latest)) {
+    if (fixed.has(name + '.json')) { safe.add(name); continue; }
+    const r = await get(b.url, { access: ACCESS, useCache: false });
+    if (!r || !r.stream) continue;
+    const text = await new Response(r.stream).text();
+    await put(name + '.json', text, { access: ACCESS, addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json' });
+    MEM.delete(name); safe.add(name);
+  }
+  // remove the old random-suffix copies — only of documents that now exist at their fixed path
+  const old = blobs.filter((b) => { const m = /^(marketing-ops\/(?!backups\/)[\w~\/-]+?)-[A-Za-z0-9]{20,}\.json$/.exec(b.pathname); return m && safe.has(m[1]); }).map((b) => b.url);
+  if (old.length) await del(old).catch(() => {});
 }
-export async function writeJSON(prefix, data, keep = 15) {
-  await put(prefix + '.json', JSON.stringify(data), { access: ACCESS, addRandomSuffix: true, contentType: 'application/json' });
-  // prune old copies, but never ones from the last few minutes — someone may be reading them right now
+// opt.ttl (ms) → a warm copy that young is fine (pages that only read); default: always check the stored copy
+export async function readJSON(name, opt = {}) {
   try {
-    const v = await versions(prefix), now = Date.now();
-    const old = v.slice(Math.max(keep, 5)).filter((b) => now - new Date(b.uploadedAt).getTime() > 5 * 60e3).map((b) => b.url);
-    if (old.length) await del(old);
-  } catch { /* pruning is housekeeping — never fail a save over it */ }
+    const c = MEM.get(name), ttl = opt.ttl || 0; // read-mostly callers pass a ttl; anything that writes back reads fresh
+    if (c && Date.now() - c.at < ttl) return copy(c.data);
+    let r = await get(name + '.json', { access: ACCESS, useCache: false, ...(c && c.etag ? { ifNoneMatch: c.etag } : {}) });
+    if (r && r.statusCode === 304 && c) { c.at = Date.now(); return copy(c.data); }
+    if (!r && !legacyDone) { await migrateLegacy(); r = await get(name + '.json', { access: ACCESS, useCache: false }); }
+    if (!r || !r.stream) { MEM.set(name, { at: Date.now(), data: null, etag: '' }); return null; }
+    const data = await new Response(r.stream).json();
+    MEM.set(name, { at: Date.now(), data, etag: (r.blob && r.blob.etag) || '' });
+    return copy(data);
+  } catch (e) { throw storeErr(e); }
+}
+const backedUp = {};
+export async function writeJSON(name, data) {
+  try {
+    const body = JSON.stringify(data);
+    const r = await put(name + '.json', body, { access: ACCESS, addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json' });
+    MEM.set(name, { at: Date.now(), data: JSON.parse(body), etag: (r && r.etag) || '' });
+    // one dated copy a day of the documents that matter most (schedule, users, attendance), kept for recovery
+    const day = new Date().toISOString().slice(0, 10);
+    if (/\/(schedule|users|tasks|attendance)$|\/att\//.test(name) && backedUp[name] !== day) { backedUp[name] = day; await put(`marketing-ops/backups/${name.replace('marketing-ops/', '').replace(/[\/~]/g, '_')}-${day}.json`, body, { access: ACCESS, addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json' }).catch(() => {}); }
+  } catch (e) { throw storeErr(e); }
 }
 
 /* ---------- passwords & sessions ---------- */
@@ -92,7 +117,7 @@ export const ownerName = () => process.env.OWNER_NAME || 'Owner';
 export async function userFromToken(token) {
   const p = verifyToken(token);
   if (!p) return null;
-  const doc = (await readJSON(USERS)) || {};
+  const doc = (await readJSON(USERS, { ttl: 15000 })) || {};
   if (p.u === 'owner') { const o = doc.owner || {}; if (o.pwChangedAt && p.iat < o.pwChangedAt) return null; return ownerUser(o); }
   const users = doc.users || [];
   const u = users.find((x) => x.username === p.u);
@@ -136,7 +161,7 @@ export const noticeFor = (me, n) => {
 };
 // every account that can sign in (the owner included), for delivering notices and messages
 export async function allAccounts() {
-  const d = (await readJSON(USERS)) || {};
+  const d = (await readJSON(USERS, { ttl: 15000 })) || {};
   return [ownerUser(d.owner || {}), ...(d.users || []).filter((u) => !u.disabled).map(sessionUser)];
 }
 

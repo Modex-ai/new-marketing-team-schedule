@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 
   if (!url || !key) return res.status(200).json({ configured: false });
 
-  const sched = await readJSON(SCHEDULE).catch(() => null);
+  const sched = await readJSON(SCHEDULE, { ttl: 30000 }).catch(() => null);
   const sources = Array.isArray(sched?.reportSources) ? sched.reportSources : DEFAULT_SOURCES;
   const ids = [...new Set(sources.map((s) => s.sheetId).filter((x) => /^[\w-]{20,}$/.test(String(x || ''))))].sort();
   if (!ids.length) return res.status(200).json({ configured: true, sheets: [], fetchedAt: null });

@@ -73,7 +73,7 @@ export const distTxt = (m) => (m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).t
 // does this check-in / check-out need the person's location?
 export async function needsGeo(me, action) {
   if (!me.member) return false;
-  const D = (await readJSON(SCHEDULE)) || {}; if (!officeOf(D)) return false;
+  const D = (await readJSON(SCHEDULE, { ttl: 15000 })) || {}; if (!officeOf(D)) return false;
   const doc = await loadMember(me.member), now = cairoAbs(Date.now()), today = Math.floor(now / 1440);
   if (action === 'out') { const open = [today, today - 1].map((i) => (((doc.days || {})[iDate(i)] || {})[me.member])).find((r) => r && r.in && !r.out); return !!open && !open.remote; }
   return !remoteWhy(D, me.member, pickShift(D, doc, me.member, now));
@@ -113,7 +113,7 @@ function pickShift(D, doc, mid, now) {
 // action: "in" | "out" | "status". Returns { ok, msg, rec?, shift? }  (msg is plain text with emoji, for Telegram and toasts)
 export async function attend(me, action, via, meta = {}, origin = '', geo = null) {
   if (!me.member) return { ok: false, msg: "This account isn't linked to a team member yet. Ask the admin to link it (Manage → Users → Team member)." };
-  const D = (await readJSON(SCHEDULE)) || {}, doc = await loadMember(me.member);
+  const D = (await readJSON(SCHEDULE, { ttl: 15000 })) || {}, doc = await loadMember(me.member);
   const mid = me.member, nowMs = Date.now(), now = cairoAbs(nowMs), today = Math.floor(now / 1440), grace = graceOf(D);
   const name = ((D.members || []).find((m) => m.id === mid) || {}).name || me.name;
   const recOf = (i) => (doc.days[iDate(i)] || {})[mid];
