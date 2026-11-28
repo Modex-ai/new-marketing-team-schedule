@@ -207,7 +207,8 @@ export default async function handler(req, res) {
       // an account limited to some team members only gets theirs
       if (data && !me) { delete data.requests; delete data.reportSources; }
       else if (data && Array.isArray(data.requests)) data.requests = data.requests.filter((r) => inScope(me, r.member) || (r.withMember && inScope(me, r.withMember)));
-      return res.status(200).json({ data });
+      // the deployed version, so open tabs reload themselves after an update
+      return res.status(200).json({ data, version: String(process.env.VERCEL_GIT_COMMIT_SHA || process.env.VERCEL_DEPLOYMENT_ID || '').slice(0, 12) });
     }
 
     if (req.method !== 'PUT') {

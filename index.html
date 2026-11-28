@@ -500,7 +500,8 @@ table.xs tr.notes td{background:#FFF8EC!important;color:var(--warn);font-size:18
 .legend2 span{display:inline-flex;align-items:center;gap:6px}
 .legend2 i{width:10px;height:10px;border-radius:3px;background:var(--c)}
 .lbw{overflow-x:auto}
-.tw{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.tw,.tblw,.lbw{display:block;overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+section.card{max-width:100%;min-width:0}main.wrap{overflow-x:clip}body{overflow-x:hidden}
 table.lbt{width:100%;border-collapse:collapse;font-size:13px;min-width:1040px}
 table.lbt th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 table.lbt th:nth-child(-n+2),table.lbt td:nth-child(-n+2){text-align:left}
@@ -738,7 +739,7 @@ table.wk td.drj{background:#FDF4F5}table.wk thead th.drj{box-shadow:inset 0 -3px
 .rvhist h4{margin:0 0 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .rvhist div{padding:4px 0}
 
-.sechead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:0}.sechead h2{margin:0;font-size:28px}
+.sechead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:0}.sechead h2{margin:0;font-family:var(--serif);font-size:28px;font-weight:600;line-height:1.1;color:var(--deep)}
 .sechead input[type=date],.sechead select{border:1px solid var(--line);border-radius:9px;padding:6px 9px;font:inherit;font-size:12.5px;background:#fff}
 .okc{color:var(--ok)}.wnc{color:var(--warn)}.bdc{color:var(--bad)}
 .myshift{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,#0E3B3D,#14494B);color:#fff;border-radius:18px;padding:16px 20px;margin:0 0 18px;box-shadow:0 10px 30px rgba(6,26,27,.18)}
@@ -1381,6 +1382,9 @@ async function load(silent) {
     const r = await fetch("/api/schedule", { cache: "no-store", headers: authed ? { authorization: "Bearer " + S.token } : {} });
     if (r.status === 401) { S.serverOK = true; return signedOut("Your session ended — please sign in again."); }
     if (!r.ok) throw new Error(r.status);
+    const jv = await r.clone().json().catch(() => ({}));
+    // a new version was deployed while this tab was open: reload to get it (straight away unless there are unsaved edits)
+    if (jv.version) { if (!S.ver) S.ver = jv.version; else if (S.ver !== jv.version) { if (!dirty() && !(S.admin && S.admin.open)) { location.reload(); return; } S.newVer = true; } }
     const j = await r.json();
     if (j.data && !dirty()) S.recAuth = authed && Array.isArray(j.data.requests);
     S.serverOK = true; S.fresh = !j.data;
@@ -1454,6 +1458,7 @@ function renderBanners() {
   let h = "";
   if (!S.serverOK) h += `<div class="banner warn">Not connected to the server — showing the starting schedule. Changes can't be saved here.</div>`;
   else if (S.fresh) h += `<div class="banner info">Showing the starting schedule. Your first save from <b>Manage</b> stores it on the server.</div>`;
+  if (S.newVer) h += `<div class="banner info">A new version of the dashboard is ready — save your changes, then <a href="#" onclick="location.reload();return false" style="color:inherit;font-weight:700">refresh</a>.</div>`;
   const nrj = NT.list.filter((n) => !n.read && n.kind === "decision" && (n.status === "rejected" || (n.days || []).some((d) => d.status === "rejected"))).length;
   const nsub = NT.list.filter((n) => !n.read && n.kind === "submitted").length;
   if (nrj) h += `<div class="banner warn" style="background:var(--bad-bg);color:var(--bad)">✕ ${nrj} schedule decision${nrj > 1 ? "s" : ""} with rejected days need${nrj > 1 ? "" : "s"} your attention — <a href="#" data-act="ntToggle" style="color:inherit;font-weight:700">View reasons</a></div>`;
@@ -4733,6 +4738,9 @@ window.addEventListener("beforeunload", (e) => { if (dirty()) { e.preventDefault
 
 setInterval(() => { renderHeader(); renderKpis(); renderLive(); renderDay(); }, 20000);
 setInterval(() => { if (!S.admin.open) load(true); }, 120000);
+// back to a tab that sat in the background (phones keep old pages): check for fresh data and a new version right away
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.token && !S.admin.open) load(true); });
+window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
 setInterval(() => { if (RS.view === "reports" && S.me && !RS.loading && (!RS.raw || !RS.raw.fetchedAt || Date.now() - new Date(RS.raw.fetchedAt) > 10 * 60e3)) loadReports(); }, 60000);
 if (location.hash === "#reports" && !S.token) showView("reports");
 if (location.hash === "#tasks" && !S.token) showView("tasks");
